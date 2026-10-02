@@ -151,11 +151,11 @@
 | # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
 |---|---|---|---|---|---|
 | 1 | 第 1、5、6 層填完「有 / 沒有 / 要自己做」 | `[官方已寫]` / `[推測]` 逐格標 | 通過（A 半） | 上方三張表 | 等 B 半合成六層表 |
-| 2 | 每層至少一個候選有實測數字 | — | 未做 | 見下方「待實測」 | 要碰 AWS 或部署，下一階段做 |
+| 2 | 每層至少一個候選有實測數字 | — | 第 5 層完成：寫入到搜得到 pgvector 365 ms、Mem0 1.85 s（AgentCore 對照 65.9 s）；第 1、6 層依「範圍調整」跳過（託管比 AgentCore 貴） | 下方「實測：第 5 層」、「範圍調整」 | 第 5 層自架在即時性上勝出，但要自己寫萃取或接 Mem0 |
 | 3 | 每人每月成本有官網價，標日期；閒置另列 | 成本 | 通過（A 半，估算） | 下方「實際費用」、`evidence/WP6/` | — |
 | 4 | 自架要自己維運的元件與估點 | `[推測]` | 通過（A 半） | 下方「維運元件」 | — |
 | 5 | 第 1 層：100 人每人一台常駐 VM 的月費 | 成本 | 24h：自架約 $9.0k、託管約 $12.2k；8h：自架約 $3.3k、託管約 $4.2k | 下方算式 | 自架 8h 情境的前提是全體同時段使用、host 能整台停機 |
-| 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | 未判定 | — | 要等 WP1、WP5 的數字與 B 半 |
+| 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | 第 1 層：**無**（隨需價下，自架每 GB-h 的價格是 AgentCore 的 3.1 倍，跟人數無關）；全方案：未判定 | 下方「第 1 層判定」 | 全方案的門檻要等 B 半的第 2–4 層，合併時再算 |
 
 #### 實際費用（全部是官網單價加假設用量的估算，本階段沒有花費）
 
@@ -197,6 +197,7 @@
 - 東京沒有 In-Region 的 Haiku 4.5、Nova Micro，只能走 cross-region profile；Haiku 4.5 的 Geo 價比 Global 貴 10%。Nova Lite、Titan V2、Cohere Embed 4 東京可直接 on-demand `[官方已寫]`（各模型的 [model card](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-haiku-4-5.html)）。
 - `[矛盾]` Nova Micro 的 Price List 有東京 SKU，文件卻寫東京沒有 In-Region。單價以 Price List 為準。
 - 汰換風險：Haiku 4.5 的 model card 寫「EOL no sooner than Oct 16, 2026」；gpt-5-mini 在 OpenAI 已標 Deprecated。
+- 實測更正（2026-10-02，[`latency-compare`](../02-memory/experiments/latency-compare/README.md)）：Mem0 2.2.1 每次 `add` 呼叫 LLM 1 次，平均 8.6K 輸入、80 輸出 token（使用者還沒有既有記憶時）。照這個數字重算，Haiku 4.5 是 283.8 + 13.2 + 0.35 ≈ **$297**：輸入多估少了、輸出多估了，合計剛好跟原估算相同。另外 mem0ai 2.2.1 搭 Nova 會在 Converse 參數驗證失敗，要用 Nova 就得修 mem0 或自己包 LLM client。
 
 **第 6 層：100 人月費**（假設 `[推測]`：每人每天 10 則對話，每則 35 units、135 KB）
 
@@ -223,14 +224,61 @@
 | 5 | Graphiti 自架 | 圖資料庫維運（5）、限流 | 約 23 |
 | 6 | Langfuse 自架 | 六元件部署（8）、升級、擴展、session→user 合併報表（5）、隱私 | 約 34；改用 Cloud 省約 18–21 |
 
+#### 實測：第 5 層寫入加檢索延遲（2026-10-02）
+
+- 腳本與原始數據：[`02-memory/experiments/latency-compare/`](../02-memory/experiments/latency-compare/README.md)。資源 tag：`wp=WP6`、`owner=kais`、`project=hyfai`。
+- 從台灣筆電呼叫東京（STS RTT 中位數 43–68 ms）。pgvector 和 Mem0 的 DB 是本機 docker，embedding 用 Titan V2、Mem0 萃取用 Haiku 4.5（`jp.`），都在東京 Bedrock。
+- 每次試驗用新的使用者、同一則訊息。`visible_ms` 是從開始寫入到搜尋第一次找回這筆資料。
+
+| 候選 | 次數 | 寫入 p50 | 搜尋 p50 | 寫入到搜得到 p50／p90 |
+|---|---|---|---|---|
+| pgvector（存原句，不萃取） | 10 | 192 ms | 170 ms | **365／463 ms** |
+| Mem0 OSS 2.2.1（同步萃取） | 10 | 1,683 ms | 170 ms | **1.85／2.07 s** |
+| AgentCore Memory（對照組，非同步萃取） | 5 | 243 ms | 337 ms | **65.9／68.1 s**（4 次命中；第一次 5 分鐘內沒萃取出來，原因沒查） |
+
+- **自架比 AgentCore 快很多的是「剛寫入就要搜得到」：** AgentCore 的長期記憶要等約 66 秒的背景萃取，Mem0 同步萃取約 1.9 秒。搜尋本身三者都在 0.2–0.35 秒。
+- 同一個 session 內的前文本來就靠短期記憶，66 秒只影響「剛說完的事實，下一個 session 馬上要用」的情境，對選型影響小。
+- 費用約 $0.36（Haiku $0.22、`RetrieveMemoryRecords` 輪詢 270 次 $0.135），算式見腳本 README。
+- 清理：docker 容器已移除；兩個 `wp6_latency_*` memory 都已刪除（見腳本 README 的清理確認）。
+
+#### 範圍調整（2026-10-02）
+
+接下來 WP6 只實測**估算月費比 AgentCore 便宜的託管方案**。託管方案的估算月費如果已經比 AgentCore 高，就不實測，直接以價格判定。自架方案也不再追加實測，已經做完的 pgvector、Mem0 OSS 保留。
+
+| 層 | 託管候選 | 100 人估算月費 | AgentCore 對照 | 判定 |
+|---|---|---|---|---|
+| 1 | E2B、Daytona | 24h $12.2k–12.4k；8h $4.2k–4.3k。E2B 縮到 1 vCPU／1 GB 也要 $5.0k／$1.8k | 實測 $832／$277；保守估 $3.4k／$1.1k（見下方「第 1 層判定」） | **跳過**：任何一種算法都比 AgentCore 貴 |
+| 5 | Mem0 Platform、Zep Cloud | $249；$150–300 | 約 $45 | **跳過**：比 AgentCore 貴 3–7 倍 |
+| 6 | Langfuse Cloud Core | 約 $105 | 約 $1.55（只算 span） | **跳過**：比 AgentCore 貴約 68 倍 |
+
+#### 第 1 層判定（2026-10-02，用 [WP1 #10](WP1-runtime-session.md#10-成本情境) 的實測）
+
+- **AgentCore 每個在線 session 每小時約 $0.0114**：WP1 讓 20 位使用者各在線約 2.42 小時（8,710 秒，含 30 分鐘閒置），總費用 $0.551548。算式 0.551548 ÷ 20 ÷ 2.42 h。這是最小 agent（不呼叫模型，約 1.1 GB、0.011 vCPU），金額 92% 是記憶體。
+- 真的 agent 記憶體會更大，所以另外算一個保守值：4 GB 加平均 0.1 vCPU，4 × 0.00945 + 0.1 × 0.0895 = **$0.0467／h**。
+- E2B 依實際配置收費，不管有沒有用到。就算縮到 1 vCPU／1 GB，也要 0.0504 + 0.0162 = **$0.0666／h**，另加 Pro $150／月。
+
+| 100 人月費 | 24h 在線 | 每天 8h |
+|---|---|---|
+| AgentCore 實測（$0.0114／h） | **$832** | **$277** |
+| AgentCore 保守（$0.0467／h） | $3,413 | $1,137 |
+| E2B（2 vCPU／4 GB，原估算） | $12,239 | $4,179 |
+| E2B（縮到 1 vCPU／1 GB） | $5,012 | $1,770 |
+| Firecracker 自架（每人一台 `c8i.large`） | $8,996 | $3,255 |
+
+- 判定：E2B、Daytona 在任何一種算法下都比 AgentCore 貴，第 1 層不實測。
+- 自架也沒有比較便宜的人數門檻：nested virtualization 要用 Intel 機型，`c8i.large` 每 GB-h 是 0.11797 ÷ 4 = $0.0295，AgentCore 是 $0.00945，貴 3.1 倍；多人共用一台 host 也只是把每人的 GB 攤平，不會改變這個比例。Savings Plans、Spot 沒算：要折到原價的 32% 以下（0.00945 ÷ 0.0295）才會比 AgentCore 便宜。3 年期 Savings Plans 或 Spot 有可能做到，但那時還要再加 host 開銷與維運人力 `[推測]`。
+- 但書：WP1 的情境是每 5 分鐘 ping 一次、不呼叫模型。真實 agent 的記憶體與 CPU 用量要等正式 agent 上 Runtime 後，再用 `USAGE_LOGS` 重算。
+
 #### 待實測（下一階段，要碰 AWS 或部署）
 
-1. 第 1 層冷啟動：E2B 託管的首次建立和 resume，從送出請求到能執行第一個指令；Firecracker 或 Kata 擇一補測。
-2. 第 5 層一次寫入加檢索延遲：pgvector、Mem0、Zep 三者同訊息、同區域各量一次。
-3. 第 6 層：一次 trace 寫入到可查詢的延遲；Bedrock 東京模型 ID 能否比對到 Langfuse 內建價格表；AgentCore span 有沒有自動帶 `user.id`。
-4. 文件沒寫、要寫信問或要試的：E2B 暫停期間的儲存費與 Pro 磁碟加購、E2B／Daytona 能否開 40 GB 磁碟、Daytona VM sandbox 的啟動秒數與開放的 tier。
+1. ~~第 1 層冷啟動~~：依上表跳過。Firecracker、Kata 自架不測。
+2. ~~第 5 層一次寫入加檢索延遲~~：pgvector、Mem0 OSS 已完成（見上方）。Mem0 Platform、Zep Cloud 依上表跳過。
+3. ~~第 6 層 Langfuse 實測~~：依上表跳過。
+4. ~~寫信問 E2B、Daytona~~（暫停期間的儲存費、40 GB 磁碟、VM sandbox 啟動秒數）：第 1 層跳過，不用問。
 
-#### 要更正研究庫的段落（實測後再改 `build-vs-buy.md`）
+A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
+
+#### 要更正研究庫的段落（已套用，2026-10-02）
 
 | 檔案:行號 | 原本寫的 | 調研結果 |
 |---|---|---|

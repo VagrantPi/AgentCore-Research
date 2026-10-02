@@ -104,7 +104,7 @@ executeCommand: aws s3 cp chart.png      s3://BUCKET/output/<session>/
 
 | 模式 | 官方說明 | 能連 S3 | 能上網 | 未確認 |
 |---|---|---|---|---|
-| **SANDBOX** | 「limited external network access to AWS services. In Sandbox mode, the code interpreter can access Amazon S3」 | **✓** | ✗ | DNS、`pip install`、S3 以外的 AWS 服務 |
+| **SANDBOX** | 「limited external network access to AWS services. In Sandbox mode, the code interpreter can access Amazon S3」 | **✓**（只限同區域，但不限 bucket） | ✗ | —（[WP3](../91-work-packages/WP3-sandbox-egress.md#回填) 實測：DNS 只解析 `*.amazonaws.com`；`pip install` 不通；STS 不通） |
 | **PUBLIC** | 「Allows the tool to access public internet resources」 | ✓ | ✓ | — |
 | **VPC** | 連到你的 VPC，與公開網路隔離 | 經由 VPC endpoint 或 NAT | **只有私有子網路 + NAT 才行**（公開子網路沒有用） | — |
 
