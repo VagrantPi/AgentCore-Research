@@ -1,0 +1,16 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "BackendAndRuntimeExecRoleDoNotUse",
+      "Effect": "Allow",
+      "Principal": {
+        "AWS": [
+          "arn:aws:iam::050571774557:user/KaisLinCli",
+          "arn:aws:iam::050571774557:role/wp/wp0-runtime-exec"
+        ]
+      },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}

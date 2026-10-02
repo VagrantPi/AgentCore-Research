@@ -1,0 +1,11 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "OnlyBackend",
+      "Effect": "Allow",
+      "Principal": { "AWS": "arn:aws:iam::050571774557:user/KaisLinCli" },
+      "Action": "sts:AssumeRole"
+    }
+  ]
+}

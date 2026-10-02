@@ -55,24 +55,34 @@ class MemoryFacade:
         return out
 
 
+def _pages(fn, key, **kw):
+    while True:
+        resp = fn(**kw)
+        yield from resp.get(key, [])
+        if not resp.get("nextToken"):
+            return
+        kw["nextToken"] = resp["nextToken"]
+
+
 def forget_actor(client, memory_id, actor_id, strategy_ids):
     """刪除一個 actor 的所有事件與 record。回傳刪除數量。
 
+    record 用 namespacePath 查（前綴比對）：WP5 實測 `namespace` 參數是完全比對，
+    查 `.../actor/{actorId}/` 會漏掉 episodic 存在 `.../actor/{actorId}/session/{sessionId}/` 的 episode。
     限制：只刪得到「namespace 含 actorId」的 record；strategy 層級（跨使用者）的 reflection 無法歸屬到個人。
     """
     events = records = 0
-    sessions = client.list_sessions(memoryId=memory_id, actorId=actor_id).get("sessionSummaries", [])
-    for s in sessions:
-        evs = client.list_events(memoryId=memory_id, actorId=actor_id, sessionId=s["sessionId"]).get("events", [])
-        for e in evs:
+    for s in list(_pages(client.list_sessions, "sessionSummaries", memoryId=memory_id, actorId=actor_id)):
+        for e in list(_pages(client.list_events, "events", memoryId=memory_id, actorId=actor_id,
+                             sessionId=s["sessionId"])):
             client.delete_event(memoryId=memory_id, actorId=actor_id, sessionId=s["sessionId"], eventId=e["eventId"])
             events += 1
     for sid in strategy_ids:
-        ns = actor_namespace(sid, actor_id)
-        ids = [r["memoryRecordId"] for r in
-               client.list_memory_records(memoryId=memory_id, namespace=ns).get("memoryRecordSummaries", [])]
-        for i in range(0, len(ids), 100):   # BatchDeleteMemoryRecords 每次最多 100 筆
+        recs = list(_pages(client.list_memory_records, "memoryRecordSummaries", memoryId=memory_id,
+                           namespacePath=actor_namespace(sid, actor_id)))
+        for i in range(0, len(recs), 100):   # BatchDeleteMemoryRecords 每次最多 100 筆
             client.batch_delete_memory_records(
-                memoryId=memory_id, records=[{"memoryRecordId": r, "namespace": ns} for r in ids[i:i + 100]])
-        records += len(ids)
+                memoryId=memory_id,
+                records=[{"memoryRecordId": r["memoryRecordId"], "namespace": r["namespaces"][0]} for r in recs[i:i + 100]])
+        records += len(recs)
     return {"events": events, "records": records}

@@ -1,0 +1,17 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "WP5TransactionSearch",
+      "Effect": "Allow",
+      "Action": [
+        "xray:GetTraceSegmentDestination", "xray:UpdateTraceSegmentDestination",
+        "xray:GetIndexingRules", "xray:UpdateIndexingRule",
+        "xray:BatchGetTraces", "xray:GetTraceSummaries",
+        "logs:PutResourcePolicy", "logs:DescribeResourcePolicies"
+      ],
+      "Resource": "*",
+      "Condition": { "StringEquals": { "aws:RequestedRegion": "ap-northeast-1" } }
+    }
+  ]
+}

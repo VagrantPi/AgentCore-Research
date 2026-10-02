@@ -1,0 +1,22 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "OwnEventsOnly",
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:CreateEvent", "bedrock-agentcore:GetEvent",
+        "bedrock-agentcore:ListEvents", "bedrock-agentcore:DeleteEvent", "bedrock-agentcore:ListSessions"
+      ],
+      "Resource": "arn:aws:bedrock-agentcore:ap-northeast-1:050571774557:memory/MEMORY_ID",
+      "Condition": { "StringEquals": { "bedrock-agentcore:actorId": "ACTOR_ID" } }
+    },
+    {
+      "Sid": "OwnRecordsOnly",
+      "Effect": "Allow",
+      "Action": ["bedrock-agentcore:RetrieveMemoryRecords", "bedrock-agentcore:ListMemoryRecords"],
+      "Resource": "arn:aws:bedrock-agentcore:ap-northeast-1:050571774557:memory/MEMORY_ID",
+      "Condition": { "StringLike": { "bedrock-agentcore:namespacePath": "/strategy/*/actor/ACTOR_ID/*" } }
+    }
+  ]
+}
