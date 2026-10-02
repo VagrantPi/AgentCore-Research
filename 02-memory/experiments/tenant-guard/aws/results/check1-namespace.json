@@ -1,0 +1,97 @@
+[
+ [
+  "A",
+  "ListSessions",
+  "允許（6 筆）"
+ ],
+ [
+  "A",
+  "ListEvents",
+  "允許（10 筆）"
+ ],
+ [
+  "A",
+  "GetEvent",
+  "允許"
+ ],
+ [
+  "A",
+  "CreateEvent",
+  "允許"
+ ],
+ [
+  "A",
+  "ListMemoryRecords(semantic)",
+  "允許（17 筆）"
+ ],
+ [
+  "A",
+  "RetrieveMemoryRecords(semantic)",
+  "允許（3 筆）"
+ ],
+ [
+  "A",
+  "ListMemoryRecords(namespacePath=semantic)",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform this operation"
+ ],
+ [
+  "A",
+  "RetrieveMemoryRecords(namespacePath=semantic)",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform this operation"
+ ],
+ [
+  "B",
+  "ListSessions",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform: bedrock-agentcore:L"
+ ],
+ [
+  "B",
+  "ListEvents",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform: bedrock-agentcore:L"
+ ],
+ [
+  "B",
+  "GetEvent",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform: bedrock-agentcore:G"
+ ],
+ [
+  "B",
+  "CreateEvent",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform: bedrock-agentcore:C"
+ ],
+ [
+  "B",
+  "ListMemoryRecords(semantic)",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform this operation"
+ ],
+ [
+  "B",
+  "RetrieveMemoryRecords(semantic)",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform this operation"
+ ],
+ [
+  "B",
+  "ListMemoryRecords(namespacePath=semantic)",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform this operation"
+ ],
+ [
+  "B",
+  "RetrieveMemoryRecords(namespacePath=semantic)",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform this operation"
+ ],
+ [
+  "*",
+  "ListMemoryRecords(/strategy/ 前綴)",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform this operation"
+ ],
+ [
+  "*",
+  "ListMemoryRecords(/ 根)",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform this operation"
+ ],
+ [
+  "*",
+  "ListActors",
+  "AccessDeniedException: User: arn:aws:sts::050571774557:assumed-role/wp5-mem-user-a/wp5-check1 is not authorized to perform: bedrock-agentcore:L"
+ ]
+]

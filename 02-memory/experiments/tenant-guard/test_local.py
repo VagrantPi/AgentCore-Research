@@ -30,8 +30,9 @@ class FakeMemory:
     def delete_event(self, memoryId, actorId, sessionId, eventId):
         self.events[(actorId, sessionId)].remove(eventId)
 
-    def list_memory_records(self, memoryId, namespace):
-        return {"memoryRecordSummaries": [{"memoryRecordId": r} for r in self.records[namespace]]}
+    def list_memory_records(self, memoryId, namespacePath):   # namespacePath 是前綴比對（WP5 實測）
+        return {"memoryRecordSummaries": [{"memoryRecordId": r, "namespaces": [ns]}
+                                          for ns, ids in self.records.items() if ns.startswith(namespacePath) for r in ids]}
 
     def batch_delete_memory_records(self, memoryId, records):
         for r in records:
@@ -54,6 +55,7 @@ def main():
     f = MemoryFacade(m, "mem-1", ["sem", "pref"])
     m.records[actor_namespace("sem", "acme_alice")] = [f"r{i}" for i in range(150)]
     m.records[actor_namespace("sem", "acme_alice2")] = ["other"]
+    m.records[actor_namespace("sem", "acme_alice") + "session/s1/"] = ["episode"]   # episodic 的 episode 在 session 層
     m.records["/strategy/refl/"] = ["cross-actor-reflection"]
 
     checks = []
@@ -69,7 +71,8 @@ def main():
     checks.append(("namespace 結尾有 /", all(ns.endswith("/") for op, ns in m.calls if op == "retrieve")))
 
     res = forget_actor(m, "mem-1", "acme_alice", ["sem", "pref"])
-    checks.append(("刪除 alice：2 筆事件、150 筆 record（分兩批）", res == {"events": 2, "records": 150}))
+    checks.append(("刪除 alice：2 筆事件、151 筆 record（含 session 層的 episode，分兩批）",
+                   res == {"events": 2, "records": 151} and not m.records[actor_namespace("sem", "acme_alice") + "session/s1/"]))
     checks.append(("alice2 的資料不受影響", m.records[actor_namespace("sem", "acme_alice2")] == ["other"]
                    and m.events[("acme_alice2", "s1")]))
     checks.append(("跨使用者的 reflection 刪不到（已知限制）", m.records["/strategy/refl/"] == ["cross-actor-reflection"]))

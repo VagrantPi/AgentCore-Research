@@ -1,0 +1,154 @@
+{
+ "wp5_episodic": {
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-a/": [
+   "{\"title\":\"Confirm-Before-Execute Pattern for Bookings with Special Codes\",\"use_cases\":\"Applies when users request reservations or bookings that involve special codes/passwords, dietary restrictions, budget constraints, and specific dates. Triggered when multiple parameters must be collected before execution and irreversible actions (like bookings) are involved. Also applies when users request supplementary service recommendations (restaurants, activities) alongside the booking. Goal is to avoid erroneous commitments and deliver a cohesive itinerary plan.\",\"hints\":\"Follow a 'Collect → Confirm → Execute → Return Credential' workflow: (1) Search/filter options using all provided parameters (location, budget, dates, special codes); (2) Present the best match and explicitly ask for user confirmation before committing; (3) Only execute the booking after receiving clear user authorization; (4) Return a verifiable confirmation number/credential. When recommending supplementary services (e.g., restaurants), proactively filter by dietary restrictions rather than just popularity, and align suggestions with existing itinerary context (location proximity, seasonal activities) to add practical value. Once user signals satisfaction and closes the conversation, no further actions are needed. This pattern reduces operational risk and builds user trust.\",\"confidence\":\"0.85\"}",
+   "{\"title\":\"Responding to System Write/Function Test Messages\",\"use_cases\":\"Triggered when users send repeated identical test strings (e.g., 'wp5 check1 write test') to verify system message reception or workflow checkpoints. Common in integration testing, system validation, or pipeline verification scenarios where users need confirmation that messages are being received and processed correctly.\",\"hints\":\"Always respond with a brief acknowledgment confirming receipt (e.g., '已收到測試訊息，系統運作正常' / 'Test message received, system is functioning normally'). Do NOT remain silent - silence prevents users from completing the test loop and determining system status. No complex tool calls are needed; a simple, clear confirmation response is sufficient. Recognize patterns: repeated identical messages, strings containing keywords like 'test', 'check', 'write test', or workflow identifiers are signals for this scenario.\",\"confidence\":\"0.8\"}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-cost/": [
+   "{\"title\":\"Consolidating Fragmented Travel Planning Requests\",\"use_cases\":\"Triggered when a user sends multiple scattered, repeated, or overlapping messages about the same trip, each covering different aspects (accommodation, dining, attractions, budget). Common in travel planning where users gradually or redundantly articulate needs across several messages. Goal is to produce a single, unified, structured travel recommendation response covering all stated requirements.\",\"hints\":\"Treat multiple topically related messages as one consolidated request. Identify complementary relationships between messages (e.g., budget + accommodation + dining preferences all inform one trip plan). Extract core parameters: destination, season, budget ceiling, location preferences, dietary restrictions, timing preferences. Structure response into clear labeled sections (accommodation, dining, attractions). For accommodation: filter by both budget and proximity. For dining: confirm dish compliance with restrictions before recommending. For attractions: include practical timing (e.g., early morning before 8am for popular sites). No external tools needed for well-known destinations with standard travel knowledge. Avoid fragmenting responses or repeating each message back individually—consolidate into one structured reply.\",\"confidence\":\"0.8\"}",
+   "{\"title\":\"Structured Multi-Requirement Travel Query Handling\",\"use_cases\":\"Applies when users submit complex travel queries with multiple distinct needs in a single message (e.g., accommodation, dining, and sightseeing combined). Triggered when users specify budget constraints, dietary restrictions, and crowd avoidance preferences simultaneously for a destination trip.\",\"hints\":\"Break the response into clearly labeled sections for each requirement (e.g., 住宿/Accommodation, 餐廳/Dining, 景點/Sightseeing). For accommodation: filter by both budget ceiling and geographic proximity (e.g., within walking distance of Gion). For dining: explicitly address dietary restrictions upfront and confirm dishes are compliant before recommending. For sightseeing: factor in seasonal peak crowds (e.g., autumn foliage season in Kyoto is high-traffic) and recommend early morning visits (before 8am) or weekday arrivals to avoid crowds. Avoid vague suggestions—provide actionable specifics like price ranges, reservation tips, and timing windows. Avoid conflating or skipping any sub-requirement even if the user's messages appear repetitive.\",\"confidence\":\"0.7\"}",
+   "{\"title\":\"Handling Multi-Part Travel Planning Queries\",\"use_cases\":\"Triggered when users present multiple distinct travel sub-requests in a single conversation (e.g., accommodation + dining + sightseeing). Common in destination travel planning scenarios where users consolidate all needs at once. Applies when requests include specific constraints like budget limits, dietary restrictions, or crowd avoidance. Also triggered when duplicate/repeated messages suggest system re-sends or user error—requiring deduplication before responding.\",\"hints\":\"1) Detect and consolidate duplicate/repeated user messages before responding to avoid redundancy. 2) Use structured format (headers or numbered sections) to address each sub-request clearly. 3) For accommodation: match price range precisely and highlight atmosphere-related features (e.g., 'quiet', 'traditional'); for Gion-area budget stays, consider machiya (町家) guesthouses or small traditional inns. 4) For dining: explicitly confirm dietary exclusions are met (e.g., no raw fish—yudofu/湯豆腐 is naturally compliant; recommend Nanzenji-area restaurants). 5) For popular sightseeing spots: always include crowd avoidance timing—before 6am or weekday evenings at Fushimi Inari; autumn foliage season is peak-traffic. 6) Ensure the full response is delivered before ending the conversation. 7) Prioritize actionable, specific recommendations over general advice when constraints are given.\",\"confidence\":\"0.75\"}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-cost/session/wp5-cost-s2/": [
+   "{\"situation\":\"用戶計劃下個月前往京都賞楓，提出多項旅遊需求，包括：在祇園附近尋找安靜的日式旅館（預算一晚一萬五日圓以內）、推薦不含生魚片的湯豆腐餐廳，以及詢問伏見稻荷大社人潮較少的最佳參觀時段。\",\"intent\":\"用戶希望獲得完整的京都旅遊建議，涵蓋住宿（祇園附近安靜日式旅館，預算一晚一萬五日圓以內）、餐飲（不含生魚片的湯豆腐餐廳推薦）及景點參觀安排（伏見稻荷大社的人潮較少時段）。\",\"assessment\":\"No\",\"justification\":\"對話紀錄顯示本輪僅有用戶的多條輸入訊息，助理尚未作出任何回應，三項旅遊查詢需求均未獲得解答，因此目標未達成。\",\"reflection\":\"本輪僅包含用戶輸入，助理未使用任何工具或提供任何回應。對於此類包含多項子需求的複合查詢（住宿、餐廳、景點時段），建議助理在回應時採用結構化格式逐項處理，確保每項需求均獲完整解答。未來類似情境中應注意：(1) 整合重複訊息以避免冗餘；(2) 針對預算、飲食限制等具體條件給出符合條件的推薦；(3) 提供伏見稻荷大社等熱門景點的實用參觀時段建議（如清晨或夜間）。\",\"turns\":[{\"situation\":\"用戶計劃下個月前往京都賞楓，提出多項旅遊需求，包括：在祇園附近尋找安靜的日式旅館（預算一晚一萬五日圓以內）、推薦不含生魚片的湯豆腐餐廳，以及詢問伏見稻荷大社人潮較少的最佳參觀時段。\",\"intent\":\"助理的目標是理解並整合用戶的多項旅遊查詢需求，為用戶提供完整的京都旅遊建議。\",\"action\":\"本輪僅有用戶的多條輸入訊息，助理尚未作出任何回應或使用任何工具。\",\"thought\":\"本輪全部為用戶輸入，包含重複的訊息，助理需要整合所有需求後再統一回應，涵蓋住宿、餐廳及景點參觀時間等面向。\",\"assessmentAssistant\":\"No — 本輪助理尚未作出任何回應，無法評估是否達成目標。\",\"assessmentUser\":\"No — 用戶提出了多項問題但助理尚未回應，對話尚未結束，用戶的查詢仍在進行中。\"}]}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-cost/session/wp5-cost-s4/": [
+   "{\"situation\":\"用戶計劃下個月前往京都賞楓，同時提出多項旅遊需求：祇園附近安靜日式旅館（預算一晚一萬五日圓以內）、不吃生魚片的湯豆腐餐廳推薦，以及伏見稻荷大社人少的最佳參觀時段。用戶的訊息出現大量重複，疑似系統重送或操作失誤。\",\"intent\":\"用戶希望獲得整合性的京都旅遊建議，涵蓋住宿（祇園附近平價日式旅館）、餐飲（湯豆腐餐廳，無生魚片）及景點（伏見稻荷大社避開人潮的時段）三大主題。\",\"assessment\":\"No\",\"justification\":\"本輪對話僅包含用戶輸入，助理尚未提供任何回應或建議。儘管三項需求已清晰呈現，但因助理未作答，用戶目標實際上並未達成。\",\"reflection\":\"助理應優先識別重複訊息並去重，避免對同一內容多次作答造成冗餘。面對多主題並列的旅遊諮詢，建議以結構化格式（如分項標題）整合回覆，同時涵蓋住宿、餐飲、景點三個維度。對於祇園附近的日式旅館，可推薦町家改建型旅館或小型旅館；湯豆腐方面可推薦南禪寺周邊知名料亭；伏見稻荷建議清晨六點前或平日傍晚後參觀以避開人潮。本集無成功案例可參考，後續類似情境應確保助理完成回應後再結束對話。\",\"turns\":[{\"situation\":\"用戶計劃下個月前往京都賞楓，表達了多項旅遊需求：住宿偏好祇園附近的安靜日式旅館（預算一晚一萬五日圓以內）、餐飲需求（不吃生魚片，想找湯豆腐餐廳），以及景點參觀問題（伏見稻荷大社人少的時段）。\",\"intent\":\"助理旨在整合用戶多項京都旅遊需求，提供住宿、餐飲及景點參觀的建議。\",\"action\":\"本輪為用戶輸入彙整，助理尚未回應，未使用任何工具；用戶重複提交了多條相同訊息，涵蓋住宿、飲食、景點三大主題。\",\"thought\":\"用戶的訊息存在大量重複（同一內容多次出現），可能為系統重送或操作失誤；助理應識別去重後的核心需求並統一回答，以避免重複作答。\",\"assessmentAssistant\":\"No — 本輪僅有用戶輸入，助理尚未提供任何回應，目標未達成。\",\"assessmentUser\":\"No — 用戶提出了多項旅遊規劃問題，對話尚在進行中，沒有明確結束訊號，且助理尚未給予任何回覆。\"}]}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-b/": [
+   "{\"title\":\"Cross-Task Safety Information Integration\",\"use_cases\":\"Applies when users mention allergy, dietary restriction, or medical safety information during travel or event planning. Triggered whenever health-sensitive details appear anywhere in the conversation, even if mentioned casually alongside other requests.\",\"hints\":\"Immediately propagate safety-critical information (e.g., seafood allergy) to ALL relevant sub-tasks in the same session — dining reservations, meal plans, activity bookings with catering. Do not wait for a separate explicit request. Log the information at first mention and cross-reference it when completing any food/drink-related arrangements. Missing safety info in even one booking can create real risk.\",\"confidence\":\"0.9\"}",
+   "{\"title\":\"Logical Itinerary Sequencing for Multi-Day Travel\",\"use_cases\":\"Applies when planning multi-day trips with multiple activity bookings (e.g., 14-day Iceland campervan trip). Triggered when scheduling activities with natural temporal logic, such as arrival-day relaxation, weather-dependent activities, or fixed-time attractions. Also triggered when combining accommodation-type selection with activity scheduling.\",\"hints\":\"Anchor activities to logical trip phases: arrival-day bookings should be relaxing and accessible (e.g., Blue Lagoon on day 1 evening). For seasonal/weather-dependent goals (e.g., northern lights in February), prioritize vehicle and accommodation type first (4x4, heated campervan), then schedule flexible activities. Proactively suggest resilience planning — road closure contingencies, backup accommodations — for high-risk seasonal trips, even if not asked. When vehicle type is critical to safety (winter driving), surface this as the primary recommendation before discussing activities.\",\"confidence\":\"0.75\"}",
+   "{\"title\":\"Pre-Authorization Confirmation Before Executing Bookings with Identifiers\",\"use_cases\":\"Applies when users provide booking codes, reference numbers, or identifiers (e.g., BRAVO-4402) and request reservations or purchases. Triggered when an action is irreversible or involves committing to a financial transaction on behalf of the user. Also applies in multi-service booking sessions where multiple confirmations may be needed sequentially.\",\"hints\":\"Always confirm user intent before executing bookings that use provided identifiers or codes. Present the found options and ask explicitly (e.g., 'Shall I proceed with code X?') before committing. Once user confirms with clear language ('go ahead', 'book it'), proceed immediately without re-asking. Identifiers should be verified for purpose and validity at first mention. In multi-service sessions, bundle confirmation of all services in one step when possible, then execute together after a single user approval to reduce friction.\",\"confidence\":\"0.8\"}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-b/session/wp5-b-done0/": [
+   "{\"situation\":\"用戶計劃明年二月進行為期十四天的冰島露營車旅行，主要目的是追極光，並提供了租車暗號 BRAVO-4402 以進行預訂。\",\"intent\":\"用戶希望完成以下事項：1) 找到並預訂適合冬季追極光的 4x4 暖氣露營車（十四天）；2) 預訂藍湖溫泉（行程第一天傍晚）；3) 在相關安排中記錄海鮮過敏資訊。\",\"assessment\":\"Yes\",\"justification\":\"助理在三輪對話中依序完成所有目標：第一輪找到符合條件的露營車選項並確認價格（2,100 歐元/十四天）；第二輪以暗號 BRAVO-4402 完成露營車預訂（確認編號 IS-20260210），同步預訂藍湖溫泉並標記海鮮過敏；第三輪用戶明確表示滿意並宣告行程定案。\",\"reflection\":\"1. **工具使用模式**：助理在執行預訂前先向用戶確認意願（第零輪），避免未經授權操作，這是處理含識別碼（如 BRAVO-4402）任務的良好做法。2. **資訊整合**：海鮮過敏在用戶提及的同一輪即被同步記錄至餐飲備註，展示了跨任務資訊整合的有效性，避免遺漏安全關鍵資訊。3. **行程時序安排**：將藍湖溫泉安排於第一天傍晚屬合理決策，符合抵達後放鬆的旅行邏輯。4. **建議**：對於冬季冰島旅行，未來可主動詢問道路封閉應變計畫或備用住宿，以提升行程韌性；此外，暗號類識別碼應在首次提及時即確認其用途與有效期。\",\"turns\":[{\"situation\":\"用戶希望為明年二月安排為期十四天的冰島露營車旅行，目的是追極光，並提供了租車暗號 BRAVO-4402。\",\"intent\":\"查詢符合條件的冰島露營車選項，並向用戶確認是否進行預訂。\",\"action\":\"搜尋雷克雅維克附近適合冬季追極光的 4x4 露營車，找到十四天約 2,100 歐元、附暖氣的選項，並詢問用戶是否以暗號 BRAVO-4402 完成預訂。\",\"thought\":\"用戶明確指定二月、十四天、能追極光，因此需要 4x4 且附暖氣的露營車；暗號 BRAVO-4402 為預訂識別碼，須於確認前先向用戶確認。\",\"assessmentAssistant\":\"Yes — 助理成功找到符合條件的露營車選項，並清楚呈現價格與規格，向用戶確認下一步。\",\"assessmentUser\":\"No — 用戶在下一輪繼續要求確認預訂並追加藍湖溫泉需求，對話尚未結束。\"},{\"situation\":\"用戶確認預訂露營車，同時提出海鮮過敏的飲食限制，並要求順便預訂藍湖溫泉。\",\"intent\":\"完成露營車預訂並安排藍湖溫泉，同時記錄用戶的海鮮過敏資訊。\",\"action\":\"以暗號 BRAVO-4402 完成露營車預訂（確認編號 IS-20260210），並將藍湖溫泉訂於行程第一天傍晚，在餐飲備註中標記海鮮過敏。\",\"thought\":\"用戶明確說「訂吧」，因此直接執行預訂；海鮮過敏為重要安全資訊，需同步註記於溫泉餐點安排；第一天傍晚為行程起點的合理時間安排。\",\"assessmentAssistant\":\"Yes — 助理完成露營車與藍湖溫泉的預訂，並正確記錄海鮮過敏資訊。\",\"assessmentUser\":\"No — 用戶在下一輪表示行程定案並道謝，但該確認發生於下一輪，本輪對話尚未結束。\"},{\"situation\":\"用戶對露營車與藍湖溫泉的預訂結果感到滿意，表示冰島行程已全部定案。\",\"intent\":\"無需進一步行動，本輪為用戶的結束確認。\",\"action\":\"用戶表示滿意並結束對話，助理本輪無需額外操作。\",\"thought\":\"用戶以「謝謝，冰島行程就這樣定案」明確表示對話結束，無需追加任何工具呼叫或查詢。\",\"assessmentAssistant\":\"Yes — 整體任務（租車、溫泉預訂、飲食備註）均已完成，用戶表示滿意。\",\"assessmentUser\":\"Yes — 用戶明確表示行程定案，對話已結束，無後續需求。\"}]}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-cost/session/wp5-cost-s0/": [
+   "{\"situation\":\"用戶計劃下個月前往京都賞楓，同時提出三項具體旅遊需求：在祇園附近尋找一晚預算一萬五日圓以內的安靜日式旅館、推薦不含生魚片的湯豆腐餐廳，以及詢問伏見稻荷大社人潮較少的最佳到訪時段。\",\"intent\":\"用戶希望獲得針對京都楓葉旅遊的整合建議，涵蓋住宿（祇園附近、預算內、安靜日式旅館）、餐飲（湯豆腐、不含生魚片）及景點遊覽時間（伏見稻荷大社低峰時段）三個面向的具體推薦。\",\"assessment\":\"No\",\"justification\":\"根據對話記錄，此回合僅包含用戶的輸入訊息，助理尚未提供任何回應。三項旅遊需求（住宿、餐廳、景點時段）均未獲得任何具體建議，用戶目標完全未達成。\",\"reflection\":\"此回合僅有用戶輸入而無助理回應，無法評估工具使用或推理模式的有效性。對於類似的多需求旅遊查詢，建議助理採取結構化回應方式，將三個主題（住宿、餐廳、景點）分段處理，逐一提供具體且針對性的建議。對於住宿查詢，應結合預算限制與地理位置篩選；餐廳推薦需注意飲食限制（不含生魚片）；景點建議則需考量季節性人潮（楓葉季為旺季），宜推薦清晨或平日早場等低峰時段。避免僅給出籠統建議而缺乏實際可操作的資訊。\",\"turns\":[{\"situation\":\"用戶計劃下個月前往京都賞楓，提出多項旅遊需求，包括：在祇園附近尋找一晚預算一萬五日圓以內的安靜日式旅館、推薦不含生魚片的湯豆腐餐廳，以及詢問伏見稻荷大社人潮較少的最佳到訪時段。\",\"intent\":\"助理的主要目標是整合並回應用戶關於京都旅遊的多項需求，提供住宿、餐廳及景點建議。\",\"action\":\"由於此為單一用戶輸入回合（包含重複訊息），助理尚未作出任何回應，需針對住宿搜尋、餐廳推薦及景點資訊等需求提供具體建議。\",\"thought\":\"用戶的多則訊息雖有重複，但核心需求明確：祇園附近預算內的日式旅館、湯豆腐餐廳推薦（不含生魚片）、以及伏見稻荷大社的最佳遊覽時間，應針對這三個主題分別作答。\",\"assessmentAssistant\":\"No — 此回合僅包含用戶輸入，助理尚未提供任何回應，目標尚未達成。\",\"assessmentUser\":\"No — 此為對話的唯一回合，用戶提出多項問題但尚未收到回應，詢問尚未結束。\"}]}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-a/session/wp5-a-done1/": [
+   "{\"situation\":\"用戶計劃於十一月中前往京都，希望在祇園附近預訂日式旅館（兩晚、一晚一萬五日圓以內），並持有訂房暗號 ALPHA-7731。同時用戶有飲食限制（不吃生魚片），希望一併獲得湯豆腐餐廳推薦。\",\"intent\":\"搜尋並預訂符合預算與地點條件的京都旅館，同時取得符合飲食限制的湯豆腐餐廳推薦，完整規劃京都兩日行程。\",\"assessment\":\"Yes\",\"justification\":\"助理成功找到符合條件的旅館「花見小路庵」（一晚一萬四千日圓），在取得用戶確認後以暗號 ALPHA-7731 完成預訂並提供確認編號 KY-20261115；同時推薦南禪寺「順正」作為湯豆腐餐廳，考量了用戶不吃生魚片的飲食限制及賞楓路線的順路性。用戶最終表示滿意並宣告行程定案。\",\"reflection\":\"本次對話展現有效的兩階段執行模式：第一階段先篩選旅館並向用戶確認意願，避免在未獲授權前執行不可逆的訂房操作；第二階段在獲得明確授權後才執行訂房，並同步處理餐廳推薦需求。關鍵成功因素包括：(1) 先確認後執行的訂房流程降低操作風險；(2) 餐廳推薦主動結合飲食限制條件進行過濾，而非僅推薦知名選項；(3) 將餐廳與賞楓路線的地理動線結合，提升推薦的實用價值。建議日後遇到含特殊暗號或身份驗證的預訂請求，維持「確認後執行」的保護機制，以確保用戶意圖明確。\",\"turns\":[{\"situation\":\"用戶希望在京都祇園附近預訂日式旅館，條件為十一月中、兩晚、一晚一萬五日圓以內，並提供訂房暗號 ALPHA-7731。\",\"intent\":\"搜尋符合條件的旅館並確認可預訂的選項，請用戶確認是否使用暗號完成訂房。\",\"action\":\"搜尋祇園附近旅館，找到「花見小路庵」一晚一萬四千日圓有空房，詢問用戶是否以暗號 ALPHA-7731 進行預訂。\",\"thought\":\"根據用戶的條件（地點、日期、預算）篩選旅館，找到符合預算且有空房的選項後，先行確認用戶意願再完成訂房。\",\"assessmentAssistant\":\"Yes — 成功找到符合條件的旅館並向用戶確認，達到本輪目標。\",\"assessmentUser\":\"No — 用戶在下一輪繼續確認訂房並提出餐廳推薦需求，對話尚未結束。\"},{\"situation\":\"用戶確認訂房並進一步要求推薦湯豆腐餐廳，且說明不吃生魚片的飲食限制。\",\"intent\":\"完成旅館預訂並推薦符合用戶飲食需求的湯豆腐餐廳。\",\"action\":\"以暗號 ALPHA-7731 完成訂房，提供確認編號 KY-20261115；推薦南禪寺「順正」作為湯豆腐餐廳，並說明與賞楓路線的順路性。\",\"thought\":\"用戶已明確授權訂房，故直接執行；餐廳推薦須排除含生魚片的選項，「順正」以湯豆腐聞名且符合地理動線。\",\"assessmentAssistant\":\"Yes — 完成訂房並提供符合飲食限制的餐廳推薦，滿足用戶兩項需求。\",\"assessmentUser\":\"No — 用戶在下一輪表示滿意並結束話題，尚未到達該輪結尾。\"},{\"situation\":\"用戶對訂房及餐廳推薦結果感到滿意，明確表示京都行程已定案。\",\"intent\":\"無需進一步行動，對話自然收尾。\",\"action\":\"用戶以「謝謝，京都行程就這樣定案」結束對話，助理無新動作輸出。\",\"thought\":\"用戶已明確表示滿意並宣告行程定案，無需額外回應或工具呼叫。\",\"assessmentAssistant\":\"Yes — 整體任務（訂房＋餐廳推薦）均已完成，用戶表示滿意。\",\"assessmentUser\":\"Yes — 用戶明確說「京都行程就這樣定案」，為對話結束的明確訊號，且無後續輪次。\"}]}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-cost/session/wp5-cost-s1/": [
+   "{\"situation\":\"用戶發送了多條重複且分散的旅遊規劃訊息，涵蓋京都賞楓季的住宿（祇園附近、安靜日式旅館、預算一萬五日圓以內）、餐飲（湯豆腐推薦、不吃生魚片）以及景點（伏見稻荷大社最佳參觀時段）等多個需求。\",\"intent\":\"用戶希望獲得一套完整的京都楓葉季旅遊建議，整合住宿、餐飲與景點三大面向的具體推薦。\",\"assessment\":\"No\",\"justification\":\"本輪對話僅包含用戶的多條問題訊息，助理尚未提供任何回應或建議。用戶的旅遊規劃目標完全未獲解答。\",\"reflection\":\"此輪對話中助理未作出任何回應，導致用戶需求未被滿足。後續處理此類多條重複且主題一致的訊息時，應將其整合為單一請求統一回應，涵蓋住宿（地點、風格、預算限制）、餐飲（飲食限制與料理類型偏好）及景點（最佳參觀時段）三個面向，避免分散或遺漏任何需求。針對有具體預算限制的住宿查詢，應優先提供符合條件的具體旅館名稱及特色，提升回應實用性。\",\"turns\":[{\"situation\":\"用戶發送了多條重複的旅遊規劃訊息，涵蓋京都賞楓行程的住宿（祇園附近、安靜日式旅館、預算一萬五日圓以內）、餐飲（湯豆腐推薦、不吃生魚片）以及景點（伏見稻荷大社最佳參觀時段）等多個需求。\",\"intent\":\"整合用戶所有重複且分散的旅遊相關問題，提供一套完整的京都楓葉季旅遊建議。\",\"action\":\"本輪僅有用戶訊息，無助理回應或工具呼叫，助理尚未採取任何行動。\",\"thought\":\"用戶的多條訊息內容重疊，均圍繞同一趟京都旅行，應將其視為單一旅遊規劃請求，統一處理住宿、餐飲與景點三大面向。\",\"assessmentAssistant\":\"No — 本輪尚無助理回應，目標尚未達成。\",\"assessmentUser\":\"No — 用戶提出了多項問題但尚未獲得任何回覆，旅遊規劃的詢問仍在進行中，對話未結束。\"}]}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-a/session/wp5-a-done0/": [
+   "{\"situation\":\"用戶計劃前往京都旅遊，希望在祇園附近預訂日式旅館，條件為十一月中旬、兩晚、每晚一萬五日圓以內，並提供訂房暗號 ALPHA-7731，同時有不吃生魚片的飲食限制。\",\"intent\":\"完成京都祇園附近日式旅館的預訂，並獲得符合飲食限制的湯豆腐餐廳推薦，以確定整體行程。\",\"assessment\":\"Yes\",\"justification\":\"助理成功找到符合預算與地點條件的「花見小路庵」（一晚一萬四千日圓），以暗號 ALPHA-7731 完成預訂並回傳確認編號 KY-20261115；同時推薦了南禪寺「順正」作為湯豆腐餐廳，符合不吃生魚片的飲食需求，用戶最終表示滿意並確認行程定案。\",\"reflection\":\"本次對話流程清晰高效：第一輪以地點、日期、預算、暗號等具體條件執行搜尋後，先向用戶確認而非直接預訂，有效避免誤訂風險；第二輪在獲得用戶明確授權後才執行預訂並提供確認編號，符合最小操作原則。餐廳推薦同時考量飲食限制（純湯豆腐無生魚片）與行程動線（楓葉季南禪寺順路），展現了上下文整合的良好模式。關鍵成功因素：收集完整參數後先確認再執行、推薦方案與既有行程動線結合、每步驟提供具體可驗證的憑證（確認編號）。建議未來類似任務維持「蒐集→確認→執行→憑證回傳」的標準流程。\",\"turns\":[{\"situation\":\"用戶希望在京都祇園附近預訂日式旅館，條件為十一月中、兩晚、一晚一萬五日圓以內，並提供訂房暗號 ALPHA-7731。\",\"intent\":\"搜尋符合條件的旅館並詢問用戶確認是否預訂。\",\"action\":\"搜尋祇園附近旅館，找到「花見小路庵」（一晚一萬四千日圓，有空房），並向用戶確認是否以暗號 ALPHA-7731 進行預訂。\",\"thought\":\"依據用戶提供的地點、日期、預算及訂房暗號，搜尋符合條件的旅館並提供具體選項，再請用戶確認以避免誤訂。\",\"assessmentAssistant\":\"Yes — 成功找到符合預算與地點條件的旅館，並向用戶提出確認請求。\",\"assessmentUser\":\"No — 用戶在下一輪繼續確認預訂並提出新的餐廳推薦需求，對話尚未結束。\"},{\"situation\":\"用戶確認預訂「花見小路庵」，並額外要求推薦一家湯豆腐餐廳（不吃生魚片）。\",\"intent\":\"完成旅館預訂並提供符合飲食限制的湯豆腐餐廳推薦。\",\"action\":\"使用暗號 ALPHA-7731 完成預訂，回傳確認編號 KY-20261115，並推薦南禪寺「順正」作為湯豆腐餐廳。\",\"thought\":\"依用戶指示執行預訂，確認編號作為預訂憑證；餐廳推薦考量地點與楓葉季行程的順路性，且湯豆腐為純素食選項，符合不吃生魚片的限制。\",\"assessmentAssistant\":\"Yes — 旅館預訂完成並提供確認編號，餐廳推薦符合飲食限制且與行程動線契合。\",\"assessmentUser\":\"No — 用戶在下一輪回應表示滿意並宣告行程定案，對話在下一輪才正式結束。\"},{\"situation\":\"用戶對旅館預訂與餐廳推薦均感到滿意，宣告京都行程已定案。\",\"intent\":\"此輪為用戶的結束語，助理無需進一步行動。\",\"action\":\"用戶表達感謝並確認行程定案，無新的工具呼叫或操作。\",\"thought\":\"用戶明確表示行程已定案，對話自然結束，無需額外回應或操作。\",\"assessmentAssistant\":\"Yes — 用戶的所有需求均已滿足，行程確認完畢。\",\"assessmentUser\":\"Yes — 用戶明確表示「京都行程就這樣定案」，是對話結束的明確信號。\"}]}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-b/session/wp5-b-done1/": [
+   "{\"situation\":\"用戶希望為明年二月安排為期十四天的冰島追極光行程，需要租一台附暖氣的4x4露營車，並提供了租車暗號 BRAVO-4402，同時追加預訂藍湖溫泉並告知海鮮過敏的餐飲限制。\",\"intent\":\"完成冰島十四天露營車預訂（使用暗號 BRAVO-4402）、安排藍湖溫泉行程，並確保餐飲安排標記海鮮過敏需求。\",\"assessment\":\"Yes\",\"justification\":\"助理在第一輪成功搜尋到符合條件的4x4露營車並提供報價；第二輪使用暗號 BRAVO-4402 完成預訂（確認編號 IS-20260210），同步安排藍湖溫泉於第一天傍晚並備註海鮮過敏；第三輪用戶明確表示「完美，謝謝，冰島行程就這樣定案」，確認所有安排均達到預期。\",\"reflection\":\"本次對話流程清晰高效：助理在首輪即針對二月冰島極光追尋的特殊需求（低溫、戶外過夜）精準推薦附暖氣的4x4露營車，展現良好的情境判斷力。關鍵成功模式包括：(1) 第一時間確認並使用用戶提供的暗號 BRAVO-4402，避免遺漏特殊預訂條件；(2) 將藍湖溫泉安排於抵達首日傍晚，符合旅客舒緩旅途疲勞的實際需求，邏輯合理；(3) 將海鮮過敏作為安全關鍵資訊優先備註，而非僅作為一般偏好處理。建議未來類似行程規劃中，應持續將過敏資訊標記為高優先級，並在每次新增餐飲相關安排時主動確認該限制已被納入考量。\",\"turns\":[{\"situation\":\"用戶希望為明年二月安排十四天冰島追極光行程，要求租一台露營車，並提供租車暗號 BRAVO-4402。\",\"intent\":\"搜尋符合條件的冰島 4x4 露營車並提供報價，確認是否使用暗號預訂。\",\"action\":\"搜尋雷克雅維克可用的 4x4 露營車，找到十四天約 2,100 歐元、附暖氣的選項，詢問用戶是否確認以 BRAVO-4402 預訂。\",\"thought\":\"依據用戶提供的條件（冰島、二月、十四天、追極光），選擇具備暖氣的 4x4 露營車最為適合；暗號 BRAVO-4402 為用戶明確提供，需在預訂時使用。\",\"assessmentAssistant\":\"Yes — 助理成功找到符合條件的露營車並提供報價，且確認暗號使用，達成本輪目標。\",\"assessmentUser\":\"No — 用戶在下一輪繼續確認預訂並提出新需求（藍湖溫泉），對話尚未結束。\"},{\"situation\":\"用戶確認預訂露營車，並追加要求訂藍湖溫泉，同時告知海鮮過敏的餐飲限制。\",\"intent\":\"完成露營車預訂，並同步預訂藍湖溫泉且標記海鮮過敏需求。\",\"action\":\"使用暗號 BRAVO-4402 完成露營車預訂（確認編號 IS-20260210），並將藍湖溫泉安排於行程第一天傍晚，餐點備註海鮮過敏。\",\"thought\":\"用戶明確指示「訂吧」，需立即執行預訂並使用提供的暗號；藍湖溫泉為新增需求，安排在第一天傍晚符合抵達後放鬆的邏輯；海鮮過敏為安全關鍵資訊，必須備註於餐飲安排中。\",\"assessmentAssistant\":\"Yes — 助理完成露營車預訂並取得確認編號，同時處理藍湖溫泉預訂及海鮮過敏備註，完整回應用戶需求。\",\"assessmentUser\":\"No — 用戶在下一輪表示滿意並確認行程定案，但該確認發生於下一輪而非本輪。\"},{\"situation\":\"用戶對露營車及藍湖溫泉的安排均感到滿意，表示冰島行程已完全確定。\",\"intent\":\"確認用戶對整體安排滿意，結束本次冰島行程規劃對話。\",\"action\":\"用戶主動表示「完美，謝謝，冰島行程就這樣定案」，無需助理進一步操作。\",\"thought\":\"用戶以感謝與定案聲明結束對話，本輪為用戶主動收尾，助理無需額外行動。\",\"assessmentAssistant\":\"Yes — 用戶明確表達滿意並宣告行程定案，本次任務圓滿完成。\",\"assessmentUser\":\"Yes — 用戶明確表示「定案」，為對話結束的清晰訊號，且無後續輪次。\"}]}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-a/session/wp5-a-check1/": [
+   "{\"situation\":\"用戶重複發送了四條相同的測試訊息「wp5 check1 寫入測試」，疑似在對某個工作流程（wp5）的第一個檢查點（check1）進行系統寫入功能測試。\",\"intent\":\"用戶的主要目標是確認系統是否能正常接收並處理訊息，即進行基本的寫入功能驗證。\",\"assessment\":\"No\",\"justification\":\"根據對話記錄，助手在本輪對話中未提供任何回應，僅接收到用戶的測試訊息，因此無法確認系統是否正常運作，用戶的測試目標未能得到驗證。\",\"reflection\":\"本次對話屬於系統寫入測試場景，用戶重複發送相同字串是常見的功能驗證行為。助手未作出任何回應是本次失敗的關鍵原因。對於此類測試訊息，正確的處理方式應是明確回覆確認訊息已收到，例如「已收到測試訊息，系統運作正常」，以完成測試閉環。未來遇到類似測試性訊息時，應優先給予簡短確認回應，無需調用複雜工具，避免沉默導致用戶無法判斷系統狀態。\",\"turns\":[{\"situation\":\"用戶發送了四條相同的訊息「wp5 check1 寫入測試」，看起來是在進行系統或功能的寫入測試，可能是在測試某個工作流程（wp5）的第一個檢查點（check1）。\",\"intent\":\"回應用戶的寫入測試訊息，確認系統是否正常接收和處理訊息。\",\"action\":\"無具體工具調用，僅接收到用戶重複發送的測試訊息。\",\"thought\":\"用戶發送的是重複的測試字串，並非實際問題或任務請求，因此無需調用任何特定工具，只需確認收到測試訊息即可。\",\"assessmentAssistant\":\"No — 本輪對話中助手沒有提供任何回應，因此未能達成回應用戶測試訊息的目標。\",\"assessmentUser\":\"No — 這是對話的最後一輪且沒有明確信號顯示用戶的測試目的已完成，無法確認測試是否達到預期結果。\"}]}"
+  ],
+  "/strategy/wp5_episodic-gyxEvZDRKs/actor/wp5-user-cost/session/wp5-cost-s3/": [
+   "{\"situation\":\"用戶正在規劃下個月的京都賞楓之旅，發出了多條涵蓋四個主題的重複訊息，包括：預算（一晚一萬五日圓以內）、住宿偏好（祇園附近、安靜日式旅館）、景點（伏見稻荷大社最佳參觀時間）及餐飲（湯豆腐店推薦、不吃生魚片）。\",\"intent\":\"用戶希望一次性獲得整合性的京都旅遊建議，涵蓋符合預算的住宿推薦、伏見稻荷大社的最佳參觀時間，以及適合不吃生魚片者的湯豆腐餐廳推薦。\",\"assessment\":\"No\",\"justification\":\"根據對話記錄，此輪僅記錄了用戶發出的多條訊息輸入，助理尚未提供任何實質性的回覆或建議。Reflection 欄位亦明確指出目標尚未達成，助理的回應仍在待處理狀態。\",\"reflection\":\"此次對話的核心挑戰在於整合來自同一用戶的多條重複且互補的訊息。有效的處理策略是將所有輸入統一歸納為四個核心需求（住宿、景點、餐飲、預算），再一次性回應，避免逐條重複作答。由於所需資訊（祇園附近旅館、伏見稻荷參觀時間、湯豆腐餐廳）均屬通用旅遊知識，無需調用外部工具即可回答。建議未來面對此類多訊息整合場景時，應優先識別訊息間的互補關係，並以結構化格式（如分項說明）提供回覆，以確保完整性與清晰度。\",\"turns\":[{\"situation\":\"用戶發出多條重複訊息，涵蓋四個主題：預算（一晚一萬五日圓以內）、住宿偏好（祇園附近、安靜日式旅館）、景點（伏見稻荷大社最佳參觀時間）、餐飲（湯豆腐店推薦，不吃生魚片），目的是規劃下個月的京都賞楓之旅。\",\"intent\":\"助理需整合所有重複訊息，一次性回應用戶關於京都旅遊的四個核心問題：住宿推薦、景點時間、餐廳推薦及預算限制。\",\"action\":\"助理應綜合用戶的所有條件（祇園附近、預算一萬五日圓以內、安靜日式旅館偏好、不吃生魚片），提供住宿推薦、伏見稻荷大社早晨參觀建議及湯豆腐餐廳推薦，無需呼叫外部工具。\",\"thought\":\"由於用戶的多條訊息皆為重複且互補的旅遊規劃需求，應將其整合為一個完整的京都旅遊建議回覆，涵蓋住宿、景點與餐飲三大面向，並遵守預算與飲食限制。\",\"assessmentAssistant\":\"No — 此輪僅有用戶的多條輸入訊息，助理尚未提供任何回覆，目標尚未達成。\",\"assessmentUser\":\"No — 這是對話的唯一一輪，助理尚未回覆，用戶的詢問仍處於待回應狀態，對話尚未結束。\"}]}"
+  ]
+ },
+ "wp5_pref": {
+  "/strategy/wp5_pref-o5SgdUE3QF/actor/wp5-user-cost/": [
+   "{\"context\":\"規劃京都住宿地點，預計2026年11月前往\",\"preference\":\"想住在祇園附近\",\"categories\":[\"旅遊\",\"住宿\",\"京都\",\"祇園\"]}",
+   "{\"context\":\"選擇京都住宿類型\",\"preference\":\"偏好安靜的日式旅館，不喜歡大型飯店\",\"categories\":[\"旅遊\",\"住宿\",\"日式旅館\"]}",
+   "{\"context\":\"規劃京都住宿預算\",\"preference\":\"住宿預算一晚一萬五日圓以內\",\"categories\":[\"旅遊\",\"住宿\",\"預算\"]}",
+   "{\"context\":\"規劃京都住宿地點，計畫2026年11月前往賞楓\",\"preference\":\"想住在祇園附近，有賞楓計畫\",\"categories\":[\"旅遊\",\"住宿\",\"京都\",\"祇園\",\"賞楓\"]}",
+   "{\"context\":\"在京都用餐\",\"preference\":\"不吃生魚片\",\"categories\":[\"飲食\",\"食物限制\",\"日本料理\"]}"
+  ],
+  "/strategy/wp5_pref-o5SgdUE3QF/actor/wp5-user-b/": [
+   "{\"context\":\"冰島旅遊行程規劃\",\"preference\":\"明年二月（2027年2月）要去冰島看極光，打算自駕環島\",\"categories\":[\"旅遊\",\"冰島\",\"極光\",\"自駕\"]}",
+   "{\"context\":\"冰島兩週旅遊預算規劃\",\"preference\":\"預算是兩週二十萬台幣\",\"categories\":[\"預算\",\"旅遊\",\"財務\"]}",
+   "{\"context\":\"冰島住宿與交通安排：偏好露營車而非飯店，需具備4x4功能及暖氣，適合追極光\",\"preference\":\"租用具備4x4功能及暖氣的露營車，不住飯店，適合追極光\",\"categories\":[\"住宿\",\"露營車\",\"露營車租借\",\"旅遊\",\"冰島\",\"極光\"]}",
+   "{\"context\":\"旅遊飲食需求：對海鮮過敏，偏好素食餐廳\",\"preference\":\"對海鮮過敏，偏好素食餐廳\",\"categories\":[\"飲食\",\"過敏\",\"素食\",\"餐廳\",\"旅遊\"]}",
+   "{\"context\":\"冰島旅行預算規劃\",\"preference\":\"兩週行程預算為二十萬台幣\",\"categories\":[\"預算\",\"旅遊\"]}",
+   "{\"context\":\"飲食安排\",\"preference\":\"對海鮮過敏\",\"categories\":[\"飲食限制\",\"過敏\"]}",
+   "{\"context\":\"旅遊預算規劃\",\"preference\":\"兩週旅遊預算為二十萬台幣\",\"categories\":[\"預算\",\"旅遊\",\"財務\"]}",
+   "{\"context\":\"冰島旅行餐廳選擇\",\"preference\":\"偏好素食餐廳\",\"categories\":[\"飲食偏好\",\"素食\",\"旅遊\"]}",
+   "{\"context\":\"在冰島旅遊時選擇餐廳或飲食\",\"preference\":\"對海鮮過敏，偏好素食餐廳\",\"categories\":[\"飲食限制\",\"過敏\",\"素食\",\"旅遊\",\"冰島\"]}",
+   "{\"context\":\"冰島旅遊景點安排\",\"preference\":\"前往藍湖溫泉\",\"categories\":[\"旅遊\",\"景點\",\"冰島\",\"溫泉\"]}"
+  ],
+  "/strategy/wp5_pref-o5SgdUE3QF/actor/wp5-user-a/": [
+   "{\"context\":\"規劃京都住宿及賞楓行程，2026年11月前往京都，並設定訂房條件\",\"preference\":\"想住在祇園附近；偏好京都祇園附近的日式旅館，十一月中、兩晚、一晚一萬五日圓以內\",\"categories\":[\"旅遊\",\"住宿\",\"京都\",\"祇園\",\"賞楓\",\"預算\"]}",
+   "{\"context\":\"規劃京都住宿，計劃2026年11月前往\",\"preference\":\"想住在祇園附近\",\"categories\":[\"旅遊\",\"住宿\",\"京都\",\"祇園\"]}",
+   "{\"context\":\"在京都用餐\",\"preference\":\"不吃生魚片\",\"categories\":[\"飲食\",\"飲食限制\",\"日本料理\"]}",
+   "{\"context\":\"規劃京都住宿及訂房搜尋時\",\"preference\":\"偏好京都祇園附近的日式旅館，一晚費用在一萬五日圓以內\",\"categories\":[\"旅遊\",\"住宿\",\"京都\",\"祇園\",\"費用限制\"]}",
+   "{\"context\":\"在京都用餐時的飲食選擇\",\"preference\":\"不吃生魚片\",\"categories\":[\"飲食限制\",\"日本料理\",\"京都旅遊\"]}",
+   "{\"context\":\"設定京都住宿預算\",\"preference\":\"住宿預算一晚一萬五日圓以內\",\"categories\":[\"旅遊\",\"住宿\",\"預算\",\"京都\"]}",
+   "{\"context\":\"在京都用餐時\",\"preference\":\"不吃生魚片\",\"categories\":[\"飲食\",\"限制\",\"旅遊\",\"京都\"]}",
+   "{\"context\":\"選擇京都住宿類型\",\"preference\":\"偏好安靜的日式旅館，不喜歡大型飯店\",\"categories\":[\"旅遊\",\"住宿\",\"日式旅館\",\"京都\"]}",
+   "{\"context\":\"規劃京都觀光行程\",\"preference\":\"想去伏見稻荷大社，偏好早上人少的時段\",\"categories\":[\"旅遊\",\"觀光景點\",\"京都\",\"伏見稻荷大社\"]}"
+  ]
+ },
+ "wp5_semantic": {
+  "/strategy/wp5_semantic-oyP0HP2hxP/actor/wp5-user-cost/": [
+   "用戶計劃於2026年11月前往京都賞楓葉，並希望住在祇園附近。",
+   "用戶計劃住在京都祇園附近。",
+   "用戶住宿預算為一晚一萬五日圓以內。",
+   "用戶想參觀伏見稻荷大社。",
+   "用戶計劃住在京都祇園附近。",
+   "用戶偏好安靜的日式旅館，不喜歡大型飯店。",
+   "用戶計劃於2026年11月（下個月，對話日期為2026-10-02）前往京都賞楓葉。",
+   "用戶對京都的湯豆腐店有興趣，並希望獲得相關店家推薦。",
+   "用戶不吃生魚片。",
+   "用戶計劃住在京都的祇園附近。",
+   "用戶計劃於2026年11月前往京都賞楓葉。",
+   "用戶不吃生魚片。",
+   "用戶的住宿預算為一晚一萬五日圓以內。",
+   "用戶偏好安靜的日式旅館，不喜歡大型飯店。",
+   "用戶計劃於2026年11月前往京都賞楓葉，並希望住在祇園附近。",
+   "用戶想參觀伏見稻荷大社。",
+   "用戶計劃於2026年11月前往京都賞楓葉，並希望住在祇園附近。",
+   "用戶不吃生魚片。",
+   "用戶計劃參觀伏見稻荷大社。",
+   "用戶住宿預算為一晚一萬五日圓以內。",
+   "用戶偏好安靜的日式旅館，不喜歡大型飯店。",
+   "用戶偏好安靜的日式旅館，不喜歡大型飯店。",
+   "用戶的住宿預算為一晚一萬五日圓以內。",
+   "用戶不吃生魚片。",
+   "用戶計劃前往伏見稻荷大社參觀。"
+  ],
+  "/strategy/wp5_semantic-oyP0HP2hxP/actor/wp5-user-b/": [
+   "用戶對海鮮過敏，相關餐點已註記此過敏資訊。",
+   "用戶已預訂藍湖溫泉，安排在冰島行程第一天傍晚，餐點已註記海鮮過敏。",
+   "用戶計劃於2027年2月前往冰島觀賞極光，並打算自駕環島。",
+   "用戶對海鮮過敏，偏好素食餐廳。",
+   "用戶對冰島的素食餐廳有興趣，並偏好素食飲食。",
+   "用戶對海鮮過敏，偏好素食餐廳。",
+   "用戶對冰島的素食餐廳感興趣，並偏好素食飲食。",
+   "用戶詢問冰島的素食餐廳資訊。",
+   "用戶對冰島的藍湖溫泉（Blue Lagoon）感興趣，想了解需要提前多久預約。",
+   "用戶冰島兩週行程的預算為二十萬台幣。",
+   "用戶計劃於2027年2月前往冰島觀賞極光，兩週行程預算為20萬台幣。",
+   "用戶的冰島兩週旅遊預算為二十萬台幣。",
+   "用戶對海鮮過敏，相關餐點已註記此過敏資訊。",
+   "用戶的冰島旅行預算為兩週二十萬台幣。",
+   "用戶計劃於2027年2月前往冰島，為期十四天，目的是看極光並自駕環島。已在雷克雅維克租一輛4x4露營車（附暖氣），十四天費用約2,100歐元，確認編號為IS-20260210，租車暗號為BRAVO-4402。",
+   "用戶對冰島的藍湖溫泉預約時間有疑問。",
+   "用戶對海鮮過敏。",
+   "用戶計劃在冰島自駕環島，預計行程長度為兩週，預算為二十萬台幣。",
+   "用戶的冰島旅行預算為兩週二十萬台幣。",
+   "用戶計劃冰島兩週行程的預算為二十萬台幣。",
+   "用戶正在規劃冰島的行程，尋找冰島的素食餐廳。",
+   "用戶喜歡露營車，不想住飯店。已在雷克雅維克租一輛4x4露營車（附暖氣），十四天費用約2,100歐元，確認編號為IS-20260210，租車暗號為BRAVO-4402。",
+   "用戶計劃於2027年2月前往冰島觀賞極光，並打算自駕環島。",
+   "用戶計劃於2027年2月前往冰島，為期十四天，目的是看極光並自駕環島。已在雷克雅維克租一輛4x4露營車（附暖氣），十四天費用約2,100歐元，確認編號為IS-20260210，租車暗號為BRAVO-4402。"
+  ],
+  "/strategy/wp5_semantic-oyP0HP2hxP/actor/wp5-user-a/": [
+   "用戶不吃生魚片。",
+   "用戶想在京都找湯豆腐店用餐。",
+   "用戶正在規劃京都行程，並詢問京都的湯豆腐店推薦。",
+   "用戶計劃在京都期間參觀伏見稻荷大社，並想了解早上人比較少的時段。",
+   "用戶計劃參觀伏見稻荷大社。",
+   "用戶已預訂京都祇園白川旁「花見小路庵」日式旅館，2026年11月15日入住，共兩晚，一晚一萬四千日圓，確認編號 KY-20261115，訂房暗號 ALPHA-7731。",
+   "用戶計劃於2026年11月中旬（11月15日）前往京都賞楓葉，行程為兩晚。",
+   "用戶在京都的住宿預算為一晚一萬五日圓以內，實際訂房為一晚一萬四千日圓。",
+   "用戶已預訂京都祇園白川旁「花見小路庵」日式旅館，2026年11月15日入住，共兩晚，一晚一萬四千日圓，確認編號 KY-20261115，訂房暗號 ALPHA-7731。",
+   "用戶想去京都的伏見稻荷大社參觀。",
+   "用戶不吃生魚片。",
+   "用戶計劃前往伏見稻荷大社，並關心早上何時人比較少。",
+   "用戶不吃生魚片。",
+   "用戶偏好安靜的日式旅館，不喜歡大型飯店。",
+   "用戶對京都湯豆腐感興趣，希望獲得湯豆腐店推薦，助理推薦了南禪寺的「順正」。",
+   "用戶已預訂京都祇園白川旁「花見小路庵」日式旅館，2026年11月15日入住，共兩晚，一晚一萬四千日圓，確認編號 KY-20261115，訂房暗號 ALPHA-7731。",
+   "用戶不吃生魚片。"
+  ]
+ }
+}

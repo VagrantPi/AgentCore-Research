@@ -10,6 +10,7 @@
 | [`permission-set.json`](permission-set.json) | IAM Identity Center 的 permission set | 同事實際拿到的權限；最後一段 Deny 保護 boundary 不被拆掉 |
 | [`wp-boundary.json`](wp-boundary.json) | 建成名為 `wp-boundary` 的 managed policy | 同事建的每個角色都必須掛上它，權限上限就是它允許的範圍，防止「自己建大權限角色再 assume」 |
 | [`wp0-owner-policy.json`](wp0-owner-policy.json) | **已套用**：IAM user `KaisLinCli` 的 inline policy `wp0-account-owner` | A 做 WP0、WP3、WP5、WP1 用的臨時權限（AgentCore 限東京、`USAGE_LOGS` 投遞）。WP1 結束時移除 |
+| [`wp5-xray-policy.json`](wp5-xray-policy.json) | **未套用**：WP5 #6 補驗 span 內容時需要（X-Ray Transaction Search）。Kais 決定（2026-10-02）不在公司帳號開啟 | 開啟 Transaction Search 是全帳號設定 |
 
 ## 四層設計
 

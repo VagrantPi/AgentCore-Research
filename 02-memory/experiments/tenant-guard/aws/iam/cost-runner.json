@@ -1,0 +1,26 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "MemoryWriteAndRetrieve",
+      "Effect": "Allow",
+      "Action": ["bedrock-agentcore:CreateEvent", "bedrock-agentcore:RetrieveMemoryRecords"],
+      "Resource": "arn:aws:bedrock-agentcore:ap-northeast-1:050571774557:memory/MEMORY_ID"
+    },
+    {
+      "Sid": "InvokeTestRuntime",
+      "Effect": "Allow",
+      "Action": "bedrock-agentcore:InvokeAgentRuntime",
+      "Resource": [
+        "arn:aws:bedrock-agentcore:ap-northeast-1:050571774557:runtime/wp0_min-HsBwOc6VWU",
+        "arn:aws:bedrock-agentcore:ap-northeast-1:050571774557:runtime/wp0_min-HsBwOc6VWU/*"
+      ]
+    },
+    {
+      "Sid": "UploadProgress",
+      "Effect": "Allow",
+      "Action": "s3:PutObject",
+      "Resource": "arn:aws:s3:::BUCKET/cost3d/*"
+    }
+  ]
+}

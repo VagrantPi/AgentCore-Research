@@ -1,0 +1,13 @@
+一天：event 100、檢索 20、record {'wp5_episodic': 8, 'wp5_pref': 5, 'wp5_semantic': 25} = 38
+resource,session_id,seconds,vcpu_hours,gb_hours,est_usd
+wp0_min,wp5-cost-wp5-user-cost-c2608680974e489c9ae6095a1d89d30a,7216,0.020251,2.349304,0.024013
+
+#5 CPUUsed-vCPUHours：metric 0.025731、USAGE_LOGS 0.025731（5 個 session），差 -0.00%
+#5 MemoryUsed-GBHours：metric 2.521397、USAGE_LOGS 2.521397（5 個 session），差 +0.00%
+USAGE_LOGS 該 session：7216 秒、0.020251 vCPU-h、2.349304 GB-h、$0.024013
+Memory 短期（event）：$0.7500 / 月
+Memory 檢索：$0.3000 / 月
+Memory 長期儲存：$0.4275 / 月
+Runtime：$0.7204 / 月
+Browser（假設 1 vCPU、4 GB）：$0.6365 / 月
+合計：$2.8344 / 月

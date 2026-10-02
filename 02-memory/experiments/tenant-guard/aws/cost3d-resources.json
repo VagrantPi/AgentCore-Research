@@ -1,0 +1,18 @@
+{
+  "_說明": "成本 3 天版（2026-10-02 起）用到的 AWS 資源。state.json 不存在時（換電腦、worktree 被清掉）腳本讀這裡，所以要 commit。收尾見 README。",
+  "memoryId": "wp5_cost3d-tc3SBsE1IR",
+  "memoryArn": "arn:aws:bedrock-agentcore:ap-northeast-1:050571774557:memory/wp5_cost3d-tc3SBsE1IR",
+  "strategies": {
+    "wp5_episodic": "wp5_episodic-XRpqz78Rb8",
+    "wp5_pref": "wp5_pref-zULikV3SJ1",
+    "wp5_semantic": "wp5_semantic-LGqqXBEh5n"
+  },
+  "costActor": "wp5-user-cost3d",
+  "cost3dInstance": "i-06afed7f19deb7f4f",
+  "cost3dInstanceType": "t4g.nano",
+  "cost3dBucket": "wp5-cost3d-6eaa8b19",
+  "cost3dRole": "arn:aws:iam::050571774557:role/wp/wp5-cost-runner",
+  "cost3dInstanceProfile": "arn:aws:iam::050571774557:instance-profile/wp/wp5-cost-runner",
+  "cost3dLaunchedAt": "2026-10-02T10:08Z",
+  "cost3dExpectedLastSessionEnd": "2026-10-04T12:15Z"
+}

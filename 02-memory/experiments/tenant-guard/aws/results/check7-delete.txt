@@ -1,0 +1,8 @@
+刪除前：sessions、records = (8, {'wp5_episodic': 5, 'wp5_pref': 9, 'wp5_semantic': 17})
+forget_actor：{'events': 64, 'records': 31}，耗時 11.2 秒
+API 順序： list_sessions → list_events → delete_event → list_events → delete_event → list_events → delete_event → list_events → delete_event → list_events → delete_event → list_events → delete_event → list_events → delete_event → list_events → delete_event → list_memory_records → batch_delete_memory_records → list_memory_records → batch_delete_memory_records → list_memory_records → batch_delete_memory_records
+呼叫次數： {'list_sessions': 1, 'list_events': 8, 'delete_event': 64, 'list_memory_records': 3, 'batch_delete_memory_records': 3}
+刪除後立即：sessions、records = (8, {'wp5_episodic': 0, 'wp5_pref': 0, 'wp5_semantic': 5})
+5 分鐘後：sessions、records = (8, {'wp5_episodic': 0, 'wp5_pref': 0, 'wp5_semantic': 0})
+sessions: [('wp5-a-check1', 0), ('wp5-a-done0', 0), ('wp5-a-done1', 0), ('wp5-a-s0', 0), ('wp5-a-s1', 0), ('wp5-a-s2', 0), ('wp5-a-s3', 0), ('wp5-a-s4', 0)]
+ListActors: ['wp5-user-a', 'wp5-user-b', 'wp5-user-cost']

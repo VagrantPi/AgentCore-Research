@@ -66,4 +66,93 @@
 
 ## 回填
 
-（複製 [`_template.md`](_template.md) 的內容到這裡）
+- 負責人：Kais
+- 執行日期：2026-10-02
+- 區域：ap-northeast-1
+- 資源 tag：`wp=WP5`、`owner=kais`、`project=hyfai`
+- 使用的 AWS 帳號：050571774557（IAM user `KaisLinCli`，沿用 [`iam/wp0-owner-policy.json`](iam/wp0-owner-policy.json)；本 WP 不需加權限）
+- 腳本、IAM 範本與原始輸出：[`02-memory/experiments/tenant-guard/aws/`](../02-memory/experiments/tenant-guard/aws/)（逐項結果見該目錄的 [README](../02-memory/experiments/tenant-guard/aws/README.md#結果)）
+- 使用者 A、B 用固定的 actorId `wp5-user-a`、`wp5-user-b`，沒有等 WP2 的 Cognito JWT
+
+### 結論（三句內）
+
+1. **Memory 的使用者隔離在 IAM 層做得到**：每位使用者一個 role，event 用 `actorId`、record 用 `namespace` 或 `namespacePath` key 限制，跨使用者的讀寫全部被拒；actor 層級的 reflection 也沒有混到對方。阻斷級 #1、#2、#3、#4 都沒有否定。
+2. **VM 能自己 AssumeRole 是真的風險，但防線很單純**：execution role 本身不需要 `sts:AssumeRole` 權限，只要任何 role 的 trust policy 寫了它的 ARN，VM 裡的程式就能拿到那個 role；所有給使用者資料用的 role，trust 只能信任後端。
+3. **刪不乾淨的只剩識別碼**：event 與 record 都刪得掉（5 分鐘內歸零），但 actorId、sessionId 會一直留在 `ListActors`／`ListSessions`；actorId 必須是不透明的 ID。
+
+### 檢核表
+
+| # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
+|---|---|---|---|---|---|
+| 1 | IAM 依 actorId 限制：哪一種 condition key 有效 | `[矛盾]` | **通過，兩種都有效**。event 用 `bedrock-agentcore:actorId`；record 的 `namespace` 與 `namespacePath` key **各自只認同名的請求參數**，用另一種參數呼叫一律被拒（fail-closed）。兩種都要用就各寫一條 Allow | [README #1](../02-memory/experiments/tenant-guard/aws/README.md#1-iam-依-actoridnamespace-限制role-a-的存取矩陣)、`results/check1-*.json`。只用 A 的 role 測（B 的 role 套同一份範本、只換 actorId，未對稱重跑） | IAM 可以當 Memory 的第 2 層防線，前提是每位使用者（或每個租戶）有自己的 principal。`[矛盾]` 的答案：[IAM 參考](https://docs.aws.amazon.com/service-authorization/latest/reference/list_amazonbedrockagentcore.html)（列 `namespace`）與[開發指南](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/specify-long-term-memory-organization.html)（列 `namespacePath`）都對，`namespacePath` 是另一個請求參數的 key。另外 [`ListMemoryRecords` API 參考](https://docs.aws.amazon.com/bedrock-agentcore/latest/APIReference/API_ListMemoryRecords.html)說 `namespace` 是前綴，實測是完全比對，以實測為準 |
+| 2 | Actor 層級的 reflection 沒有混到另一位使用者 | `[推測]` | **是** | A 2 筆、B 3 筆 reflection，episode 5 筆，semantic／preference 60 筆，用雙方特徵詞交叉比對，0 筆混到對方；reflection 原文見 README | reflection 一律設在 actor 層級。reflection **不是匿名的**（保留了 `BRAVO-4402`、「Iceland」），設在 strategy 層級會讓所有人讀到 |
+| 3 | 範圍縮小的臨時憑證在 VM 裡讀不到 B 的資料 | `[官方已寫]` | **是** | 後端 `AssumeRole` + session policy（只 `users/A/*`），憑證送進 VM：讀 A 成功、讀 B `AccessDenied`。**和步驟 4 的偏差**：憑證不是經 `InvokeAgentRuntime` 的 payload 傳入，而是用 `InvokeAgentRuntimeCommand` 以環境變數帶進 VM（最小 agent 沒有 boto3，也不處理 payload）；VM 內拿到的是同一組憑證，結論不受影響 | 「後端發範圍縮小的憑證給 VM」可行。正式 agent 用 payload 傳入時，要避免憑證被寫進 log |
+| 4 | VM 自己 AssumeRole 能繞過；trust policy 能擋 | `[推測]` | **是，能繞過；是，trust 能擋** | trust 寫了 execution role ARN 時，VM 內 `AssumeRole` 成功並讀到 B；改成只信任後端後 `AccessDenied`。execution role 的 identity policy **沒有** `sts:AssumeRole` 也能 assume（同帳號下 trust 寫出 ARN 就足夠） | 帳號裡任何 trust 寫了 execution role ARN 的 role 都等於交給 VM。上線前要掃整個帳號的 trust policy；範本 [`trust-backend.json`](../02-memory/experiments/tenant-guard/aws/iam/trust-backend.json) |
+| 5 | `USAGE_LOGS` 能否依使用者分攤；與 metric 加總差多少 | `[官方已寫]` | **通過，差 0%** | 成本模擬的 session ID 以使用者開頭（`wp5-cost-wp5-user-cost-…`），`USAGE_LOGS` 依 session 加總即得該使用者的 Runtime 用量。同時段 `wp0_min` 5 個 session 的 log 加總：0.025731 vCPU-h、2.521397 GB-h，與 `CPUUsed-vCPUHours`、`MemoryUsed-GBHours` metric 完全相同（`results/cost-day.txt`） | session ID 要能對回使用者：以使用者 ID 開頭，或後端保留「session → 使用者」對照表。metric 只到 runtime 層級，分攤一定要用 log。同一個 log group 會混到其他 runtime（這次有 WP1 的 `wp1_cost_v1_img_pub`），要依 `agent.name` 過濾 |
+| 6 | Span 裡有沒有對話內容；opt-out 變數的實際行為 | `[矛盾]` | **無法驗證（決定不驗）** | `KaisLinCli` 沒有 X-Ray 權限，帳號也沒開 CloudWatch Transaction Search（沒有 `aws/spans` log group）。開啟是全帳號設定，**Kais 決定（2026-10-02）不在公司帳號開啟**。補驗時所需的權限見 [`iam/wp5-xray-policy.json`](iam/wp5-xray-policy.json) | 不阻斷選型。在補驗之前，一律假設 span 含對話內容：`aws/spans` 與 agent log group 設短保留期、限縮讀取權限、加 CloudWatch 資料保護政策；agent 程式不自己把 prompt 寫進 log。**正式環境開 tracing 時補驗** |
+| 7 | 刪除一位使用者資料的步驟與耗時；reflection 無殘留 | `[推測]` | **通過，但識別碼刪不掉** | `ListSessions` → 每個 session `ListEvents` → `DeleteEvent` ×64 → 每個 strategy `ListMemoryRecords(namespacePath)` → `BatchDeleteMemoryRecords`；共 79 次呼叫、11.2 秒。剛刪完 semantic 還列出 5 筆，5 分鐘後全部 0，reflection 無殘留。但 `ListActors`、`ListSessions` 仍列出 A 的 actorId 與 8 個空 session | 刪除作業要刪完等幾分鐘再掃。actorId 不能用 email 等個資。`namespace` 參數是**完全比對**（文件寫前綴），用它查會漏掉 session 層的 episode；`guard.forget_actor()` 已改用 `namespacePath` |
+| 8 | 一位使用者一個月的實際費用（Memory、Runtime、Browser 分開列） | 成本 | **約 $2.83 / 人 / 月**（估算，1 天版；3 天版進行中）：Memory $1.48、Runtime $0.72、Browser $0.64（規格假設） | 見下方「實際費用」 | 進決策矩陣。Memory 占一半以上，其中 event 寫入最貴；Runtime 幾乎全是閒置的記憶體費用 |
+| 9 | `ListEvents` / `GetMemoryRecord` 這類讀取操作是否計費 | 無數字 | **無法驗證** | [官網定價頁](https://aws.amazon.com/bedrock/agentcore/pricing/)（2026-10-02 查）只列「新 event」、「每月儲存的 record」、「record 檢索」三項，沒有提到 `ListEvents`、`GetEvent`、`ListMemoryRecords`、`GetMemoryRecord`；拿不到帳單無法實證 | 成本估算先當免費；上線後若能拿到帳單再對 |
+| 10 | VM 裡的 A token 讀不到 B 的資料、呼叫不了 A 沒買的技能；過期後失效 | `[推測]` | **等待 WP2** | 要用 B 在 WP2 建的自家 MCP server 測試執行個體 | — |
+| 11 | Runtime 的 execution role 讀不到 Browser profile，只有自家 server 讀得到 | `[推測]` | **等待 WP2** | 同上 | — |
+
+其他觀察：
+
+- **短時間大量寫 event，長期記憶萃取會直接失敗**：連續寫 100 個 event（約 6 秒）後，`ListMemoryExtractionJobs` 出現 8 個 `FAILED`、原因 `LTM_RATE_EXCEEDED`，沒有自動重試。正式環境要控制寫入速率，或監控失敗的萃取工作並用 `StartMemoryExtractionJob` 重跑。
+- **episodic 要「對話有結尾」才產出**：50 個重複提問超過 20 分鐘都沒有 episode；補寫有明確結尾（「謝謝，就這樣定案」）的對話後約 10 分鐘出現 episode 與 reflection。semantic、preference 則在寫入後幾分鐘內就有。
+- **在 VM 裡執行程式**：用 `InvokeAgentRuntimeCommand`，不必另建 image。`command` **不經過 shell**，要自己包 `sh -c '...'`；PUBLIC 網路下 VM 裡可以 `pip install boto3`。這個 API 本身就能在任何 session 的 VM 裡下任意指令，正式環境的使用者與後端都不該有這個權限。
+
+### 實際費用
+
+情境：一位使用者一天 100 個 Memory event、20 次檢索、Runtime 在線 2 小時、Browser 10 分鐘。
+
+> **3 天版進行中**（Kais 決定，2026-10-02）：在一台 EC2 `t4g.nano`（`i-06afed7f19deb7f4f`）上跑 `cost_day.py 3`（`ec2_runner.py launch`），Memory `wp5_cost3d-tc3SBsE1IR`、actor `wp5-user-cost3d`；所有資源 ID 記在 [`cost3d-resources.json`](../02-memory/experiments/tenant-guard/aws/cost3d-resources.json)，換電腦也能收尾。第 1 天 2026-10-02 10:09 UTC 開始、每 24 小時一天，最後一個 session 約 2026-10-04 12:15 UTC 結束；**13:20 UTC（台灣 21:20）後**依序 `ec2_runner.py fetch` → `cost_report.py` → 回填到這裡取代下表 → `ec2_runner.py cleanup`、`cleanup.py memory`。機器跑完會自己關機並終止。下表是 **1 天版**。
+>
+> 一開始在本機跑，因為筆電會移動、休眠會中斷，第 1 天跑到一半就停掉（actor `wp5-user-cost`，該 Runtime session 已手動 `StopRuntimeSession`），不列入計算。
+
+**和步驟 9 的偏差**：Runtime 是 105 分鐘內每 5 分鐘呼叫一次，最後閒置 15 分鐘到逾時；規格的「idle 30 分鐘」沒有刻意做出來（呼叫之間本來就是閒置，`wp0_min` 不呼叫模型，CPU 幾乎全程閒置）。閒置時記憶體照算（WP0 #3），所以在線總時數相同時，閒置怎麼分布不影響費用。跑測試用的 EC2 `t4g.nano`（3 天約 $0.4）是量測工具，不算進每人月費。
+
+1 天版：月費 = 1 天 × 30。費用在 session 結束約 45 分鐘後算：該 session 已記到 7216 秒（預期約 7200 秒），且 log 加總與 metric 一致，判定已到齊；1 小時後重查數字不變。
+
+| 資源 | 用量（1 天） | 用量來源 | 單價（官網，2026-10-02 查） | 估算月費（USD） |
+|---|---|---|---|---|
+| Memory 短期（event） | 100 個 event | 自己計數 | $0.25 / 1,000 個新 event | 0.7500 |
+| Memory 檢索 | 20 次 | 自己計數 | $0.50 / 1,000 次 | 0.3000 |
+| Memory 長期儲存 | 一天產生 38 筆 record（semantic 25、preference 5、episodic 8） | `ListMemoryRecords` 實際列出 | $0.75 / 1,000 筆 / 月（built-in） | 0.4275 |
+| Runtime（`wp0_min`，v1） | 7216 秒、0.020251 vCPU-h、2.349304 GB-h → $0.024013 | `USAGE_LOGS`（與 metric 一致） | $0.0895 / vCPU-h、$0.00945 / GB-h | 0.7204 |
+| Browser | 10 分鐘（**未實跑**，假設 1 vCPU、4 GB） | 假設 | $0.0895 / vCPU-h、$0.00945 / GB-h | 0.6365 |
+| **合計** | | | | **2.8344** |
+
+- 長期儲存的算法：record 一個月內線性累積，平均存量 = 月底的一半（38 × 30 ÷ 2 = 570 筆）。同主題的 record 會被合併，實際可能更少；但這次有 8 個萃取工作因 `LTM_RATE_EXCEEDED` 失敗，也可能低估。
+- Runtime 用的是最小 agent（不呼叫模型、約 1 GB），**不含模型 token 費用**；真的 agent 記憶體更大，閒置費用會等比例增加。費用 92% 是記憶體（2.35 GB-h × $0.00945 = $0.0222），CPU 只占 8%。
+- Browser 的規格與用量要等 WP2（瀏覽器改由自家 MCP server 開）實測後更新。WP4 的回填沒有費用數字。
+- 原始輸出：`02-memory/experiments/tenant-guard/aws/results/cost-day.txt`；算法：`cost_report.py`。
+
+### 否定項目的替代方案
+
+| 被否定的檢核點 | 替代方案 | 多出的成本或限制 |
+|---|---|---|
+| （無阻斷級否定）#7 actorId、sessionId 刪不掉 | actorId 用後端產生的不透明 ID（例如 UUID），「ID → 使用者」的對照表放自家 DB，刪除使用者時刪對照表 | 要多維護一張對照表 |
+| #4 VM 能自己 AssumeRole | 使用者資料用的 role，trust 只信任後端；後端發範圍縮小的臨時憑證給 VM | 每次請求多一次 `AssumeRole`（STS 有速率上限，需要快取到過期前） |
+
+### 清理確認
+
+- [x] IAM role `/wp/wp5-mem-user-a`、`/wp/wp5-mem-user-b`、`/wp/wp5-user-data` 已刪除
+- [x] S3 bucket `wp5-isolation-59b47063` 已清空並刪除
+- [x] Memory `wp5_mem-ah80eJAA2e` 已刪除（2026-10-02 09:36 UTC，狀態 `DELETING`）
+- [ ] Memory `wp5_cost3d-tc3SBsE1IR`（成本 3 天版）— 3 天版算完後用 `uv run cleanup.py memory` 刪除
+- [ ] EC2 `i-06afed7f19deb7f4f`（`t4g.nano`，跑完自己終止）、S3 bucket `wp5-cost3d-6eaa8b19`、role 與 instance profile `/wp/wp5-cost-runner` — 3 天版算完後用 `uv run ec2_runner.py cleanup` 刪除
+- [x] Runtime：沿用 WP0 的 `wp0_min-HsBwOc6VWU`（**保留**給 WP1）；`wp0-runtime-exec` 沒有改動
+- [x] Browser、Gateway、Policy、VPC endpoint：未建立
+- [ ] 隔天確認沒有仍在跑的 Runtime session — WP1 結束時一起確認
+
+### 要更正研究庫的段落
+
+| 檔案:行號 | 原本寫的 | 實測結果 |
+|---|---|---|
+| `02-memory/README.md:135` | `namespace`（完全相等）或 `namespacePath`（`StringLike`） | 兩個 key 都能用 `StringLike`（實測 `/strategy/*/actor/<id>/*`）；差別在各自只對應同名的請求參數 |
+| `02-memory/multi-tenant-isolation.md:7` | 本機實作「用假的 client 測試」 | 已由 WP5 用真的 AWS client 實測，見 `experiments/tenant-guard/aws/` |
+| `02-memory/multi-tenant-isolation.md:52` | 不要用 `namespacePath` 做前綴查詢 | `namespace` 參數是完全比對，要查子層（episodic 的 session 層 episode）只能用 `namespacePath`；結尾加 `/` 仍可避免比對到 `alice2` |
+| `02-memory/multi-tenant-isolation.md:86` | `namespacePath`、`namespaceVariable` 只出現在開發指南，需實測 | `namespacePath` key 有效，但只對應 `namespacePath` 請求參數；`namespace` key 只對應 `namespace` 參數。`namespaceVariable` 未測 |
+| `02-memory/multi-tenant-isolation.md:228` | 依 actor 的 namespace `ListMemoryRecords` | `namespace` 參數是完全比對，查不到子層的 episode；要用 `namespacePath`（`guard.forget_actor()` 已改） |
+| `02-memory/multi-tenant-isolation.md:223`（被遺忘權） | 未提 actorId、sessionId 本身 | actorId、sessionId 刪不掉，會留在 `ListActors`／`ListSessions` |
