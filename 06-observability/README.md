@@ -64,7 +64,7 @@ Session（session.id，透過 header 或 OTel baggage 傳遞）
 | `Throttles`、`SystemErrors`、`UserErrors` | 錯誤分類：throttle 回 429；quota 回 **402**（見 [01](../01-runtime/)） |
 | `SessionCount`（新建立的 session 數，**累計值**） | 使用趨勢 |
 | **`ActiveSessionCount`**（**目前進行中的 session 數**，可以依 Runtime、CodeInterpreter、Browser 篩選） | **監控 session 配額的用量**，建議對它設警報 |
-| `CPUUsed-vCPUHours`、`MemoryUsed-GBHours` | 資源用量，接近帳單上的數字，**但最多延遲 60 分鐘，而且不等於實際帳單** |
+| `CPUUsed-vCPUHours`、`MemoryUsed-GBHours` | 資源用量，**最多延遲 60 分鐘**。[WP0](../91-work-packages/WP0-cost-baseline.md#回填) 實測：資料約 1 小時後到齊，加總與 `USAGE_LOGS` 完全一致；和實際帳單差多少無法驗證（帳號拿不到帳單） |
 | WebSocket 相關：`ActiveStreamingConnections`、進出的 byte 數 | 雙向串流的容量規劃 |
 
 ### Log
@@ -72,7 +72,7 @@ Session（session.id，透過 header 或 OTel baggage 傳遞）
 | 類型 | 內容 | 注意事項 |
 |------|------|---------|
 | `APPLICATION_LOGS` | 每次呼叫的 trace/span ID，**加上 `request_payload` 和 `response_payload`** | **包含使用者的完整對話內容** |
-| `USAGE_LOGS` | 每個 session 每秒的 vCPU-hours 和 GB-hours | 可以用來把成本分攤到個別 session 或使用者（官方文件的說法，尚未實測；由 [WP0](../91-work-packages/WP0-cost-baseline.md)、[WP5](../91-work-packages/WP5-user-state-isolation.md) 驗證） |
+| `USAGE_LOGS` | 每個 session 每秒的 vCPU-hours 和 GB-hours | 可以用來把成本分攤到個別 session：[WP0](../91-work-packages/WP0-cost-baseline.md#回填) 已實測，每個 session 每秒一筆、有 `session.id`，加總與 metric 一致。**沒有使用者 ID**，要分攤到使用者得自己維護 session → 使用者的對照（由 [WP5](../91-work-packages/WP5-user-state-isolation.md) 驗證） |
 
 ## 在 agent 程式裡加上 instrumentation
 
@@ -101,7 +101,7 @@ Session（session.id，透過 header 或 OTel baggage 傳遞）
 
 ### 成本
 
-- 費用全部依 CloudWatch 的價格計算：span 的 ingestion 大約每 GB $0.35、log 大約每 GB $0.50，另外還有儲存和查詢費用（見 [00](../00-overview/README.md#計費模型)）。
+- 費用全部依 CloudWatch 的價格計算：span 的 ingestion 每 GB $0.35（東京同價）；標準 log 的攝入美東每 GB $0.50、**東京每 GB $0.76**（[WP6](../91-work-packages/WP6-oss-alternatives.md#回填) 查 CloudWatch Price List），另外還有儲存和查詢費用（見 [00](../00-overview/README.md#計費模型)）。
 - **Agent 的 span 很大：** 內容包含 prompt 和回應，一輪對話就可能有數 KB 到數十 KB，工具的結果如果是長文件會更大。**流量大的時候，CloudWatch 的費用可能超過 Runtime 本身**（判斷）。
 - **控制方式：**
   - Transaction Search 的**索引抽樣比例**（`UpdateIndexingRule`）。

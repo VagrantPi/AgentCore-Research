@@ -121,7 +121,7 @@ A 半全部 13 個沙箱 session（含 probe 重跑與 5 分鐘測試）估算�
 - [x] Runtime / Harness、Browser、Gateway、Policy、Memory、VPC endpoint：A 半未建立
 - [ ] 隔天確認沒有仍在跑的 session（`list-code-interpreter-sessions`）
 
-#### 要更正研究庫的段落
+#### 要更正研究庫的段落（已套用，2026-10-02）
 
 | 檔案:行號 | 原本寫的 | 實測結果 |
 |---|---|---|
