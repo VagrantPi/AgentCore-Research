@@ -70,7 +70,7 @@
 
 ## 回填
 
-> **部分回填（2026-10-02）：** 除了 #10、#11 都跑完了，全部是 PUBLIC。#11（VPC 組）等 B 在 WP3 建好 VPC；#10（成本情境）要實測：用 `USAGE_LOGS` 量實際用量，全程約 3.5 小時，尚未跑。
+> **部分回填（2026-10-02）：** 除了 #11 都跑完了，全部是 PUBLIC。#11（VPC 組）等 B 在 WP3 建好 VPC。#10（成本情境）用 `USAGE_LOGS` 實測，見檢核表與下方「#10 成本情境」。
 
 - 負責人：kais
 - 執行日期：2026-10-02
@@ -99,16 +99,39 @@
 | 8 | 單 session 3 個並行請求：全部成功、`/ping` 不被卡 | `[推測]` | 通過（多執行緒版）：9/9 成功、延遲都是 20.2–20.3 s、同一台 VM、每個請求期間收到 10 次 `/ping`。阻塞版：9/9 成功但排隊成 20/40/60 s、`/ping` 0 次；**有 1 次第 3 個請求花 87 s 且換了 `boot_token`**（process 被重啟或換 VM，記憶體狀態會遺失） | `concurrent.csv` | 一人一 session、多聊天室共用可行；agent 的 handler 必須 async 或多執行緒 |
 | 8′ | 阻塞版本是否在閒置逾時後被砍 | `[官方已寫]` | 通過，而且範圍更大：180 秒的請求（閒置逾時 60 秒）在阻塞版（156.7 s）和**回 `Healthy` 的多執行緒版**（246.8 s）都收到 `RuntimeClientError`、session 被終止；處理中回 `HealthyBusy` 的版本 180.2 s 成功 | `concurrent.csv` | 長任務一定要回 `HealthyBusy`。正式環境閒置逾時預設 15 分鐘，所以超過 15 分鐘的請求適用 |
 | 9 | Session 建立速率上限 | `[矛盾]` | 沒有碰到上限：100 個新 session 在約 1 秒內送出，0 次 throttle | `burst.csv` | 1.6/s 不成立；25/s 是持續速率還是上限，這個規模分辨不出來。不影響選型 |
+| 10 | 20 位使用者 2 小時的費用；換算 100 位使用者月費 | 成本 | 20 位：0.5114 vCPU-h、53.45 GB-h，**$0.551**（依實測用量計價）。每人一次 2 小時在線 $0.0275 → 100 人 × 30 天 **約 $82.6 / 月** | `wp1-cost.csv`、`cost_scenario.csv`、原始 log `wp1_cost_usage_logs.jsonl.gz`；見下方「#10 成本情境」 | 費用只跟 session 活著的秒數成正比，跟呼叫次數幾乎無關；九成以上是記憶體。最後一次使用後立刻 `StopRuntimeSession` 可省掉閒置的 21%（約 $65 / 月） |
 
 - 平台在 handler 忙碌時約每 2 秒打一次 `/ping`。
 - 阻塞版那次 87 s、換了 `boot_token`：和 8′ 一致，阻塞約 60 秒、超過閒置逾時後 VM 被換掉。
 - 8′ 每組只跑 1 次（回 `Healthy` 的那組前後被砍 2 次）。這批 runtime 的閒置逾時是 60 秒，沒有用預設的 15 分鐘重跑。
+
+### #10 成本情境
+
+**設定：** runtime `wp1_cost_v1_img_pub`（V1、PUBLIC、最小 agent `:wp1`、`idleRuntimeSessionTimeout=1800`），`USAGE_LOGS` 投遞到 WP0 的 `wp0-usage` log group。20 位使用者各用一個固定 session，每 5 分鐘呼叫一次 `{"prompt":"ping"}`，每人 24 次，使用者之間錯開 15 秒；最後一次呼叫後不 stop，讓 session 自然閒置逾時。腳本 [`cost_scenario.py`](../01-runtime/experiments/cold-start/cost_scenario.py)。
+
+**時間（UTC）：** 負載 06:43:39–08:43:24；session 約 09:13 閒置逾時結束；10:17 算錢（log 在 09:57 和 10:17 兩次查詢完全相同，已到齊）。
+
+**資料完整：** 480 / 480 次呼叫成功；20 位使用者每位只有 1 個 `boot_token`（2 小時內 session 沒被中途回收）；每個 session 的 log 秒數 8701–8721 秒，符合預期的 115 分鐘使用 + 30 分鐘閒置 = 8700 秒。
+
+| 項目 | vCPU-hours | GB-hours | 估算金額（USD） |
+|---|---|---|---|
+| 20 個 session 合計 | 0.511378 | 53.452354 | 0.550893 |
+| 其中活躍時段（第一次到最後一次呼叫） | 0.408571 | 42.166830 | 0.435044（79%） |
+| 其中閒置時段（最後一次呼叫後 30 分鐘） | 0.102807 | 11.285525 | 0.115849（21%） |
+| 每個 session 平均 | 0.025569 | 2.672618 | 0.027545 |
+
+- **月費外推（線性）：** $0.027545（實測的每人一次 2 小時在線）× 100 人 × 30 天 = **$82.63 / 月**，即每人每月約 $0.83。若每次用完立刻 `StopRuntimeSession`，只算活躍時段：$0.435044 ÷ 20 × 3000 = **$65.26 / 月**。
+- **費用只看 session 活多久：** 閒置時段占 21% 的秒數、也剛好占 21% 的金額，每 5 分鐘一次的 ping 幾乎不增加用量。平均每個活著的 session 約 0.011 vCPU、1.10 GB 記憶體；金額 92% 來自記憶體。
+- **和 metric 對帳**（log 加總含 2 個乾跑 session）：GB-hours 53.511837 對 53.524180，差 0.02%；vCPU-hours 0.512418 對 0.521447，差 1.7%（WP0 是 0%）。原因未確認，推測 metric 多算了不屬於任何 session 的預先開好的 VM；對金額影響不到 $0.001。
+- **限制：** 用的是最小 agent（約 1.1 GB），真實 agent 記憶體較大，金額會等比增加；真實 agent 的數字等 WP5 或正式 agent 再量。
+- 原始 `USAGE_LOGS`（174,415 筆，含乾跑）已存成 [`wp1_cost_usage_logs.jsonl.gz`](../01-runtime/experiments/cold-start/wp1_cost_usage_logs.jsonl.gz)（[`dump_usage_logs.py`](../01-runtime/experiments/cold-start/dump_usage_logs.py)），log group 只保留 14 天。
 
 ### 實際費用
 
 | 資源 | 用量（vCPU-hours、GB-hours、次數、token） | 用量來源（`USAGE_LOGS`、metric、自己計數） | 單價（官網，標日期） | 估算金額（USD） |
 |---|---|---|---|---|
 | Runtime（7 個 wp1_ runtime） | 約 470 個 session，每個活幾秒到約 4 分鐘；burst 的 280 個沒有主動停止，閒置 60 秒後回收 | 自己計數；這批 runtime 沒開 `USAGE_LOGS` | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 遠低於 1（未精算） |
+| Runtime `wp1_cost_v1_img_pub`（#10，20 個 session + 2 個乾跑） | 0.512418 vCPU-h、53.511837 GB-h | `USAGE_LOGS`，與 metric 對帳見 #10 | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 0.551548 |
 | ECR | 約 1.1 GB（`:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy`，小的幾乎不佔空間） | 自己計數 | — | 每月約 0.1 |
 
 ### 否定項目的替代方案
@@ -120,7 +143,8 @@
 
 ### 清理確認
 
-- [ ] Runtime 已刪除——**刻意保留**給 #11（VPC 組要跟 PUBLIC 比）與 #10：`wp1_cs_v1_img_pub`、`wp1_cs_v2_img_pub`、`wp1_cs_v1_bigimg_pub`、`wp1_cs_v2_bigimg_pub`、`wp1_cs_v1_img_pub_blk`、`wp1_cs_v1_img_pub_busy`、`wp1_ss_v1_img_pub`（含 endpoint `wp1_pinned`）。沒有 session 時不計運算費
+- [x] #10 的 runtime `wp1_cost_v1_img_pub`、delivery source `wp1_cost-usage-src` 與它的 delivery 已刪除（2026-10-02）；`wp0-usage-dst` 和 log group 是 WP0 的，保留
+- [ ] 其餘 Runtime 已刪除——**刻意保留**給 #11（VPC 組要跟 PUBLIC 比）：`wp1_cs_v1_img_pub`、`wp1_cs_v2_img_pub`、`wp1_cs_v1_bigimg_pub`、`wp1_cs_v2_bigimg_pub`、`wp1_cs_v1_img_pub_blk`、`wp1_cs_v1_img_pub_busy`、`wp1_ss_v1_img_pub`（含 endpoint `wp1_pinned`）。沒有 session 時不計運算費
 - [ ] ECR image `wp-agentcore-coldstart:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy` 待 WP1 全部跑完再刪
 - [ ] 隔天確認 Runtime 沒有仍在跑的 session
 
