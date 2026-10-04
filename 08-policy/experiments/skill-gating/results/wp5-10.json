@@ -1,0 +1,34 @@
+{
+ "steps": {
+  "1 /mcp tools/list": {
+   "http": 200,
+   "body": "event: message\ndata: {\"result\":{\"tools\":[{\"name\":\"com_wp2_todo__list_todos\",\"description\":\"列出使用者的待辦事項。user_id 參數僅供相容，server 一律以呼叫者身分為準。\",\"inputSchema\":{\"type\":\"object\",\"properties\":{\"user_id\":{\"type\":\"string\"}}}}]},\"jsonrpc\":\"2.0\",\"id\":1}\n\n"
+  },
+  "2 /mcp todo 帶 user_id=被害者": {
+   "http": 200,
+   "body": "event: message\ndata: {\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"{\\\"speak\\\":\\\"共 2 筆待辦\\\",\\\"data\\\":{\\\"todos\\\":[\\\"A：繳電話費\\\",\\\"A：買牛奶\\\"]}}\"}]},\"jsonrpc\":\"2.0\",\"id\":1}\n\n"
+  },
+  "3 /v1/invoke todo 帶 user_id=被害者": {
+   "http": 200,
+   "body": "{\"status\":\"ok\",\"speak\":\"共 2 筆待辦\",\"data\":{\"todos\":[\"A：繳電話費\",\"A：買牛奶\"]}}"
+  },
+  "4 /mcp 呼叫沒買的 flight": {
+   "http": 200,
+   "body": "event: message\ndata: {\"result\":{\"content\":[{\"type\":\"text\",\"text\":\"Unknown tool: com_wp2_flight__search_flights\"}],\"isError\":true},\"jsonrpc\":\"2.0\",\"id\":1}\n\n"
+  },
+  "5 /v1/invoke 呼叫沒買的 flight": {
+   "http": 403,
+   "body": "{\"error\":\"skill not purchased\"}"
+  },
+  "6 過期後 /mcp tools/list": {
+   "http": 401,
+   "body": "{\"error\":\"jwt expired\"}"
+  },
+  "7 過期後 /v1/invoke todo": {
+   "http": 401,
+   "body": "{\"error\":\"jwt expired\"}"
+  }
+ },
+ "waited_s": 66.2,
+ "client_roundtrip_ms": 67572
+}

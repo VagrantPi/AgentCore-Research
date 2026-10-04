@@ -93,8 +93,8 @@
 | 7 | 刪除一位使用者資料的步驟與耗時；reflection 無殘留 | `[推測]` | **通過，但識別碼刪不掉** | `ListSessions` → 每個 session `ListEvents` → `DeleteEvent` ×64 → 每個 strategy `ListMemoryRecords(namespacePath)` → `BatchDeleteMemoryRecords`；共 79 次呼叫、11.2 秒。剛刪完 semantic 還列出 5 筆，5 分鐘後全部 0，reflection 無殘留。但 `ListActors`、`ListSessions` 仍列出 A 的 actorId 與 8 個空 session | 刪除作業要刪完等幾分鐘再掃。actorId 不能用 email 等個資。`namespace` 參數是**完全比對**（文件寫前綴），用它查會漏掉 session 層的 episode；`guard.forget_actor()` 已改用 `namespacePath` |
 | 8 | 一位使用者一個月的實際費用（Memory、Runtime、Browser 分開列） | 成本 | **約 $2.83 / 人 / 月**（估算，1 天版；3 天版進行中）：Memory $1.48、Runtime $0.72、Browser $0.64（規格假設） | 見下方「實際費用」 | 進決策矩陣。Memory 占一半以上，其中 event 寫入最貴；Runtime 幾乎全是閒置的記憶體費用 |
 | 9 | `ListEvents` / `GetMemoryRecord` 這類讀取操作是否計費 | 無數字 | **無法驗證** | [官網定價頁](https://aws.amazon.com/bedrock/agentcore/pricing/)（2026-10-02 查）只列「新 event」、「每月儲存的 record」、「record 檢索」三項，沒有提到 `ListEvents`、`GetEvent`、`ListMemoryRecords`、`GetMemoryRecord`；拿不到帳單無法實證 | 成本估算先當免費；上線後若能拿到帳單再對 |
-| 10 | VM 裡的 A token 讀不到 B 的資料、呼叫不了 A 沒買的技能；過期後失效 | `[推測]` | **等待 WP2** | 要用 B 在 WP2 建的自家 MCP server 測試執行個體 | — |
-| 11 | Runtime 的 execution role 讀不到 Browser profile，只有自家 server 讀得到 | `[推測]` | **等待 WP2** | 同上 | — |
+| 10 | VM 裡的 A token 讀不到 B 的資料、呼叫不了 A 沒買的技能；過期後失效 | `[推測]` | **是、是、是**（2026-10-04） | Runtime `wp5_agent` 的 VM 裡拿 A 的 actor JWT（60 秒）直接打 EC2 上的 HephAgora：<br>① `/mcp`、`/v1/invoke` 都帶 `user_id=userB` 讀 todo → 只回 A 自己的 2 筆<br>② `/mcp` 呼叫 flight → `Unknown tool`；`/v1/invoke` → 403 `skill not purchased`<br>③ 等 66 秒後兩個入口都 401 `jwt expired`<br>原始輸出 [`results/wp5-10.json`](../08-policy/experiments/skill-gating/results/wp5-10.json)；細節見下方「#10、#11 補測」 | 使用者 token 可以交給 VM：外洩的最大損害＝A 本人在 60 秒內能做的事。前提是 server 一律依 actor 取資料、不信 caller 給的參數。token 在 60 秒內可重複使用（HephAgora 刻意不檢查 jti） |
+| 11 | Runtime 的 execution role 讀不到 Browser profile，只有自家 server 讀得到 | `[推測]` | **是**（2026-10-04） | profile `userA__example_com`、`userB__example_com`（tag `user`、`site`）。<br>VM 內 execution role `/wp/wp5-agent-exec`：`ListBrowserProfiles`、`GetBrowserProfile` 全部 `AccessDeniedException`。<br>server 角色 `/wp/wp5-hephagora-ec2`（只多給這兩個 action）：列得到、也讀得到兩個 profile。<br>原始輸出 [`results/wp5-11-exec.json`](../08-policy/experiments/skill-gating/results/wp5-11-exec.json)、[`results/wp5-11-server.txt`](../08-policy/experiments/skill-gating/results/wp5-11-server.txt) | profile 權限只給 server 的角色，execution role 不給任何 Browser 動作。IAM 對 profile 只有 `aws:ResourceTag` 可用，「A 的請求只拿 A 的 profile」要由 server 自己保證 |
 
 其他觀察：
 
@@ -156,3 +156,63 @@
 | `02-memory/multi-tenant-isolation.md:86` | `namespacePath`、`namespaceVariable` 只出現在開發指南，需實測 | `namespacePath` key 有效，但只對應 `namespacePath` 請求參數；`namespace` key 只對應 `namespace` 參數。`namespaceVariable` 未測 |
 | `02-memory/multi-tenant-isolation.md:228` | 依 actor 的 namespace `ListMemoryRecords` | `namespace` 參數是完全比對，查不到子層的 episode；要用 `namespacePath`（`guard.forget_actor()` 已改） |
 | `02-memory/multi-tenant-isolation.md:223`（被遺忘權） | 未提 actorId、sessionId 本身 | actorId、sessionId 刪不掉，會留在 `ListActors`／`ListSessions` |
+
+### #10、#11 補測（2026-10-04）
+
+- 負責人：Kais
+- 執行日期：2026-10-04（09:10–09:27 UTC 建、測、刪；`USAGE_LOGS` 投遞在 10:30 UTC 算完費用後刪）
+- 區域：ap-northeast-1
+- 資源 tag：`wp=WP5`、`owner=kais`、`project=hyfai`（Browser profile 另加 `user`、`site`）
+- 使用的 AWS 帳號：050571774557（IAM user `KaisLinCli`；EC2、VPC、ECR、S3、IAM 用既有的群組權限，沒有加權限）
+- 自家 MCP server：WP2 的 HephAgora 分支 `wp2/skill-gating` 沒有推上 GitLab，由 Kais **依 [skill-gating README](../08-policy/experiments/skill-gating/README.md) 重建**（同名分支，[`de3df3d6`](https://gitlab.hephaistudio.dscloud.biz:49156/hephai/HephAgora/-/tree/wp2/skill-gating)）。和 WP2 版本的差異：
+  - 沒有 Browser MCP server，這次用不到。
+  - migration 合成一個 `036`。
+  - todo 改成每人一份資料（`wp2_todos`），這樣 #10 才有「B 的資料」可以讀。
+  - 本機與 EC2 版都先跑過 `scripts/wp2/check.sh`，15 項全過。
+- 架構：
+  - EC2 `t4g.medium` 跑 HephAgora，開關為 `HEPHAGORA_REQUIRE_ACTOR=1`、`HEPHAGORA_MCP_FACADE=1`。
+  - Runtime `wp5_agent`：PUBLIC 網路；execution role 只能拉映像、寫 log、呼叫 Haiku，沒有任何 Browser 權限。
+  - agent 用 probe 直接打 HTTP，不經模型：`probe=abuse`（#10）、`probe=profile`（#11），見 [`agent/main.py`](../08-policy/experiments/skill-gating/agent/main.py)。
+  - 使用者 A、B 是 actor JWT 的 `sub`（`userA`、`userB`），由開發機扮演後端簽發，沒有用 Cognito：HephAgora 認的就是 `sub`。
+
+#### 結論（三句內）
+
+1. **使用者 token 進 VM，能做的事不會超過使用者本人**：讀別人的資料、呼叫沒買的技能都被 server 擋下，過期後兩個入口都回 401。前提是 server 依 actor 取資料，不信任工具參數裡的使用者 ID。
+2. **Browser profile 的存取可以只給 server**：execution role 不給權限就讀不到，server 角色加兩個 action 就讀得到。profile 不需要先建 Browser 就能建立。
+3. 剩下的風險是 token 在 60 秒內可以重複使用，以及 profile 的 IAM 只能用 tag 區分。前者靠 60 秒效期控制；後者要由 server 自己檢查「這個請求的使用者 = profile 的 `user` tag」。
+
+#### 費用
+
+| 資源 | 用量 | 用量來源 | 單價（官網，2026-10-04 查） | 估算金額（USD） |
+|---|---|---|---|---|
+| Runtime `wp5_agent`，3 個 session（含 1 次 token 沒換進去的失敗呼叫） | 0.005760 vCPU-h、0.640581 GB-h（共 998 秒，每個 session 含 5 分鐘閒置） | `USAGE_LOGS`（`usage_cost.py`，2026-10-04 10:28 UTC，最後 session 結束後 1 小時） | $0.0895／vCPU-h、$0.00945／GB-h | 0.0066 |
+| EC2 `t4g.medium` | 0.1944 h（09:10:04–09:21:44 UTC，700 秒） | 啟動與終止時間 | $0.0432／h | 0.0084 |
+| EBS gp3 30 GB | 0.1944 h | 同上 | $0.096／GB-月（÷730 h） | 0.0008 |
+| 公有 IPv4 | 0.1944 h | 同上 | $0.005／h | 0.0010 |
+| **合計** | | | | **≈ 0.0168** |
+
+- 算式：Runtime 0.005760 × 0.0895 + 0.640581 × 0.00945 = 0.000516 + 0.006053；EC2 0.1944 × 0.0432；EBS 30 × 0.096 × 0.1944 ÷ 730；IPv4 0.1944 × 0.005。
+- 不含 ECR、S3（存放約 20 分鐘，可忽略）與 CloudWatch Logs。這次沒有呼叫模型。
+
+#### 否定項目的替代方案
+
+無（#10、#11 都通過）。
+
+#### 清理確認
+
+- [x] Runtime `wp5_agent-db7UGyFQOS` 已刪除（09:27 UTC，session 都已閒置逾時）；log group `/aws/bedrock-agentcore/runtimes/wp5_agent-db7UGyFQOS-DEFAULT` 已刪除
+- [x] Browser profile `userA__example_com-yxhNOKhfsC`、`userB__example_com-LX75w0kfGa` 已刪除；沒有開過 Browser session
+- [x] EC2 `i-0aab33e1d4a2bcafb` 已終止（EBS 隨之刪除）；VPC `vpc-0e8771eab59450c50`、子網路、IGW、路由表、安全群組已刪除
+- [x] ECR `wp5-hephagora`、`wp5-agent`（含映像），以及 S3 `wp5-kais-deploy-050571774557` 已刪除
+- [x] IAM `/wp/wp5-hephagora-ec2`（含 instance profile）、`/wp/wp5-agent-exec` 已刪除
+- [x] `USAGE_LOGS` delivery source `wp5_agent-usage-src` 與 delivery `3Crw3jaqmjkgsIMf` 已刪除（10:30 UTC，算完費用後）；destination `wp0-usage-dst` 是 WP0 的，保留
+- [x] 用 `resourcegroupstaggingapi get-resources`（`wp=WP5`、`owner=kais`）複查：剩下的只有 3 天成本測試的 `wp5_cost3d`、`i-06afed7f19deb7f4f` 和它的 EBS、ENI、S3，不屬於本節
+- [x] Gateway、Policy、Memory、VPC endpoint、NAT：未建立
+
+#### 要更正研究庫的段落
+
+| 檔案:行號 | 原本寫的 | 實測結果 |
+|---|---|---|
+| `91-work-packages/README.md:137` | 使用者 token（#10、#11）等 WP2 | #10、#11 都通過（2026-10-04，用重建的 HephAgora）。README 由 Kais 統一更新，本次不改 |
+| `05-built-in-tools/browser-reliability-security.md:45` | 生命週期從 `CreateBrowserProfile` 開始，沒說要不要先建 Browser | `CreateBrowserProfile` 只需要 name（可加 tag），不依附任何 Browser；profile 和 Browser 是兩個獨立資源 |
+| `08-policy/experiments/skill-gating/README.md:6` | HephAgora 分支「尚未推上 GitLab；推上後補連結」 | 原分支一直沒推，已由 Kais 重建同名分支；差異見本節開頭（README 已同步改） |
