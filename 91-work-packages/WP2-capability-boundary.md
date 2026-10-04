@@ -202,7 +202,7 @@ Cedar 規則可以先用 [`08-policy/experiments/prompt-to-policy/`](../08-polic
 | 5 | Harness 覆寫 `allowedTools` 後模型不知道被排除的工具 | `[官方已寫]`，未實證 | 通過 | B 帶 `["@ha/com_wp2_todo__*"]`：「我目前沒有查詢機票的能力」；列工具只列 2 個 todo 工具 | 可當第二層防線；第一層仍是 server |
 | 6 | VM 裡直接呼叫 `StartBrowserSession` 收到 `AccessDenied` | `[官方已寫]` | 通過 | `wp2-agent-exec` 對自訂 browser 與 `aws.browser.v1` 皆 `AccessDeniedException` | VM 碰不到 Browser |
 | 7 | 包成自家工具的 Browser：B 成功、A 被拒、白名單外被擋 | `[推測]` | 通過 | B：Example Domain；A：工具不可見，直打 `/v1/invoke` 403；B 開 google.com：`ERR_BLOCKED_BY_ADMINISTRATOR` | Browser 依技能收費可行 |
-| 8 | 接手登入由 server 主導 | `[推測]` | 未做（改天） | — | 要另測手機能否開 Live View（DCV 網頁客戶端官方不支援 iOS／Android） |
+| 8 | 接手登入由 server 主導 | `[推測]` | 2026-10-05 補做：**通過（iOS 模擬器）**，見下方「#8 補做」 | — | 手機開 Live View 官方有支援（DCV 1.10.1 起）；本列初版寫「官方不支援」是錯的 |
 | 10 | 一般工具延遲 p50；Browser 工具端到端 | — | 21 ms（p90 23 ms，n=20）；5.8 s（n=3） | Runtime 內 `probe=mcp_latency` | — |
 | 11 | Browser 工具費用；測試 server 費用 | 成本 | Browser 每次呼叫約 **$0.00016**（實跑 5 次、計費約 5–6 秒／次），20 次換算約 $0.003；測試 server（EC2 27 分鐘）約 $0.024 | `USAGE_LOGS` → `usage_cost.py`（10:06 UTC，最後 session 結束後 1 小時）；EC2 用量×官網價 | Browser 依次計費、極便宜；Harness 一個 session 約是自寫 Runtime 的 5 倍（記憶體大） |
 
@@ -247,7 +247,7 @@ AWS 部分沒有否定項目。
 | `00-overview/harness-vs-runtime.md:29` | `remote_mcp` 的 header 引用 token vault；每次呼叫能不能帶不同使用者的 token 沒寫 | 每次 `InvokeHarness` 覆寫 `tools` 就能帶不同使用者的 header（token 由後端明文組進參數） |
 | `00-overview/harness-vs-runtime.md:36` | `allowedTools` 可以限制模型能看到的工具 | 實證：覆寫後模型不知道被排除的工具；`remote_mcp` 的工具寫成 `@<server 名>/<工具名>` |
 
-### #8 接手登入改由 server 主導（2026-10-04）：無法驗證（阻斷）
+### #8 接手登入改由 server 主導（2026-10-04）：無法驗證（阻斷）→ 2026-10-05 已補做，見下一節
 
 - 負責人：Kais
 - 執行日期：2026-10-04（只確認前提，沒有建資源）
@@ -296,3 +296,66 @@ AWS 部分沒有否定項目。
 #### 清理確認
 
 - [x] 本節沒有建立任何 AWS 資源
+
+### #8 補做：接手登入由 server 主導（2026-10-05，Kais）
+
+- 負責人：Kais（接手 B 群）
+- 執行日期：2026-10-05 00:30–00:53 台灣時間（2026-10-04 16:30–16:53 UTC）
+- 區域：ap-northeast-1（AgentCore Browser）；HephAgora、agent、Browser skill server 都在開發機
+- 資源 tag：沒有建立需要 tag 的資源（用系統 browser `aws.browser.v1`）
+- 使用的 AWS 帳號：050571774557（IAM user `KaisLinCli`）
+- 實作、重現步驟、證據：[`08-policy/experiments/skill-gating/takeover/`](../08-policy/experiments/skill-gating/takeover/README.md)
+- 取代 WP4 程式的是 WP6 的 [`mobile-takeover`](../05-built-in-tools/experiments/mobile-takeover/README.md)；Browser MCP server 這次用 Python 重寫（`browser_skill.py`），以 http binding 掛在重建的 HephAgora（`wp2/skill-gating`）後面，HephAgora 程式沒改，只加 seed
+
+#### 結論（三句內）
+
+1. **server 主導的接手登入走得通，而且 agent 拿不到 Live View URL**：server 偵測到登入頁就 `take_control`、把 viewer 連結推給 App；使用者在手機上登入、交還後 server `release_control`、重連 CDP、讀到登入成功，只回 `{"status": "logged_in", "message": ...}`。agent 對話、agent 輸出、HephAgora log 與帳本搜尋 URL 相關字串都是 0 筆。
+2. **使用者沒交還也收得乾淨**：工具在總預算 270 秒時自己 release、停 session，回 `user_did_not_complete_login`，比 HephAgora binding 的 300 秒早結束。
+3. **手機端還有兩個實作要處理的問題**：雲端 Chrome 會跳「要儲存密碼嗎？」（使用者帳密可能被存進 profile，要用企業政策關掉）；iOS 鍵盤開著時點擊偶爾落在錯的位置。真機、Android 都還沒測。
+
+#### 檢核表
+
+| # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
+|---|---|---|---|---|---|
+| 8 | 接手登入由 server 主導可以走完；agent 的對話與 trace 裡沒有 Live View URL | `[推測]` | **通過（iOS 模擬器）**。偵測登入頁到推播 5.7 秒（沒有 CDP 逾時時；有逾時重連時 34–62 秒）；開連結到 Live View 首畫面 2.4 秒；交還後 1.5–3.6 秒拿到結果。URL 外洩搜尋 0 筆 | `events.csv`、`transcript.json`、`transcript_timeout.json`、截圖 | Browser 技能依「server 主導接手」設計可行；真機與 Android 未驗，選型上當作「機制已證實、手機體驗待驗」 |
+
+另外跑過的情境：
+
+| 情境 | 結果 |
+|---|---|
+| 授權：B 看得到 `com_wp2_login-web__login_and_check`、A 看不到、A 直接呼叫 | 通過（A 回 `Unknown tool`）；本機 HephAgora 先跑 `scripts/wp2/check.sh` 15 項全過 |
+| 使用者沒交還 | 通過：270 秒時回 `user_did_not_complete_login` |
+| CDP 指令逾時 | 第一版沒做重試，一次 `goto` 逾時就整個失敗；加上「逾時就重連 CDP 再做一次」後，兩次 `goto` 逾時都靠重連救回 |
+
+#### 發現（實作時要處理）
+
+1. **雲端 Chrome 會想存使用者的密碼**：使用者接手登入後跳出「Save password?」。Browser 若用會保存的 profile，下一個操作的人或 agent 可能拿到。用企業政策關掉 `PasswordManagerEnabled`，並把「接手輸入的帳密不會被保存」列入驗收。
+2. **HephAgora 呼叫外部 MCP server 時不帶 actor**（只帶 OAuth bearer），Browser server 不知道要推給哪個使用者；這次用固定的 userB。要讓 HephAgora 把 actor 傳給 binding（約 5 行），或改由 HephAgora 自己推播。
+3. **錯誤時 HephAgora 把內部 server 位址回給 agent**：工具丟例外時，agent 收到的錯誤含 `_meta.server: http://host.docker.internal:13200/mcp`。成功時沒有，但正式版要拿掉。
+4. **等待要用總預算**：固定等 240 秒時，開頁花了 62 秒（測試站在 Heroku，閒置後第一次開很慢，加一次 CDP 逾時重連），總共 302 秒，被 HephAgora 300 秒先判逾時。改成工具總預算 270 秒。
+5. **iOS 鍵盤開著時點擊偶爾偏移**：鍵盤開著點密碼欄兩次沒點到，收起鍵盤就點準了；另一輪鍵盤開著卻沒問題。推測是 Safari 彈鍵盤時捲動了可視範圍，正式 viewer 要處理並在真機驗。
+6. 一次工具呼叫掛著等使用者好幾分鐘（這次 2–3 分鐘），binding 與 agent 端逾時都要拉長。較好的做法是工具先回「已請使用者登入」，完成後用新的一輪通知 agent。
+
+#### 實際費用
+
+| 資源 | 用量 | 用量來源 | 單價 | 估算金額（USD） |
+|---|---|---|---|---|
+| AgentCore Browser（系統 browser）5 個 session | 約 912 秒（130＋179＋302＋270＋31） | `events.csv` 的 `session_started`／`session_stopped` | 每 browser-hour 約 $0.09（WP6 `USAGE_LOGS` 實測） | 約 0.02 |
+| Haiku 4.5 | 5 次對話、各 2 輪 | — | — | 未量（很小） |
+
+#### 否定項目的替代方案
+
+沒有否定項目。若真機上鍵盤或觸控不能用，替代方案見上一節「真機若有問題時的替代方案」。
+
+#### 清理確認
+
+- [x] 5 個 Browser session 都已 `stop()`；`list-browser-sessions --status READY` 為空
+- [x] 本機 HephAgora（`docker compose -p hephagora-wp2`）已 down；Browser skill server 已停
+- [x] 測試 consumer 私鑰在 HephAgora 的 `.wp2-keys/`（已在 `.gitignore`），沒有進任何 repo
+
+#### 還沒驗的
+
+- 真的 iOS、Android 手機（WP2 原本要求）
+- agent 跑在 Runtime 上的 trace（這次 agent 在本機；「URL 不經 agent」由 server 設計決定，與 agent 跑在哪裡無關）
+- 有 CAPTCHA、OTP、跨站 SSO 的真實網站；URL 白名單（WP2 #7 已驗）
+

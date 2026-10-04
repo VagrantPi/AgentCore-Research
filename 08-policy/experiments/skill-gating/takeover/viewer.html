@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<title>請登入</title>
+<style>
+  html, body { margin: 0; height: 100%; background: #111; color: #ccc; font: 12px system-ui; }
+  #bar { display: flex; gap: 8px; align-items: center; padding: 6px 10px; }
+  #status { flex: 1; }
+  #handback { font-size: 15px; padding: 6px 12px; }
+  #kbd { width: calc(100vw - 24px); margin: 0 10px 6px; font-size: 16px; padding: 6px; }
+  #wrap { position: relative; width: 100vw; overflow: hidden; }
+  #dcv-display { position: absolute; top: 0; left: 0; transform-origin: top left; }
+</style>
+</head>
+<body>
+<div id="bar"><span id="status">連線中…</span><button id="handback" disabled>完成，交還給 agent</button></div>
+<!-- 手機 Safari 點 DCV canvas 不會取得焦點；用這個輸入框叫出鍵盤，再把按鍵轉給 DCV（WP6 mobile-takeover 的作法） -->
+<input id="kbd" placeholder="點這裡打字（轉送到遠端瀏覽器）" autocapitalize="off" autocomplete="off" autocorrect="off">
+<div id="wrap"><div id="dcv-display"></div></div>
+<script type="module">
+// 連線流程照抄 hephclaw web/browser-view/dcv-session.mjs；路徑一律相對 /viewer/<ticket>/
+import dcv from '/dcvjs-esm/dcv.js';
+
+const rel = (p) => new URL(p, location.href);
+const report = (name, extra = {}) =>
+  fetch(rel('event'), { method: 'POST', body: JSON.stringify({ name, sincePageStartMs: Math.round(performance.now()), ...extra }) });
+const status = (text) => { document.getElementById('status').textContent = text; };
+const res = await fetch(rel('config'));
+if (!res.ok) { status('連結已失效'); throw new Error('expired'); }
+const config = await res.json();
+
+const display = document.getElementById('dcv-display');
+const fit = (w, h) => {
+  const scale = window.innerWidth / w;
+  Object.assign(display.style, { width: `${w}px`, height: `${h}px`, transform: `scale(${scale})` });
+  document.getElementById('wrap').style.height = `${h * scale}px`;
+};
+fit(config.width, config.height);
+
+const handback = document.getElementById('handback');
+handback.addEventListener('click', async () => {
+  handback.disabled = true;
+  await fetch(rel('handback'), { method: 'POST' });
+  status('已交還，agent 繼續中');
+  report('handback_sent');
+});
+
+report('page_loaded', { userAgent: navigator.userAgent });
+const params = () => new URL(config.signedUrl).searchParams;
+dcv.setLogLevel(dcv.LogLevel.ERROR);
+dcv.authenticate(config.signedUrl, {
+  httpExtraSearchParams: params,
+  promptCredentials: () => { status('需要帳密（不應發生）'); report('prompt_credentials'); },
+  error: (_, e) => { status('驗證失敗'); report('auth_error', { error: String(e?.message ?? e?.code ?? e) }); },
+  success: async (_, result) => {
+    const auth = result?.[0];
+    try {
+      const connection = await dcv.connect({
+        url: config.signedUrl, sessionId: auth.sessionId, authToken: auth.authToken,
+        divId: 'dcv-display',
+        baseUrl: new URL('/dcvjs-esm', location.origin).href,
+        enabledChannels: ['display', 'input'], clipboardAutoSync: false, enableWebCodecs: false,
+        observers: {
+          httpExtraSearchParams: params,
+          firstFrame: () => { status('請在下方畫面登入'); handback.disabled = false; report('first_frame'); },
+          disconnect: (reason) => { status('已中斷'); report('disconnect', { reason: JSON.stringify(reason) }); },
+          displayLayout: (w, h) => { if (w > 0 && h > 0) fit(w, h); },
+        },
+      });
+      const kbd = document.getElementById('kbd');
+      for (const type of ['keydown', 'keyup']) {
+        kbd.addEventListener(type, (e) => {
+          if (e.isComposing || e.keyCode === 229) return;  // 輸入法選字中不轉
+          connection.sendKeyboardEvent(e);
+          e.preventDefault();
+        });
+      }
+      // 輸入法選完字只拿得到字串：逐字轉送，事件間隔 30 ms（連續送第一個字會掉）
+      kbd.addEventListener('compositionend', async (e) => {
+        for (const ch of e.data) {
+          for (const type of ['keydown', 'keyup']) {
+            connection.sendKeyboardEvent(new KeyboardEvent(type, { key: ch }));
+            await new Promise((r) => setTimeout(r, 30));
+          }
+        }
+        kbd.value = '';
+      });
+    } catch (e) {
+      status('連線失敗'); report('connect_error', { error: String(e?.message ?? e?.code ?? e) });
+    }
+  },
+});
+</script>
+</body>
+</html>

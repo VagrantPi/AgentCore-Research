@@ -1,0 +1,86 @@
+{
+  "user": "userB",
+  "prompt": "幫我登入測試網站，然後告訴我登入結果。",
+  "tools": [
+    "com_wp2_flight__search_flights",
+    "com_wp2_login-web__login_and_check",
+    "com_wp2_todo__list_todos"
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "text": "幫我登入測試網站，然後告訴我登入結果。"
+        }
+      ],
+      "tracking_id": "6bcaad68-5ead-41b3-a983-a06ac9cd7425"
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "text": "我幫您登入測試網站。"
+        },
+        {
+          "toolUse": {
+            "toolUseId": "tooluse_we6FVmEbpInFnDKRL1jr3a",
+            "name": "com_wp2_login-web__login_and_check",
+            "input": {}
+          }
+        }
+      ],
+      "metadata": {
+        "usage": {
+          "inputTokens": 1134,
+          "outputTokens": 60,
+          "totalTokens": 1194
+        },
+        "metrics": {
+          "latencyMs": 861,
+          "timeToFirstByteMs": 964
+        }
+      },
+      "tracking_id": "67e6b502-40c7-4eae-923f-2ebe149cc685"
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "toolResult": {
+            "status": "success",
+            "toolUseId": "tooluse_we6FVmEbpInFnDKRL1jr3a",
+            "content": [
+              {
+                "text": "{\"speak\":\"{\\n  \\\"status\\\": \\\"logged_in\\\",\\n  \\\"message\\\": \\\"You logged into a secure area!\\\"\\n}\",\"data\":{\"text\":\"{\\n  \\\"status\\\": \\\"logged_in\\\",\\n  \\\"message\\\": \\\"You logged into a secure area!\\\"\\n}\"}}"
+              }
+            ],
+            "isError": false
+          }
+        }
+      ],
+      "tracking_id": "1c6c6ec3-3d9a-47a9-87ea-7e6628cfa8fb"
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "text": "登入成功！✅\n\n**登入結果：**\n- 狀態：已登入\n- 訊息：「您已進入安全區域！」\n\n您已成功登入測試網站。"
+        }
+      ],
+      "metadata": {
+        "usage": {
+          "inputTokens": 1278,
+          "outputTokens": 58,
+          "totalTokens": 1336
+        },
+        "metrics": {
+          "latencyMs": 829,
+          "timeToFirstByteMs": 558
+        }
+      },
+      "tracking_id": "70b439d2-ff19-4cfa-aa8d-2fe34e7592a3"
+    }
+  ],
+  "reply": "登入成功！✅\n\n**登入結果：**\n- 狀態：已登入\n- 訊息：「您已進入安全區域！」\n\n您已成功登入測試網站。\n"
+}

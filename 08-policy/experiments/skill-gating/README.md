@@ -9,7 +9,7 @@
   - `com.wp2.todo` 改成每人一份資料（`src/wp2/todo.ts`）。
   - 本機驗收改成 `scripts/wp2/check.sh`，compose 檔用 `docker-compose.wp2-local.yml`，project 名 `hephagora-wp2`、port 13100。
 - 本目錄放 agent、呼叫腳本與說明。
-- 已完成：本機 #0、#1、#2、#9、#12；AWS（東京）#3、#4、#5、#6、#7、#10。#8 改天做，#11 見 WP2 回填。
+- 已完成：本機 #0、#1、#2、#9、#12；AWS（東京）#3、#4、#5、#6、#7、#10。#8 於 2026-10-05 補做，見 [`takeover/`](takeover/README.md)；#11 見 WP2 回填。
 
 ## 架構
 

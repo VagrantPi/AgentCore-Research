@@ -57,7 +57,7 @@
 | 優先序 | 編號 | 題目 | 回答的選型問題 | 風險 | 價值 | 估點 | 前置 | 分群 | 負責人 | 狀態 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 前置 | [WP0](WP0-cost-baseline.md) | 成本量測基礎 | 之後每包的費用怎麼估算 | — | 前置 | 2 | — | A | Kais | ✅ 完成（2026-10-02） |
-| 1 | [WP2](WP2-capability-boundary.md) | 能力邊界：自家 MCP server 依技能授權 | 「只能用買到的技能」能不能由自家 MCP server 強制、agent 繞不過；Browser 包成自家工具可不可行；還要不要 Gateway | 高 | 高 | 8 | WP0、自家 MCP server 測試執行個體 | B | RomanChen → Kais | 🟡 #0–#7、#9–#12 完成（2026-10-02，本機＋東京實測）；#8 接手登入進行中（2026-10-05 Kais 接手，改用 WP6 的接手實作） |
+| 1 | [WP2](WP2-capability-boundary.md) | 能力邊界：自家 MCP server 依技能授權 | 「只能用買到的技能」能不能由自家 MCP server 強制、agent 繞不過；Browser 包成自家工具可不可行；還要不要 Gateway | 高 | 高 | 8 | WP0、自家 MCP server 測試執行個體 | B | RomanChen → Kais | ✅ 完成（2026-10-05）：#0–#7、#9–#12（2026-10-02）；#8 server 主導接手登入在 iOS 模擬器通過，agent 拿不到 Live View URL；真機未驗；Gateway 選配 G1–G6 不做（不需要 Gateway） |
 | 2 | [WP3](WP3-sandbox-egress.md) | 沙箱連外 | 「agent 能寫程式但不能上網」擋不擋得死；不能上網時仍連得到自家 MCP server | 高 | 高 | A 半 2、B 半 3 | A 半：WP0；B 半：WP0、WP2 的自家 MCP server 測試執行個體 | A、B 各半 | Kais、RomanChen | ✅ 完成（A 半、B 半皆 2026-10-02） |
 | 3 | [WP5](WP5-user-state-isolation.md) | 使用者狀態與隔離、每使用者成本 | 資料不外洩、每人成本算得出來 | 高 | 高 | 5 | WP0、一個最小的 Runtime（WP1 步驟 1） | A | Kais | ✅ 完成（2026-10-04）：阻斷級 #1–#4、#10 都通過，無否定；#11 通過；#8 約 $2.53–2.84 / 人 / 月（3 天版與 1 天版）；#6 決定不驗、#9 無法驗證 |
 | 4 | [WP1](WP1-runtime-session.md) | Runtime 冷啟動與「一人一實體」 | microVM 撐不撐得住對話體驗？V2 值不值得？ | 中 | 高 | 5 | WP0 | A | Kais | ✅ 完成（2026-10-04）：PUBLIC 組預喚醒後首句 p50 170–196 ms；#10 100 人月費約 $82.6；#11 VPC 模式不增加冷啟動 |
@@ -132,11 +132,11 @@
 |---|---|---|---|
 | 首句延遲（冷 / 暖） | [WP1](WP1-runtime-session.md#回填)：預喚醒後 p50 170–196 ms；VPC 不增加 | [WP7](WP7-openclaw-on-agentcore.md#回填)：首則 4.6 秒（預熱池，用光後 16.7–20.7 秒）、完整 OpenClaw 19.8 秒，之後每則約 5 秒 | [WP6](WP6-oss-alternatives.md#回填)：未實測（第 1 層託管比 AgentCore 貴，不測） |
 | 能力邊界能否在 agent 外強制 | [WP2](WP2-capability-boundary.md#回填) + [WP3](WP3-sandbox-egress.md#回填)：通過（自家 MCP server 授權 agent 繞不過；VPC 無 NAT 擋得住外網） | [WP7](WP7-openclaw-on-agentcore.md#回填)：預設會上網、執行程式；改 endpoint 設定後無 NAT 可用，只剩聊天與寫程式 | [WP6](WP6-oss-alternatives.md#b-半第-234-層)：OpenClaw `tools.deny` 鎖得住，但預設全開、HTTP 請求等同 owner、網路要另外擋 |
-| 接手登入 | [WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：iOS 模擬器實測可行（viewer 加輸入框轉送按鍵、交還後重連 CDP）；WP2 #8 server 主導流程進行中；實體手機未驗 | — | [WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：Steel、Cloudflare 有交還機制；手機操作沒有一家官方支援 |
+| 接手登入 | [WP2 #8](WP2-capability-boundary.md#8-補做接手登入由-server-主導2026-10-05kais)＋[WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：server 主導流程在 iOS 模擬器通過，agent 拿不到 URL；要處理雲端 Chrome 存密碼、鍵盤開著時點擊偏移；實體手機未驗 | — | [WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：Steel、Cloudflare 有交還機制；手機操作沒有一家官方支援 |
 | 資料隔離 | [WP5](WP5-user-state-isolation.md#回填)：通過（Memory、臨時憑證、VM 裡的使用者 token、Browser profile） | 未測 | [WP6](WP6-oss-alternatives.md#第-5-層記憶)：只有 pgvector＋RLS 能在資料層強制，其他靠應用層帶 `user_id` |
 | 每位使用者每月實際成本 | [WP5](WP5-user-state-isolation.md#實際費用)：約 $2.53–2.84（估算，**不含模型 token**） | [WP7](WP7-openclaw-on-agentcore.md#實際費用)：約 $20.7（**含模型**，模型佔 94%）＋網路固定費約 $188／月 | [WP6](WP6-oss-alternatives.md#實際費用)：OpenClaw 每人一台 $35.4（24h）／$14.4（每天 8h），不含模型；沒有比方案 B 便宜的人數門檻 |
 | 要自己維運的元件 | 少 | 中 | [WP6](WP6-oss-alternatives.md#回填)：挑最省的路線也約 60 點 |
-| 關鍵否定項（阻斷） | 無（WP2 #8 進行中） | 無（#6 改設定可過） | 無；但成本沒有優勢 |
+| 關鍵否定項（阻斷） | 無 | 無（#6 改設定可過） | 無；但成本沒有優勢 |
 
 - **每人月費三欄不能直接比**：方案 B 不含模型 token，方案 A 含（WP7 實測模型佔 94%）。最大的缺口是方案 B 的模型 token 費，要等正式 agent 上 Runtime 後用 `USAGE_LOGS` 與 Bedrock 用量重算；WP1、WP5 的 Runtime 用量也是用不呼叫模型的最小 agent 量的。
 
@@ -171,13 +171,13 @@ VM 要存取使用者資料時，由後端 AssumeRole 加 session policy 發範�
 | 同一個 session ID 可以讓一位使用者的多個聊天室共用一台 microVM，並行請求不會卡住 `/ping` | `[推測]`；WP1 已實證（PUBLIC），條件是 handler 為 async 或多執行緒 | WP1 |
 | 自家 MCP server 能依使用者身分過濾 `tools/list`、拒絕未購買工具的呼叫 | `[推測]`；WP2 已實證（HephAgora，本機與 `/mcp` 標準入口；需加購買表與開關） | WP2 |
 | Runtime 的 agent 能把每位使用者的 token 帶到自家 MCP server；Harness 的 `remote_mcp` 能不能做到未知 | `[推測]`；WP2 已實證：Runtime 可以；Harness 每次 `InvokeHarness` 覆寫 `tools` 也可以 | WP2 |
-| Browser 包成自家 MCP server 的工具後，依技能收費、網域白名單、接手登入都能運作；VM 開不了 Browser | `[推測]`；WP2 部分實證：依技能收費、白名單、VM 開不了 Browser 都成立；接手登入（#8）未做 | WP2 |
+| Browser 包成自家 MCP server 的工具後，依技能收費、網域白名單、接手登入都能運作；VM 開不了 Browser | `[推測]`；WP2 已實證：依技能收費、白名單、VM 開不了 Browser 都成立；接手登入（#8）2026-10-05 在 iOS 模擬器通過，真機未驗 | WP2 |
 | Harness 呼叫時覆寫 `allowedTools` / `skills` 能限制模型看到的工具 | `[官方已寫]`；WP2 已實證 `allowedTools`（`skills` 未測） | WP2 |
 | （選配）Gateway Policy 能依 JWT 內的「已購買能力」陣列過濾 `tools/list` | `[推測]` | WP2 選配 G3 |
 | Code Interpreter 的 Sandbox 模式擋得住任意外網 | `[推測]`；WP3 已實證：擋得住，但放行同區域任意 S3 bucket | WP3 |
 | Runtime 的 VM 不能上網時仍連得到自家 MCP server | `[推測]`；WP3 已實證（VPC 無 NAT＋VPC peering） | WP3 |
 | 使用者 token 進到 VM，被濫用時最多只能做該使用者本來能做的事 | ✅ 已證實（前提：server 依 actor 取資料，不信任工具參數裡的使用者 ID） | WP5 #10 |
-| Live View + `take_control` 能做出「使用者登入後交還給 agent」 | `[官方已寫]` 機制、`[推測]` 流程；WP6 在 iOS 模擬器實證機制可行（viewer 要自己轉送按鍵、交還後重連 CDP） | WP4 的回填是空的、接手程式不存在；server 主導流程由 WP2 #8 驗證 |
+| Live View + `take_control` 能做出「使用者登入後交還給 agent」 | `[官方已寫]` 機制、`[推測]` 流程；WP6 在 iOS 模擬器實證機制可行（viewer 要自己轉送按鍵、交還後重連 CDP） | WP4 的回填是空的、接手程式不存在；server 主導流程 WP2 #8 已在 iOS 模擬器驗證（2026-10-05） |
 | Memory `actorId` 加 IAM 能擋住跨使用者讀取；episodic reflection 不會跨使用者 | ✅ 已證實（每位使用者一個 principal 時；reflection 要設在 actor 層級） | WP5 #1、#2 |
 | 後端發範圍縮小的臨時憑證，VM 讀不到其他使用者的資料；VM 不能自己取得範圍外的憑證 | ✅ 已證實（前提：trust 只信任後端） | WP5 #3、#4 |
 | USAGE_LOGS 可以分攤每位使用者的成本 | ✅ 已證實（session ID 對得回使用者即可，與 metric 差 0%） | WP0、WP5 #5 |
