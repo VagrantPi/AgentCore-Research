@@ -3,7 +3,12 @@
 [WP2](../../../91-work-packages/WP2-capability-boundary.md) 的交付物。驗證「使用者只能用買到的技能」能不能由自家 server 強制，而不是靠 agent 或 prompt；以及 Browser 包成自家技能後能不能正常運作。
 
 - 自家 MCP server＝**HephAgora**（`hephai/HephAgora`）。
-- HephAgora 的改動在它的分支 `wp2/skill-gating`（尚未推上 GitLab；推上後補連結）。本目錄放 agent、呼叫腳本與說明。
+- HephAgora 的改動在它的分支 `wp2/skill-gating`。原分支（RomanChen，2026-10-02）一直沒有推上 GitLab，2026-10-04 由 Kais 依本文件重建同名分支，用來做 WP5 #10、#11：[hephai/HephAgora `wp2/skill-gating`](https://gitlab.hephaistudio.dscloud.biz:49156/hephai/HephAgora/-/tree/wp2/skill-gating)（`de3df3d6`）。重建版和原版的差異：
+  - 沒有 Browser MCP server（`wp2-browser-server.ts`），所以 #6、#7、#8 不能用重建版重現。
+  - migration 合成 `036_wp2_skill_entitlements.sql`。
+  - `com.wp2.todo` 改成每人一份資料（`src/wp2/todo.ts`）。
+  - 本機驗收改成 `scripts/wp2/check.sh`，compose 檔用 `docker-compose.wp2-local.yml`，project 名 `hephagora-wp2`、port 13100。
+- 本目錄放 agent、呼叫腳本與說明。
 - 已完成：本機 #0、#1、#2、#9、#12；AWS（東京）#3、#4、#5、#6、#7、#10。#8 改天做，#11 見 WP2 回填。
 
 ## 架構
@@ -39,7 +44,8 @@ EC2 上的 HephAgora 測試版：POST /mcp（標準 MCP 入口）
 
 | 檔案 | 用途 |
 |---|---|
-| `agent/` | Runtime 用的 agent（`main.py`、`Dockerfile`、`requirements.txt`）。每個請求用 payload 的 `actor_token` 連 HephAgora `/mcp`，模型能用哪些工具完全由 HephAgora 決定。另有量測入口 `probe=browser`（#6）、`probe=mcp_latency`（#10） |
+| `agent/` | Runtime 用的 agent（`main.py`、`Dockerfile`、`requirements.txt`）。每個請求用 payload 的 `actor_token` 連 HephAgora `/mcp`，模型能用哪些工具完全由 HephAgora 決定。另有量測入口 `probe=browser`（#6）、`probe=mcp_latency`（#10），以及 WP5 用的 `probe=abuse`（WP5 #10）、`probe=profile`（WP5 #11） |
+| `results/` | WP5 #10、#11 的原始輸出（2026-10-04） |
 | `invoke_runtime.sh` | 呼叫 Runtime；payload 裡的 `__TOKEN_<user>__` 會換成當下現簽的 actor JWT |
 | `harness_check.py` | 呼叫 Harness；每次覆寫 `tools`（remote_mcp header 帶 token），可選覆寫 `allowedTools` |
 

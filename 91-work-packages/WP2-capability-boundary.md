@@ -246,3 +246,49 @@ AWS 部分沒有否定項目。
 | `91-work-packages/README.md:171`–`:174` | 自家 server 過濾、token 帶到 server、Browser 包裝、`allowedTools` 覆寫：`[推測]` / 未實證 | 已實證；#8 接手登入未做 |
 | `00-overview/harness-vs-runtime.md:29` | `remote_mcp` 的 header 引用 token vault；每次呼叫能不能帶不同使用者的 token 沒寫 | 每次 `InvokeHarness` 覆寫 `tools` 就能帶不同使用者的 header（token 由後端明文組進參數） |
 | `00-overview/harness-vs-runtime.md:36` | `allowedTools` 可以限制模型能看到的工具 | 實證：覆寫後模型不知道被排除的工具；`remote_mcp` 的工具寫成 `@<server 名>/<工具名>` |
+
+### #8 接手登入改由 server 主導（2026-10-04）：無法驗證（阻斷）
+
+- 負責人：Kais
+- 執行日期：2026-10-04（只確認前提，沒有建資源）
+- 區域：ap-northeast-1
+- 資源 tag：`wp=WP2`、`owner=kais`、`project=hyfai`（本節沒有建任何資源）
+- 使用的 AWS 帳號：050571774557（IAM user `KaisLinCli`）
+
+#### 結論（三句內）
+
+1. **#8 沒有做，兩個前提都不成立**：
+   - 步驟 8 寫的「沿用 WP4 的程式」不存在。[WP4 回填](WP4-browser-takeover.md#回填)是空的，`05-built-in-tools/experiments/takeover-demo/` 從沒建立。
+   - WP2 的 HephAgora 分支 `wp2/skill-gating` 沒有推上 GitLab。
+2. HephAgora 已由 Kais 重建，用來做 WP5 #10、#11。重建版**不含** Browser MCP server，也沒有 `take_control`、Live View、推播端點。
+3. 手機能不能開 Live View 也還沒測。DCV 網頁客戶端官方不支援 iOS／Android，這仍然是 `[推測]` 的風險。
+
+#### 檢核表
+
+| # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
+|---|---|---|---|---|---|
+| 8 | 接手登入由 server 主導可以走完；agent 的對話與 trace 裡沒有 Live View URL | `[推測]` | **無法驗證**（前提不存在） | `glab api projects/hephai%2FHephAgora/repository/branches?search=wp2` 回 `[]`（2026-10-04）；repo 內沒有 `take_control`／Live View 的程式 | 「使用者接手登入」仍沒有實證。選型時當作未知數；有網站需要登入的技能，先排在 #8 驗完之後 |
+
+#### 要補做 #8 需要的東西
+
+1. HephAgora 的 Browser MCP server（WP2 原本有，重建版沒做），加上：
+   - 偵測到登入頁就停止自動操作。
+   - `UpdateBrowserStream` 關閉自動化串流（`take_control`）。
+   - 產生 Live View 預簽 URL（最長 300 秒）。
+   - 推到模擬的 App 推播端點。
+   - 等使用者交還後 `release_control`，再繼續。
+2. 一個嵌入 DCV 網頁客戶端（`BrowserLiveView`）的頁面，讓手機打開推播帶的連結。
+3. 一支真的 iOS 和一支 Android 手機，由人實際操作登入。
+4. 估計工時：程式 3–5 小時，加上 AWS 一個時段約 1 小時。
+
+#### 手機打不開時的替代方案（未驗證，供補做時比較）
+
+| 方案 | 做法 | 代價 |
+|---|---|---|
+| 改用電腦接手 | 推播只通知，Live View 連結在電腦瀏覽器開 | 使用者要離開手機 |
+| App 原生登入表單 | server 偵測到登入頁時，請 App 用原生表單收帳密／OTP，再由 server 填入 | 帳密會經過自家 server，資安責任和合規要另外評估 |
+| 網站支援的委派授權 | 有 OAuth／裝置碼流程的網站改走授權，不操作登入頁 | 只適用部分網站 |
+
+#### 清理確認
+
+- [x] 本節沒有建立任何 AWS 資源
