@@ -1,0 +1,4 @@
+# 2026-10-02 實測可用的版本；mcp 2.x 的 client API 與 1.x 不同，升級前先在本機驗
+bedrock-agentcore==1.24.0
+strands-agents==1.57.2
+mcp==2.1.1

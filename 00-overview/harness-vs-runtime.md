@@ -26,14 +26,14 @@
 
 | 類型 | 說明 | 什麼時候用 |
 |------|------|-----------|
-| `remote_mcp` | 直接填入 MCP server 的 URL；header 可以引用 Identity token vault 的 ARN（`${arn:...}`），執行時才換成實際的 key | 簡單接一個現成的 MCP server |
+| `remote_mcp` | 直接填入 MCP server 的 URL；header 可以引用 Identity token vault 的 ARN（`${arn:...}`），執行時才換成實際的 key。每次 `InvokeHarness` 覆寫 `tools` 就能帶不同使用者的 header（[WP2](../91-work-packages/WP2-capability-boundary.md) #4 實證） | 簡單接一個現成的 MCP server |
 | `agentcore_gateway` | 填入 Gateway ARN，這個 gateway 底下的所有工具都會變成可用 | 需要治理：驗證、Policy、OAuth 憑證輪替 |
 | `agentcore_browser` | 代管的瀏覽器 | 需要操作網頁 |
 | `agentcore_code_interpreter` | 代管的程式碼沙箱（Python / JS / TS） | 資料分析、計算 |
 | `inline_function` | **只定義 schema，實際在呼叫端執行**（見下方〈逃生口〉） | 需要人工核准，或要呼叫內部 API |
 | 內建 `shell`、`file_operations` | 每個 session 預設就有：bash 指令與檔案讀寫 | 讓 agent 能寫程式、執行程式 |
 
-`allowedTools` 支援 glob 語法（例如 `@git/read_*`、`@builtin`），可以限制模型能看到哪些工具。
+`allowedTools` 支援 glob 語法（例如 `@git/read_*`、`@builtin`），可以限制模型能看到哪些工具。[WP2](../91-work-packages/WP2-capability-boundary.md) #5 實證：呼叫時覆寫後，模型不知道被排除的工具；`remote_mcp` 的工具寫成 `@<server 名>/<工具名>`。
 
 ### 其他能力
 
