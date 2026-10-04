@@ -72,7 +72,7 @@
 
 > **部分回填（2026-10-02）：** 除了 #11 都跑完了，全部是 PUBLIC。#11（VPC 組）等 B 在 WP3 建好 VPC。#10（成本情境）用 `USAGE_LOGS` 實測，見檢核表與下方「#10 成本情境」。
 >
-> **#11 回填（2026-10-04）：** 借 WP7 建的無 NAT VPC 量完，VPC 不增加冷啟動時間。
+> **#11 回填（2026-10-04）：** 借 WP7 建的無 NAT VPC 量完，VPC 不增加冷啟動時間。**WP1 全部 11 個檢核點完成。**
 
 - 負責人：kais
 - 執行日期：2026-10-02
@@ -158,7 +158,8 @@
 - [x] #10 的 runtime `wp1_cost_v1_img_pub`、delivery source `wp1_cost-usage-src` 與它的 delivery 已刪除（2026-10-02）；`wp0-usage-dst` 和 log group 是 WP0 的，保留
 - [x] 其餘 Runtime 已刪除（2026-10-04）：`wp1_cs_v1_bigimg_pub`、`wp1_cs_v2_bigimg_pub`、`wp1_cs_v1_img_pub_blk`、`wp1_cs_v1_img_pub_busy`、`wp1_ss_v1_img_pub`（含 endpoint `wp1_pinned`）06:30 UTC；#11 用的 `wp1_cs_v1_img_pub`、`wp1_cs_v2_img_pub`、`wp1_cs_v1_img_vpc`、`wp1_cs_v2_img_vpc` 與它們的 `USAGE_LOGS` 投遞 07:19 UTC
 - [x] ECR image `wp-agentcore-coldstart:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy` 已刪除（07:20 UTC）；repo 與 `:small` 屬於 WP0，保留
-- [ ] 隔天確認 Runtime 沒有仍在跑的 session；VPC 與服務連結角色的刪除見 [WP7 清理確認](WP7-openclaw-on-agentcore.md#清理確認)
+- [x] 隔天確認 Runtime 沒有仍在跑的 session — 2026-10-04 16:14 UTC：`wp1_*` Runtime 都已不存在；共用的 `wp0_min` 已刪除（見 [WP0 清理確認](WP0-cost-baseline.md#清理確認)）
+- [ ] VPC `wp7-vpc` 與服務連結角色 — 屬於 [WP7 清理確認](WP7-openclaw-on-agentcore.md#清理確認)。2026-10-04 16:14 UTC 查：VPC endpoint 都已刪，但 VPC 裡還有 2 張 `agentic_ai` 類型的網卡是 `in-use`，VPC 還刪不掉
 
 ### 要更正研究庫的段落
 

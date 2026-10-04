@@ -117,9 +117,9 @@ A 半全部 13 個沙箱 session（含 probe 重跑與 5 分鐘測試）估算�
 
 #### 清理確認
 
-- [ ] Code Interpreter 已刪除 — **保留**到 B 半做完 #3 的 VPC 對照，之後一起刪：`wp3_ci_sandbox-eMBYT5nBx9`、`wp3_ci_public-DNP69Pgcan`、role `/wp/wp3-ci-exec`、`USAGE_LOGS` 投遞（delivery source `wp3_ci_sandbox-usage-src`、`wp3_ci_public-usage-src`，destination `wp3-usage-dst`，log group `/aws/vendedlogs/bedrock-agentcore/wp3-usage`）
+- [x] Code Interpreter 已刪除 — B 半做完 #3 後於 2026-10-04 16:10 UTC 刪除：`wp3_ci_sandbox-eMBYT5nBx9`、`wp3_ci_public-DNP69Pgcan`、role `/wp/wp3-ci-exec`、`USAGE_LOGS` 投遞（delivery、source `wp3_ci_sandbox-usage-src`、`wp3_ci_public-usage-src`，destination `wp3-usage-dst`）、log group `/aws/vendedlogs/bedrock-agentcore/wp3-usage`。刪 log group 前存成 [`evidence/usage-logs/wp3-usage.jsonl.gz`](evidence/usage-logs/)（1,275 筆）
 - [x] Runtime / Harness、Browser、Gateway、Policy、Memory、VPC endpoint：A 半未建立
-- [ ] 隔天確認沒有仍在跑的 session（`list-code-interpreter-sessions`）
+- [x] 隔天確認沒有仍在跑的 session — 兩個 Code Interpreter 已刪除（2026-10-04 16:10 UTC），`wp3-usage` 最後一筆紀錄是 2026-10-02 04:49 UTC
 
 #### 要更正研究庫的段落（已套用，2026-10-02）
 

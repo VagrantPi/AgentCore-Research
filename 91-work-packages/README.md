@@ -60,7 +60,7 @@
 | 1 | [WP2](WP2-capability-boundary.md) | 能力邊界：自家 MCP server 依技能授權 | 「只能用買到的技能」能不能由自家 MCP server 強制、agent 繞不過；Browser 包成自家工具可不可行；還要不要 Gateway | 高 | 高 | 8 | WP0、自家 MCP server 測試執行個體 | B | RomanChen → Kais | ✅ 完成（2026-10-05）：#0–#7、#9–#12（2026-10-02）；#8 server 主導接手登入在 iOS 模擬器通過，agent 拿不到 Live View URL；真機未驗；Gateway 選配 G1–G6 不做（不需要 Gateway） |
 | 2 | [WP3](WP3-sandbox-egress.md) | 沙箱連外 | 「agent 能寫程式但不能上網」擋不擋得死；不能上網時仍連得到自家 MCP server | 高 | 高 | A 半 2、B 半 3 | A 半：WP0；B 半：WP0、WP2 的自家 MCP server 測試執行個體 | A、B 各半 | Kais、RomanChen | ✅ 完成（A 半、B 半皆 2026-10-02） |
 | 3 | [WP5](WP5-user-state-isolation.md) | 使用者狀態與隔離、每使用者成本 | 資料不外洩、每人成本算得出來 | 高 | 高 | 5 | WP0、一個最小的 Runtime（WP1 步驟 1） | A | Kais | ✅ 完成（2026-10-04）：阻斷級 #1–#4、#10 都通過，無否定；#11 通過；#8 約 $2.53–2.84 / 人 / 月（3 天版與 1 天版）；#6 決定不驗、#9 無法驗證 |
-| 4 | [WP1](WP1-runtime-session.md) | Runtime 冷啟動與「一人一實體」 | microVM 撐不撐得住對話體驗？V2 值不值得？ | 中 | 高 | 5 | WP0 | A | Kais | ✅ 完成（2026-10-04）：PUBLIC 組預喚醒後首句 p50 170–196 ms；#10 100 人月費約 $82.6；#11 VPC 模式不增加冷啟動 |
+| 4 | [WP1](WP1-runtime-session.md) | Runtime 冷啟動與「一人一實體」 | microVM 撐不撐得住對話體驗？V2 值不值得？ | 中 | 高 | 5 | WP0 | A | Kais | ✅ 完成（PUBLIC 組 2026-10-02、#11 VPC 組 2026-10-04）：V1 + 小 image + 預喚醒即可；VPC 不增加冷啟動；100 人月費約 $82.6 |
 | ~~5~~ | ~~[WP4](WP4-browser-takeover.md)~~ | ~~Browser 接手登入~~ | ~~Muse 式的接手流程能不能在 AgentCore 做出來~~ | ~~中~~ | ~~中~~ | ~~8~~ | ~~WP0~~ | — | 其他工程師 | ✅ 已由其他工程師完成 |
 | 6 | [WP6](WP6-oss-alternatives.md) | 不用 AgentCore 的開源方案 | 自架的真實成本與缺口 | 低 | 中 | A 半 5、B 半 5 | — | A、B 各半 | Kais、RomanChen → Kais | ✅ 完成（2026-10-05）：#8 方案 C 沒有比方案 B 便宜的人數門檻；#6 OpenClaw 用 `tools.deny` 鎖得住但不是預設；#7 AgentCore Live View 在 iOS 模擬器接手可行（viewer 要自己轉送按鍵） |
 | 7 | [WP7](WP7-openclaw-on-agentcore.md) | OpenClaw on AgentCore 官方範例實跑 | 方案 A 的真實數字，當對照組 | 低 | 低 | 3 | WP0、WP3 的 VPC | B | RomanChen → Kais | ✅ 完成（2026-10-04）：首則 4.6 秒（預熱池）、完整 OpenClaw 19.8 秒；每人月費約 $20.7（模型佔 94%）；#5 預設會上網、#6 改兩個 endpoint 設定後無 NAT 可回話，不列阻斷 |
@@ -92,7 +92,7 @@
 | 測試身分：使用者 A、B 的 JWT（Cognito） | B，WP2 第一步 | A 在 WP5 用同一組身分測隔離 |
 | 自家 MCP server 的測試執行個體（含 `todo`、包了 Browser 的 `flight` 技能） | B，WP2 步驟 0–2 | B 在 WP3 測連線；A 在 WP5 測使用者 token 被濫用的範圍 |
 | 不開 NAT 的 VPC | B，WP3 | A 在 WP1 的 VPC 組沿用；B 在 WP7 的能力邊界測試沿用 |
-| 最小的 Runtime：`wp0_min-HsBwOc6VWU`（東京，PUBLIC，image `wp-agentcore-coldstart:small`，execution role `/wp/wp0-runtime-exec`） | A，WP0 已部署 | WP0 驗證 `USAGE_LOGS`；WP5 測 VM 內的憑證；之後 WP1 繼續用 |
+| 最小的 Runtime：`wp0_min-HsBwOc6VWU`（東京，PUBLIC，image `wp-agentcore-coldstart:small`，execution role `/wp/wp0-runtime-exec`） | A，WP0 已部署 | WP0 驗證 `USAGE_LOGS`；WP5 測 VM 內的憑證；WP1 沿用。**已刪除（2026-10-04）**，`USAGE_LOGS` 原始紀錄存在 [`evidence/usage-logs/`](evidence/usage-logs/) |
 | 區域 | 已定：東京（`ap-northeast-1`） | 兩人。公司機器與自家 MCP server 都在東京；亞太區只有東京支援 V2 |
 
 跨群要交接的數字：WP4 的 Browser 每次 session 費用改從其他工程師的結果取得，由 A 放進 WP5 的「每位使用者月費」；A 把 WP1 的冷啟動數字交給 B，當 WP6 比較開源方案、WP7 對照方案 A 的基準。
@@ -130,7 +130,7 @@
 
 | 面向 | 方案 B：AgentCore Runtime（自寫 agent） | 方案 A：OpenClaw 跑在 AgentCore | 方案 C：自架開源 |
 |---|---|---|---|
-| 首句延遲（冷 / 暖） | [WP1](WP1-runtime-session.md#回填)：預喚醒後 p50 170–196 ms；VPC 不增加 | [WP7](WP7-openclaw-on-agentcore.md#回填)：首則 4.6 秒（預熱池，用光後 16.7–20.7 秒）、完整 OpenClaw 19.8 秒，之後每則約 5 秒 | [WP6](WP6-oss-alternatives.md#回填)：未實測（第 1 層託管比 AgentCore 貴，不測） |
+| 首句延遲（冷 / 暖） | [WP1](WP1-runtime-session.md#回填)：池子內 V1 冷 0.56 s、池子用光 3.6 s；暖 0.19–0.22 s；預喚醒後 0.17 s；VPC 不增加 | [WP7](WP7-openclaw-on-agentcore.md#回填)：首則 4.6 秒（預熱池，用光後 16.7–20.7 秒）、完整 OpenClaw 19.8 秒，之後每則約 5 秒 | [WP6](WP6-oss-alternatives.md#回填)：未實測（第 1 層託管比 AgentCore 貴，不測） |
 | 能力邊界能否在 agent 外強制 | [WP2](WP2-capability-boundary.md#回填) + [WP3](WP3-sandbox-egress.md#回填)：通過（自家 MCP server 授權 agent 繞不過；VPC 無 NAT 擋得住外網） | [WP7](WP7-openclaw-on-agentcore.md#回填)：預設會上網、執行程式；改 endpoint 設定後無 NAT 可用，只剩聊天與寫程式 | [WP6](WP6-oss-alternatives.md#b-半第-234-層)：OpenClaw `tools.deny` 鎖得住，但預設全開、HTTP 請求等同 owner、網路要另外擋 |
 | 接手登入 | [WP2 #8](WP2-capability-boundary.md#8-補做接手登入由-server-主導2026-10-05kais)＋[WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：server 主導流程在 iOS 模擬器通過，agent 拿不到 URL；要處理雲端 Chrome 存密碼、鍵盤開著時點擊偏移；實體手機未驗 | — | [WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：Steel、Cloudflare 有交還機制；手機操作沒有一家官方支援 |
 | 資料隔離 | [WP5](WP5-user-state-isolation.md#回填)：通過（Memory、臨時憑證、VM 裡的使用者 token、Browser profile） | 未測 | [WP6](WP6-oss-alternatives.md#第-5-層記憶)：只有 pgvector＋RLS 能在資料層強制，其他靠應用層帶 `user_id` |
