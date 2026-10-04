@@ -1,6 +1,6 @@
 # 實驗：Runtime 冷啟動與 session 建立速率
 
-> 狀態：**PUBLIC 組合已在東京實跑（2026-10-02，[WP1](../../../91-work-packages/WP1-runtime-session.md)）。** VPC 組、zip 尚未跑。
+> 狀態：**PUBLIC 組合已在東京實跑（2026-10-02，[WP1](../../../91-work-packages/WP1-runtime-session.md)）；VPC 組 2026-10-04 實跑（WP1 #11）。** zip 尚未跑。
 >
 > 本機已驗證的部分：agent 直接執行與 container 執行都正常（arm64、`/ping`、`/invocations`）；`bench.py` 的 deploy / measure / cleanup 流程，以及 MMDSv2 補開的分支，都用 botocore Stubber 對照真實的 service model 測試過。
 
@@ -81,6 +81,22 @@ python bench.py cleanup
 | wp1_cs_v2_img_pub | 20 | 1898 | 2313 | 217 | 2/20 | 183 |
 | wp1_cs_v1_bigimg_pub | 20 | 559 | 616 | 192 | 20/20 | 0.1 |
 | wp1_cs_v2_bigimg_pub | 20 | 1861 | 2260 | 191 | 1/20 | 203 |
+
+**VPC 組（WP1 #11，2026-10-04）：** 同一個 `:wp1` 映像，PUBLIC 與 VPC 在同一段時間交錯量測（03:29–03:38 UTC），boto3 1.43.108。VPC 是 WP7 建的無 NAT、無 IGW VPC（private subnet 在 `apne1-az4`、`az1`，S3 gateway＋ECR `api`／`dkr`＋Logs 等 interface endpoint）。
+
+| 變體 | n | cold p50 (ms) | cold p90 (ms) | warm p50 (ms) | 不重複的 boot_token 數 | 等待 READY 的時間 (s) |
+|------|---|---------------|---------------|---------------|-----------------------|----------------------|
+| wp1_cs_v1_img_pub | 20 | 611 | 660 | 176 | 20/20 | （沿用） |
+| wp1_cs_v1_img_vpc | 20 | 612 | 684 | 187 | 20/20 | 10 |
+| wp1_cs_v2_img_pub | 20 | 1998 | 2362 | 204 | 2/20 | （沿用，當初 183） |
+| wp1_cs_v2_img_vpc | 20 | 1914 | 1988 | 212 | 2/20 | 527 |
+
+| burst 變體 | 送出 | 成功 | 池子 n / p50 | 真冷啟動 n / p50 / p90 |
+|-----------|------|------|-------------|------------------------|
+| wp1_cs_v1_img_pub | 30 | 30 | 10 / 675 ms | 20 / 3793 ms / 3802 ms |
+| wp1_cs_v1_img_vpc | 30 | 30 | 13 / 602 ms | 17 / 3603 ms / 3683 ms |
+
+**VPC 不增加冷啟動時間**：從池子拿或池子用光後的真冷啟動，VPC 和 PUBLIC 的差距都在雜訊範圍內。唯一的差別在建立 runtime：V2 VPC 等 READY 要 527 秒，PUBLIC 是 183 秒。
 
 **V1 的 cold 不是真的冷啟動。** 40 次 V1 試驗都是該 process 的第一個請求，但 `boot_age_s` 的中位數是 36 秒（small）與 97 秒（big）：process 在請求到之前就已經啟動。V1 是從預先開好的實例池（約 15 台）分配 VM，所以 image 大小在這裡看不出影響。池子用光後的真冷啟動見下方 burst：small 約 3.6 s，1 GB 約 17.8 s。
 
