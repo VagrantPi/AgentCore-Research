@@ -10,6 +10,7 @@
 
 單價：官網定價頁，2026-10-02 查。
 """
+import json
 import subprocess
 import sys
 from datetime import datetime, timedelta, timezone
@@ -26,15 +27,19 @@ st = load_state()
 actor = st.get("costActor", "wp5-user-cost")
 dp = client("bedrock-agentcore")
 records = {}
-for name, sid in st["strategies"].items():
-    n, tok = 0, None
-    while True:
-        r = dp.list_memory_records(memoryId=st["memoryId"], namespacePath=f"/strategy/{sid}/actor/{actor}/", maxResults=100,
-                                   **({"nextToken": tok} if tok else {}))
-        n += len(r["memoryRecordSummaries"])
-        if not (tok := r.get("nextToken")):
-            break
-    records[name] = n
+try:
+    for name, sid in st["strategies"].items():
+        n, tok = 0, None
+        while True:
+            r = dp.list_memory_records(memoryId=st["memoryId"], namespacePath=f"/strategy/{sid}/actor/{actor}/", maxResults=100,
+                                       **({"nextToken": tok} if tok else {}))
+            n += len(r["memoryRecordSummaries"])
+            if not (tok := r.get("nextToken")):
+                break
+        records[name] = n
+except dp.exceptions.ResourceNotFoundException:   # Memory 已刪：用刪除前記下的數字
+    records = json.loads(Path(__file__).with_name("results").joinpath("cost-days.json").read_text())["3day"]["records"]
+    print("Memory 已刪除，record 數改讀 results/cost-days.json")
 cost_days = st["costDays"]
 n_days = len(cost_days)
 rec_day = sum(records.values()) / n_days
@@ -42,7 +47,8 @@ print(f"{n_days} 天：event {100 * n_days}、檢索 {20 * n_days}、record {rec
 
 # Runtime：USAGE_LOGS
 root = Path(__file__).resolve().parents[4]
-since = datetime.fromisoformat(cost_days[0]["startedAt"]) - timedelta(minutes=5)
+# 往前多抓 60 分鐘：VM 會從預先開好的池子分配，開機那幾秒記在 session 第一次呼叫前 6–43 分鐘（見 README #8）
+since = datetime.fromisoformat(cost_days[0]["startedAt"]) - timedelta(minutes=60)
 until = datetime.fromisoformat(cost_days[-1]["lastInvokeAt"]) + timedelta(minutes=30)
 csv = subprocess.run(["uv", "run", "-q", str(root / "91-work-packages/scripts/usage_cost.py"),
                       "--log-group", "/aws/vendedlogs/bedrock-agentcore/wp0-usage",

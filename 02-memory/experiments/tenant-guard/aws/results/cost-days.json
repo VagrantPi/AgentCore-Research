@@ -1,0 +1,34 @@
+{
+ "1day": {
+  "actor": "wp5-user-cost",
+  "session": "wp5-cost-wp5-user-cost-c2608680974e489c9ae6095a1d89d30a",
+  "startedAt": "2026-10-02T06:48:59.149858+00:00",
+  "lastInvokeAt": "2026-10-02T08:34:24.779081+00:00"
+ },
+ "3day": {
+  "actor": "wp5-user-cost3d",
+  "memoryId": "wp5_cost3d-tc3SBsE1IR",
+  "_records說明": "Memory 刪除前（2026-10-04 13:04 UTC）ListMemoryRecords 實際列出的 record 數；Memory 已刪，cost_report.py 改讀這裡",
+  "records": {"wp5_episodic": 18, "wp5_pref": 4, "wp5_semantic": 7},
+  "days": [
+   {
+    "day": 1,
+    "startedAt": "2026-10-02T10:09:39.705399+00:00",
+    "session": "wp5-cost-wp5-user-cost3d-d1-98b065b912fe4a5a86e35d3743ae0b86",
+    "lastInvokeAt": "2026-10-02T11:56:37.579175+00:00"
+   },
+   {
+    "day": 2,
+    "startedAt": "2026-10-03T10:09:39.718737+00:00",
+    "session": "wp5-cost-wp5-user-cost3d-d2-07e7fb28926e406fbbd7f3a24aeda350",
+    "lastInvokeAt": "2026-10-03T11:56:38.102126+00:00"
+   },
+   {
+    "day": 3,
+    "startedAt": "2026-10-04T10:09:39.714331+00:00",
+    "session": "wp5-cost-wp5-user-cost3d-d3-f731b5ae131c40ba9f5f617ccebf4b90",
+    "lastInvokeAt": "2026-10-04T11:56:38.837855+00:00"
+   }
+  ]
+ }
+}

@@ -1,18 +1,19 @@
+Memory 已刪除，record 數改讀 results/cost-days.json
 3 天：event 300、檢索 60、record {'wp5_episodic': 18, 'wp5_pref': 4, 'wp5_semantic': 7}，平均每天 9.7 筆
 resource,session_id,seconds,vcpu_hours,gb_hours,est_usd
-wp0_min,wp5-cost-wp5-user-cost3d-d1-98b065b912fe4a5a86e35d3743ae0b86,7208,0.020333,2.312943,0.023677
+wp0_min,wp5-cost-wp5-user-cost3d-d1-98b065b912fe4a5a86e35d3743ae0b86,7214,0.021446,2.314483,0.023791
 wp0_min,wp5-cost-wp5-user-cost3d-d2-07e7fb28926e406fbbd7f3a24aeda350,7224,0.020795,2.387761,0.024425
 wp0_min,wp5-cost-wp5-user-cost3d-d3-f731b5ae131c40ba9f5f617ccebf4b90,7215,0.020704,2.481568,0.025304
 
-USAGE_LOGS wp5-cost-wp5-user-cost3d-d1-98b065b912fe4a5a86e35d3743ae0b86：7208 秒、0.020333 vCPU-h、2.312943 GB-h、$0.023677
+USAGE_LOGS wp5-cost-wp5-user-cost3d-d1-98b065b912fe4a5a86e35d3743ae0b86：7214 秒、0.021446 vCPU-h、2.314483 GB-h、$0.023791
 USAGE_LOGS wp5-cost-wp5-user-cost3d-d2-07e7fb28926e406fbbd7f3a24aeda350：7224 秒、0.020795 vCPU-h、2.387761 GB-h、$0.024425
 USAGE_LOGS wp5-cost-wp5-user-cost3d-d3-f731b5ae131c40ba9f5f617ccebf4b90：7215 秒、0.020704 vCPU-h、2.481568 GB-h、$0.025304
-#5 CPUUsed-vCPUHours：metric 0.062710、USAGE_LOGS 0.062710（4 個 session），差 -0.00%
-#5 MemoryUsed-GBHours：metric 7.323122、USAGE_LOGS 7.323121（4 個 session），差 -0.00%
-成本 session 合計：21647 秒、0.061832 vCPU-h、7.182272 GB-h；平均每天 $0.024469
+#5 CPUUsed-vCPUHours：metric 0.065194、USAGE_LOGS 0.065194（4 個 session），差 +0.00%
+#5 MemoryUsed-GBHours：metric 7.345533、USAGE_LOGS 7.345532（4 個 session），差 -0.00%
+成本 session 合計：21653 秒、0.062945 vCPU-h、7.183812 GB-h；平均每天 $0.024507
 Memory 短期（event）：$0.7500 / 月
 Memory 檢索：$0.3000 / 月
 Memory 長期儲存：$0.1087 / 月
-Runtime：$0.7341 / 月
+Runtime：$0.7352 / 月
 Browser（假設 1 vCPU、4 GB）：$0.6365 / 月
-合計：$2.5293 / 月
+合計：$2.5304 / 月
