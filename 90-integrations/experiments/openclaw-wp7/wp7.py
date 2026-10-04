@@ -213,9 +213,9 @@ def cmd_boundary(a):
         invoke(sid, {"action": "warmup", "userId": uid, "actorId": actor, "channel": "test"})
         ready_s, _ = wait_ready(sid, t0)
         print("openclaw ready", ready_s)
-    for prompt in BOUNDARY:
+    for prompt in a.prompt or BOUNDARY:
         ms, body = chat(sid, name, prompt)
-        rec = {"at": now(), "tag": a.tag, "user": name, "session": sid, "prompt": prompt, "latency_ms": ms,
+        rec = {"at": now(), "tag": a.tag, "user": name, "session": sid, "prompt": prompt, "latency_ms": ms, "full": a.wait_full,
                "status": status(sid), "reply": body}
         with (HERE / "boundary.jsonl").open("a") as f:
             f.write(json.dumps(rec, ensure_ascii=False) + "\n")
@@ -265,6 +265,7 @@ if __name__ == "__main__":
     l = sp.add_parser("load"); l.add_argument("--users", type=int, default=10); l.add_argument("--rounds", type=int, default=10)
     l.add_argument("--stagger", type=float, default=15); l.add_argument("--prefix", default="load")
     b = sp.add_parser("boundary"); b.add_argument("--user", required=True); b.add_argument("--tag", required=True); b.add_argument("--wait-full", action="store_true")
+    b.add_argument("--prompt", action="append", help="自訂問題，可重複；省略時用 BOUNDARY")
     g = sp.add_parser("logs"); g.add_argument("--since", required=True); g.add_argument("--until"); g.add_argument("--pattern"); g.add_argument("--width", type=int, default=300)
     t = sp.add_parser("tokens"); t.add_argument("--since", required=True); t.add_argument("--until")
     a = p.parse_args()

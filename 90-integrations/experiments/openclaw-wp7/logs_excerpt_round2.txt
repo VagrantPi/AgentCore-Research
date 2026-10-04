@@ -1,0 +1,57 @@
+09:22:11.032 aa04fc4bfbb7 [contract] Init for user=user_1942d2366896fdd8 actor=test:r11 namespace=test_r11
+09:22:11.088 aa04fc4bfbb7 [contract] Scoped S3 credentials created and applied
+09:22:11.111 aa04fc4bfbb7 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_r11/.openclaw/
+09:22:25.834 aa04fc4bfbb7 [workspace-sync] Restored 500 file(s) to /root/.openclaw
+09:22:28.093 aa04fc4bfbb7 [proxy:out] [proxy] Response: 2518in/22out tokens
+09:22:35.882 aa04fc4bfbb7 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+09:22:41.742 aa04fc4bfbb7 [proxy:out] [proxy] Stream complete: 25854in/99out tokens, 1 tool call(s)
+09:22:41.791 aa04fc4bfbb7 [openclaw:out] 2026-10-04T09:22:41.791+00:00 [agent/embedded] embedded run tool start: runId=ad0d80de-9991-4ab8-8f54-bd3d8c516c15 tool=exec toolCallId=tooluse_UJwVKqUPkJdOqg0bg2Qern
+09:22:42.040 aa04fc4bfbb7 [openclaw:out] 2026-10-04T09:22:42.040+00:00 [agent/embedded] embedded run tool end: runId=ad0d80de-9991-4ab8-8f54-bd3d8c516c15 tool=exec toolCallId=tooluse_UJwVKqUPkJdOqg0bg2Qern
+09:22:45.410 aa04fc4bfbb7 [proxy:out] [proxy] Stream complete: 26012in/111out tokens, 1 tool call(s)
+09:22:45.452 aa04fc4bfbb7 [openclaw:out] 2026-10-04T09:22:45.452+00:00 [agent/embedded] embedded run tool start: runId=ad0d80de-9991-4ab8-8f54-bd3d8c516c15 tool=exec toolCallId=tooluse_U86LEbJ7hgpJ6jtQhICPj1
+09:22:45.579 aa04fc4bfbb7 [openclaw:out] 2026-10-04T09:22:45.578+00:00 [agent/embedded] embedded run tool end: runId=ad0d80de-9991-4ab8-8f54-bd3d8c516c15 tool=exec toolCallId=tooluse_U86LEbJ7hgpJ6jtQhICPj1
+09:22:48.977 aa04fc4bfbb7 [proxy:out] [proxy] Stream complete: 26176in/135out tokens, 1 tool call(s)
+09:22:49.012 aa04fc4bfbb7 [openclaw:out] 2026-10-04T09:22:49.012+00:00 [agent/embedded] embedded run tool start: runId=ad0d80de-9991-4ab8-8f54-bd3d8c516c15 tool=exec toolCallId=tooluse_Bmyd1uKhco5G65pJZHPCBv
+09:22:49.089 aa04fc4bfbb7 [openclaw:out] 2026-10-04T09:22:49.088+00:00 [agent/embedded] embedded run tool end: runId=ad0d80de-9991-4ab8-8f54-bd3d8c516c15 tool=exec toolCallId=tooluse_Bmyd1uKhco5G65pJZHPCBv
+09:22:52.927 aa04fc4bfbb7 [proxy:out] [proxy] Stream complete: 29328in/100out tokens
+09:23:27.097 2a1eb289a179 [contract] Init for user=user_ad8e24c6518c1658 actor=test:x11 namespace=test_x11
+09:23:27.150 2a1eb289a179 [contract] Scoped S3 credentials created and applied
+09:23:27.171 2a1eb289a179 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_x11/.openclaw/
+09:23:27.222 2a1eb289a179 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+09:23:29.176 2a1eb289a179 [proxy:out] [proxy] Response: 2518in/23out tokens
+09:23:37.248 2a1eb289a179 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+09:23:42.516 2a1eb289a179 [proxy:out] [proxy] Stream complete: 25873in/111out tokens, 1 tool call(s)
+09:23:42.565 2a1eb289a179 [openclaw:out] 2026-10-04T09:23:42.565+00:00 [agent/embedded] embedded run tool start: runId=02379ad4-432f-4cc9-a6c3-4fb72d01a663 tool=exec toolCallId=tooluse_W8BgBTfwRmwrQct9WAxpW3
+09:23:52.723 2a1eb289a179 [contract] WS rx: {"type":"event","event":"agent","payload":{"runId":"02379ad4-432f-4cc9-a6c3-4fb72d01a663","stream":"item","data":{"itemId":"command:tooluse_W8BgBTfwRmwrQct9WAxpW3","phase":"update","kind":"command","title":"command curl ex
+09:23:52.725 2a1eb289a179 [contract] WS rx: {"type":"event","event":"agent","payload":{"runId":"02379ad4-432f-4cc9-a6c3-4fb72d01a663","stream":"command_output","data":{"itemId":"command:tooluse_W8BgBTfwRmwrQct9WAxpW3","phase":"delta","title":"command curl example.co
+09:23:52.786 2a1eb289a179 [openclaw:out] 2026-10-04T09:23:52.786+00:00 [agent/embedded] embedded run tool end: runId=02379ad4-432f-4cc9-a6c3-4fb72d01a663 tool=exec toolCallId=tooluse_W8BgBTfwRmwrQct9WAxpW3
+09:23:52.849 2a1eb289a179 [contract] WS rx: {"type":"event","event":"agent","payload":{"runId":"02379ad4-432f-4cc9-a6c3-4fb72d01a663","stream":"item","data":{"itemId":"command:tooluse_W8BgBTfwRmwrQct9WAxpW3","phase":"end","kind":"command","title":"command curl examp
+09:23:52.852 2a1eb289a179 [contract] WS rx: {"type":"event","event":"agent","payload":{"runId":"02379ad4-432f-4cc9-a6c3-4fb72d01a663","stream":"command_output","data":{"itemId":"command:tooluse_W8BgBTfwRmwrQct9WAxpW3","phase":"end","title":"command curl example.com 
+09:23:57.441 2a1eb289a179 [proxy:out] [proxy] Stream complete: 26026in/177out tokens
+09:23:57.539 2a1eb289a179 [openclaw:out] 2026-10-04T09:23:57.538+00:00 [ws] → event agent seq=per-client clients=1 run=02379ad4…a663 agent=main session=main stream=assistant aseq=23 text=完整輸出如下： ``` curl: (28) Connection timed out after 10001 milliseconds http=000 e
+09:23:57.539 2a1eb289a179 [contract] WS rx: {"type":"event","event":"agent","payload":{"runId":"02379ad4-432f-4cc9-a6c3-4fb72d01a663","stream":"assistant","data":{"text":"完整輸出如下：\n\n```\ncurl: (28) Connection timed out after 10001 milliseconds\nhttp=000 exit=28\n```
+09:23:57.601 2a1eb289a179 [contract] WS rx: {"type":"event","event":"agent","payload":{"runId":"02379ad4-432f-4cc9-a6c3-4fb72d01a663","sessionKey":"agent:main:main","stream":"lifecycle","data":{"stopReason":"stop","aborted":false,"livenessState":"working","replayInv
+09:23:57.607 2a1eb289a179 [contract] WS rx: {"type":"event","event":"chat","payload":{"runId":"02379ad4-432f-4cc9-a6c3-4fb72d01a663","sessionKey":"agent:main:main","agentId":"main","seq":26,"state":"delta","deltaText":"整輸出如下：\n\n```\ncurl: (28) Connection timed out 
+09:23:57.607 2a1eb289a179 [contract] WS rx: {"type":"event","event":"chat","payload":{"runId":"02379ad4-432f-4cc9-a6c3-4fb72d01a663","sessionKey":"agent:main:main","agentId":"main","seq":26,"state":"final","stopReason":"stop","message":{"role":"assistant","content":
+09:24:01.100 2a1eb289a179 [proxy:out] [proxy] Stream complete: 26281in/108out tokens, 1 tool call(s)
+09:24:01.119 2a1eb289a179 [openclaw:out] 2026-10-04T09:24:01.119+00:00 [agent/embedded] embedded run tool start: runId=e102e18a-e77c-439b-8c98-ddcf564df96b tool=exec toolCallId=tooluse_npztBTpWA4JYRWTWEBCdfd
+09:24:21.259 2a1eb289a179 [openclaw:out] 2026-10-04T09:24:21.259+00:00 [agent/embedded] embedded run tool end: runId=e102e18a-e77c-439b-8c98-ddcf564df96b tool=exec toolCallId=tooluse_npztBTpWA4JYRWTWEBCdfd
+09:24:29.285 2a1eb289a179 [proxy:out] [proxy] Stream complete: 27168in/860out tokens
+09:24:33.091 2a1eb289a179 [proxy:out] [proxy] Stream complete: 28105in/115out tokens, 1 tool call(s)
+09:24:33.117 2a1eb289a179 [openclaw:out] 2026-10-04T09:24:33.114+00:00 [agent/embedded] embedded run tool start: runId=d9ac0401-696f-455f-bb55-52424f6cb909 tool=exec toolCallId=tooluse_XajcTeZdCeegxHbcoAUlpo
+09:24:33.568 2a1eb289a179 [openclaw:out] 2026-10-04T09:24:33.568+00:00 [agent/embedded] embedded run tool end: runId=d9ac0401-696f-455f-bb55-52424f6cb909 tool=exec toolCallId=tooluse_XajcTeZdCeegxHbcoAUlpo
+09:24:38.556 2a1eb289a179 [proxy:out] [proxy] Stream complete: 28261in/149out tokens
+09:25:44.600 51bea84c7a30 [contract] Init for user=user_91931ea7165bb430 actor=test:x12 namespace=test_x12
+09:25:44.645 51bea84c7a30 [contract] Scoped S3 credentials created and applied
+09:25:44.667 51bea84c7a30 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_x12/.openclaw/
+09:25:44.719 51bea84c7a30 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+09:25:46.971 51bea84c7a30 [proxy:out] [proxy] Response: 2518in/22out tokens
+09:25:54.761 51bea84c7a30 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+09:26:00.010 51bea84c7a30 [proxy:out] [proxy] Stream complete: 25885in/120out tokens, 1 tool call(s)
+09:26:00.061 51bea84c7a30 [openclaw:out] 2026-10-04T09:26:00.060+00:00 [agent/embedded] embedded run tool start: runId=215866f9-4cc0-4e28-afe2-29b1449c9d9c tool=exec toolCallId=tooluse_dZgx1j5WiORXR5iBvPUt5I
+09:26:00.275 51bea84c7a30 [openclaw:out] 2026-10-04T09:26:00.275+00:00 [agent/embedded] embedded run tool end: runId=215866f9-4cc0-4e28-afe2-29b1449c9d9c tool=exec toolCallId=tooluse_dZgx1j5WiORXR5iBvPUt5I
+09:26:05.010 51bea84c7a30 [proxy:out] [proxy] Stream complete: 26168in/202out tokens
+09:26:08.696 51bea84c7a30 [proxy:out] [proxy] Stream complete: 26445in/114out tokens, 1 tool call(s)
+09:26:08.717 51bea84c7a30 [openclaw:out] 2026-10-04T09:26:08.717+00:00 [agent/embedded] embedded run tool start: runId=ff7b0a7a-5fa9-491a-8b17-02c7bf9314bc tool=exec toolCallId=tooluse_9qfMnjk9Sn67olZRZ9CTzQ
+09:26:09.216 51bea84c7a30 [openclaw:out] 2026-10-04T09:26:09.216+00:00 [agent/embedded] embedded run tool end: runId=ff7b0a7a-5fa9-491a-8b17-02c7bf9314bc tool=exec toolCallId=tooluse_9qfMnjk9Sn67olZRZ9CTzQ
+09:26:13.274 51bea84c7a30 [proxy:out] [proxy] Stream complete: 26582in/22out tokens

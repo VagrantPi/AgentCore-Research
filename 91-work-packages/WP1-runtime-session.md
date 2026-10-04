@@ -139,6 +139,13 @@
 | VPC endpoint、NAT（#11 借用 WP7 的 VPC） | — | — | — | 計入 [WP7](WP7-openclaw-on-agentcore.md#實際費用) |
 | ECR | 約 1.1 GB（`:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy`，小的幾乎不佔空間） | 自己計數 | — | 每月約 0.1 |
 
+### 沒有補做的項目（成本高、對選型沒有影響）
+
+| 項目 | 為什麼沒做 | 要補的話 |
+|---|---|---|
+| #11 的 1 GB 映像 VPC 版 | `bench.py` 的矩陣本來就不建 `bigimg × vpc`；`:wp1-big` 映像已在清理時刪除，補測要重新 build、push 1 GB 映像並重建 VPC。小映像在池子內外都看不出 VPC 的差別，沒有理由認為大映像會不同 | 重建 `:wp1-big`，`bench.py` 拿掉 `bigimg × vpc` 的排除，再跑 `measure`、`burst` |
+| #11 多輪重複 | PUBLIC 與 VPC 各量 1 輪（`measure` 20 次、`burst` 30 次）。VPC 減 PUBLIC 的差距在 -374 到 +24 ms 之間，方向不一致（多數時候 VPC 反而稍快），不會改變「VPC 不增加冷啟動」的結論 | 在同一個 VPC 換時段再跑 2–3 輪 |
+
 ### 否定項目的替代方案
 
 | 被否定的檢核點 | 替代方案 | 多出的成本或限制 |
@@ -164,3 +171,5 @@
 | `01-runtime/README.md` 配額 | session 建立速率 1.6/s 或 25/s | 100 個在約 1 秒內送出都沒被 throttle |
 | `01-runtime/README.md:202` | 沒設定 `requireMMDSV2` 的 runtime 呼叫會失敗 | `CreateAgentRuntime` 新建的 runtime 預設就是 `requireMMDSV2: true` |
 | `01-runtime/README.md:210` 一節 | 冷啟動沒有數字 | 補上本次結果，連到實驗 README |
+| `01-runtime/README.md:220` | VPC 模式：官方提到可能增加 session 的啟動時間 | #11：冷啟動不增加（池子內外都約 0 ms）；只有 V2 建立 runtime 時等 READY 從 183 秒變 527 秒 |
+| `01-runtime/README.md:266` | 冷啟動實驗尚未在 AWS 上實跑 | PUBLIC 組 2026-10-02、VPC 組 2026-10-04 已實跑，見實驗 README |

@@ -27,6 +27,7 @@
 | `wp7.py` | 量測：`first`、`burst`、`restore`、`idle`、`load`、`boundary`，加上 `logs`、`tokens` |
 | `metrics.py` | 用 CloudWatch metric 對帳 token 與 guardrail text unit |
 | `first.csv`、`burst.csv`、`restore.csv`、`load.csv`、`boundary.jsonl` | 原始結果 |
+| `logs_excerpt.txt`、`logs_excerpt_round2.txt` | Runtime log 的關鍵行（log group 已隨清理刪除） |
 
 `infra.json`（每個資源的 ID 與建立／刪除時間）不進版控。
 
@@ -47,6 +48,13 @@ uv run --with boto3 python wp7.py boundary --user x01 --tag nat --wait-full
 uv run --with boto3 python vpc.py drop-nat            # WP7 #6、WP1 #11
 uv run --with boto3 python wp7.py first --users n01
 uv run --with boto3 python deploy.py bedrock-dns on   # #6b
+uv run --with boto3 python vpc.py drop-ep
+uv run --with boto3 python deploy.py cleanup
+# 補測（第 2 輪，09:19–09:27 UTC）：#6 收緊版設定下驗 exec 連外、S3 匿名外送、#3 檔案可見
+uv run --with boto3 python vpc.py archive
+uv run --with boto3 python vpc.py up-tight            # 不要和 deploy.py 同時跑，兩者都會寫 infra.json
+uv run --with boto3 python deploy.py support && uv run --with boto3 python deploy.py push && uv run --with boto3 python deploy.py runtime
+uv run --with boto3 python wp7.py boundary --user x11 --tag r2-exec-nonat --wait-full --prompt "..."
 uv run --with boto3 python vpc.py drop-ep
 uv run --with boto3 python deploy.py cleanup
 uv run --with boto3 python vpc.py down                # 隔天，網卡清掉後

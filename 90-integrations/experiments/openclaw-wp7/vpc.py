@@ -5,6 +5,8 @@
   drop-nat    刪 NAT、EIP、預設路由、IGW、public subnet
   drop-ep     刪全部 endpoint 與 endpoint 安全群組（停止計費）
   down        刪 private subnet、Runtime 安全群組、路由表、VPC（網卡清掉後才刪得掉）
+  archive     把第 1 輪已刪除的資源紀錄移到 round1（補測前用）
+  up-tight    補測：在無 NAT 的 VPC 建 #6 收緊版的 endpoint（bedrock-runtime 開 private DNS、加 STS）
   show        印出 infra.json
 
 每個資源的 ID 與建立／刪除時間（UTC）記在 infra.json，計費用「小時數 × 官網價」。
@@ -124,21 +126,57 @@ def up():
             {"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": "0.0.0.0/0"}]}])
         rec(s, "runtime_sg", g)
 
+    endpoints(s, INTERFACE, NO_PRIVATE_DNS)
+
+
+def endpoints(s, services, no_private_dns):
+    vpc = s["vpc"]["id"]
     subnets = [s[f"private_subnet_{i}"]["id"] for i in range(len(PRIVATE))]
     if "ep_s3" not in s:
         e = ec2.create_vpc_endpoint(VpcId=vpc, ServiceName=f"com.amazonaws.{REGION}.s3", VpcEndpointType="Gateway",
                                     RouteTableIds=[s["private_rt"]["id"]], PolicyDocument=json.dumps(S3_POLICY),
                                     TagSpecifications=spec("vpc-endpoint", "wp7-s3"))["VpcEndpoint"]["VpcEndpointId"]
         rec(s, "ep_s3", e)
-    for svc in INTERFACE:
+    for svc in services:
         key = f"ep_{svc}"
         if key not in s:
             e = ec2.create_vpc_endpoint(VpcId=vpc, ServiceName=f"com.amazonaws.{REGION}.{svc}", VpcEndpointType="Interface",
                                         SubnetIds=subnets, SecurityGroupIds=[s["endpoint_sg"]["id"]],
-                                        PrivateDnsEnabled=svc not in NO_PRIVATE_DNS,
+                                        PrivateDnsEnabled=svc not in no_private_dns,
                                         TagSpecifications=spec("vpc-endpoint", f"wp7-{svc}"))["VpcEndpoint"]["VpcEndpointId"]
             rec(s, key, e, azs=len(subnets))
     print("subnets:", ",".join(subnets), "runtime_sg:", s["runtime_sg"]["id"])
+
+
+# #6 收緊後的最小組合：無 NAT，bedrock-runtime 開 private DNS，加 STS（容器建 scoped 憑證要用）
+TIGHT = ["bedrock-runtime", "sts", "secretsmanager", "ecr.api", "ecr.dkr", "logs"]
+
+
+def up_tight():
+    """補測（第 2 輪）：在已拔掉 NAT 的 VPC 重建收緊版 endpoint。第 1 輪的紀錄先用 archive 移到 round1。"""
+    s = load()
+    if "endpoint_sg" not in s:
+        g = ec2.create_security_group(GroupName="wp7-endpoint-sg", Description="WP7 VPC endpoints: 443 from VPC",
+                                      VpcId=s["vpc"]["id"], TagSpecifications=spec("security-group", "wp7-endpoint-sg"))["GroupId"]
+        ec2.authorize_security_group_ingress(GroupId=g, IpPermissions=[
+            {"IpProtocol": "tcp", "FromPort": 443, "ToPort": 443, "IpRanges": [{"CidrIp": CIDR}]}])
+        rec(s, "endpoint_sg", g)
+    endpoints(s, TIGHT, set())
+    ids = [s[k]["id"] for k in s if k.startswith("ep_") and k != "ep_s3"]
+    while any(e["State"] != "available" for e in ec2.describe_vpc_endpoints(VpcEndpointIds=ids)["VpcEndpoints"]):
+        time.sleep(10)
+    print("all interface endpoints available")
+
+
+def archive():
+    """把已刪除、第 2 輪要重建的資源紀錄移到 round1，保留第 1 輪的時間供計費。"""
+    s = load()
+    r1 = s.setdefault("round1", {})
+    for k in [k for k, v in s.items() if k != "round1" and isinstance(v, dict) and "deleted" in v
+              and (k.startswith("ep_") or k in ("endpoint_sg", "bucket", "secret", "guardrail", "role", "ecr", "runtime", "usage_delivery"))]:
+        r1[k] = s.pop(k)
+    save(s)
+    print("archived:", sorted(r1))
 
 
 def mark_deleted(s, key):
@@ -204,5 +242,5 @@ def down():
 
 if __name__ == "__main__":
     cmd = sys.argv[1] if len(sys.argv) > 1 else "show"
-    {"up": up, "drop-nat": drop_nat, "drop-ep": drop_ep, "down": down,
+    {"up": up, "drop-nat": drop_nat, "drop-ep": drop_ep, "down": down, "archive": archive, "up-tight": up_tight,
      "show": lambda: print(json.dumps(load(), indent=2))}[cmd]()
