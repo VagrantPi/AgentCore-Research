@@ -302,7 +302,7 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 
 1. 第 2 層：OpenClaw 可以只靠設定檔在框架外鎖掉 exec、上網（實測），但預設全開、經 HTTP 進來的請求等同 owner、官方明說一個租戶一個 gateway；自架就是每人一台機器，100 人 24h 約 $3.5k／月，跟 AgentCore 保守估算（$3.4k）差不多、是實測值（$832）的 4 倍。Strands 本身不帶多餘工具，但每個聊天室要一個 Agent 實例。
 2. 第 3 層：授權函式庫（Cedar、OPA、Casbin）省不了程式碼，手寫 70 行換成 Cedar 還有約 60 行（查 DB、403／429、限流、計量都還在）；多得到的是型別檢查與日後的形式驗證。MCP gateway 類專案要多養一個服務、購買資料要多一份，不值得。**維持 WP2 的手寫做法。**
-3. 第 4 層：託管瀏覽器沒有一家在官方文件寫明支援「手機上操作 Live View」；反而 AgentCore 用的 DCV Web Client SDK 從 1.10.1（2025-10-22）起支援 iOS Safari／Chrome、Android Chrome 與觸控 `[官方已寫]`。Steel、Cloudflare Browser Run 有正式的接手、交還機制。價格上只有 Cloudflare 比 AgentCore Browser 便宜一點（每小時 $0.09 vs $0.101），Live View 實測待做。
+3. 第 4 層：託管瀏覽器沒有一家在官方文件寫明支援「手機上操作 Live View」；反而 AgentCore 用的 DCV Web Client SDK 從 1.10.1（2025-10-22）起支援 iOS Safari／Chrome、Android Chrome 與觸控 `[官方已寫]`。Steel、Cloudflare Browser Run 有正式的接手、交還機制。價格上只有 Cloudflare 比 AgentCore Browser 便宜一點（每小時 $0.09 vs $0.101，100 人每月只差 $1.4），不實測；改在 iOS 模擬器 Safari 實測 AgentCore 的接手（[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md)）：點擊、英數、中文都能送進遠端，交還後自動化接得上，但 viewer 要自己加輸入框轉送按鍵。
 
 #### 第 2 層：Agent 框架與技能
 
@@ -358,7 +358,7 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 | 手機上操作 | **沒有正式支援**：「Mobile keyboards aren't officially supported」`[官方已寫]` | 官方沒寫 | 官方沒寫 | noVNC 寫支援 iOS、Android `[官方已寫]`；KasmVNC 直連不支援 Safari `[官方已寫]` | 官方沒寫 |
 | profile 保存 | 有，Context 設 `persist: true` 無限期保存；一人一個 Context 要自己管 `[官方已寫]` | 有，30 天沒用自動刪除、單一 300 MB `[官方已寫]` | 第三方說沒有 `[推測]` | 要自己做 | 官方沒寫跨 session profile |
 | 網域白名單 | 有 `allowedDomains`，只擋主框架跳轉 `[官方已寫]` | 官方沒寫 | 要自己做 | 要自己做（Chromium 政策或代理） | 官方沒寫 |
-| Live View 開啟時間 | 官方沒寫 | 官方沒寫 | 官方沒寫 | 要自己量 | 官方沒寫；待實測 |
+| Live View 開啟時間 | 官方沒寫 | 官方沒寫 | 官方沒寫 | 要自己量 | 官方沒寫；未實測（價格判定） |
 | 授權 | 商用 | 商用 | Apache-2.0，仍標 beta | noVNC MPL-2.0 | 商用 |
 
 - 來源：[Browserbase live view](https://docs.browserbase.com/features/session-live-view)、[Browserbase contexts](https://docs.browserbase.com/features/contexts)、[Browserbase pause/resume](https://www.browserbase.com/changelog/pause-and-resume-for-agents)、[Steel human-in-the-loop](https://docs.steel.dev/overview/sessions-api/human-in-the-loop)、[steel-mcp-server](https://github.com/steel-dev/steel-mcp-server)、[Steel profiles](https://docs.steel.dev/overview/profiles-api/overview)、[noVNC](https://github.com/novnc/noVNC)、[Cloudflare live view](https://developers.cloudflare.com/browser-run/features/live-view/)、[Cloudflare human-in-the-loop](https://developers.cloudflare.com/browser-run/features/human-in-the-loop/) `[官方已寫]`
@@ -388,18 +388,33 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 | Steel | $10（Launch，但單 session 15 分、並發 10） | $250（Scale：250 + max(0, 40 − 100)） |
 | Cloudflare | $13.1（5 + 90 × 0.09） | $49.1（5 + 490 × 0.09） |
 
-依 A 半的範圍規則，只有 Cloudflare 比 AgentCore 便宜，只實測 Cloudflare（免費方案每天 10 分鐘就夠量 Live View 開啟時間）。
+依 A 半的範圍規則，只有 Cloudflare 比 AgentCore 便宜，但 100 人、每人 5 h 每月只省 $1.4，不值得另外實測，以價格判定。第 4 層的實測改做方案 B 自己的 AgentCore Browser（決策真正卡的是手機接手），見下方「實測：手機上接手 AgentCore Browser」。
+
+**實測：手機上接手 AgentCore Browser**（[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md)，iOS 模擬器 Mobile Safari，2026-10-04）
+
+| 項目 | 結果 |
+|---|---|
+| Live View 開頁到第一個畫面 | 第一次 5.6 秒（含下載 2 MB 的 dcv.js）；之後 1.7–1.9 秒（3 次） |
+| 點擊傳到遠端 | 成功 |
+| 直接對 DCV 畫面打字 | **失敗**：Safari 點 canvas 不會取得焦點，按鍵沒地方接、也不叫出螢幕鍵盤 |
+| viewer 加 HTML 輸入框、按鍵轉給 `connection.sendKeyboardEvent` | 成功：叫出 iOS 螢幕鍵盤，「Taipei 101」＋Enter 送進遠端並完成搜尋 |
+| 中文（輸入法選完字的字串逐字送） | 成功，但連續送第一個字會掉；每個事件間隔 30 ms 後完整 |
+| 交還後自動化接著做 | 成功；但接手會切斷原本的 CDP 連線，交還後要重新連 |
+| 手機尺寸視窗（390×844） | 網站改成手機版排版，字看得清楚 |
+| 同一 session 兩個 Live View | 第二個 `Connection limit reached` |
+
+- 限制：模擬器的 HID 事件不等於實體手機的觸控與螢幕鍵盤；真正的注音輸入（`compositionend`）沒測，中文那一項用按鈕模擬選完字的字串。費用約 $0.013（479 秒 × $0.101／h）。
 
 #### 檢核表（B 半負責的部分）
 
 | # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
 |---|---|---|---|---|---|
 | 1 | 第 2、3、4 層填完「有 / 沒有 / 要自己做」 | `[官方已寫]` / `[推測]` 逐格標 | 通過（B 半） | 上方三張表 | 和 A 半合起來六層都填完 |
-| 2 | 每層至少一個候選有實測數字 | — | 第 2 層：兩個聊天室並行 Strands 468–592 ms、OpenClaw 793–1,048 ms，10／10 沒串；第 3 層：Cedar 25 行、83 µs；**第 4 層：待實測（Cloudflare Live View 開啟時間）** | [chatroom-concurrency](../90-integrations/experiments/chatroom-concurrency/README.md)、[cedar-skill-gating](../08-policy/experiments/cedar-skill-gating/README.md) | — |
+| 2 | 每層至少一個候選有實測數字 | — | 第 2 層：兩個聊天室並行 Strands 468–592 ms、OpenClaw 793–1,048 ms，10／10 沒串；第 3 層：Cedar 25 行、83 µs；第 4 層：候選以價格判定不實測；改測方案 B 的 AgentCore Live View，開頁到第一個畫面 1.7–1.9 秒（第一次 5.6 秒） | [chatroom-concurrency](../90-integrations/experiments/chatroom-concurrency/README.md)、[cedar-skill-gating](../08-policy/experiments/cedar-skill-gating/README.md)、[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md) | 第 4 層方案 C 候選沒有實測數字，但價差小（每月 $1.4），不影響選型 |
 | 3 | 每人每月成本有官網價，標日期；閒置另列 | 成本 | 通過（B 半，估算） | 上方價格表、下方「實際費用」、`evidence/WP6/L4-*` | — |
 | 4 | 自架要自己維運的元件與估點 | `[推測]` | 通過（B 半） | 下方「維運元件」 | — |
 | 6 | OpenClaw 自架時，能否在框架外強制工具白名單 | `[推測]` | **可以，但不是預設**：`tools.deny` 關掉 exec、上網後，以使用者身分要求執行指令、讀網頁都被拒（實測）；預設設定兩者都會照做（實測） | [探測結果](../90-integrations/experiments/chatroom-concurrency/README.md#結果2026-10-04) | 不是阻斷項，但要另外補三件事，見下方 |
-| 7 | 有沒有候選能做到「使用者接手登入、交還後 agent 繼續」 | `[推測]` | Steel（steel-mcp-server handoff）、Cloudflare Browser Run（`Cloudflare.handoff`）有正式機制；**手機上能否操作，託管的沒有一家官方寫支援**（noVNC 支援手機，但交還要自己做） | 上方第 4 層表 | 方案 B 反而比較有把握：DCV Web Client SDK 1.10.1 起官方支援手機瀏覽器 `[官方已寫]`；hephclaw 的 iOS App 已在 Simulator 的真 WKWebView 收到 AgentCore Live View 串流（1280×720，`canvasHasContent: true`），實體 iPhone 的觸控與鍵盤未驗證（hephclaw `docs/agent-workspace/mobile-browser-research-20260930.md`）。方案 C 選託管瀏覽器時要自己實機驗證 |
+| 7 | 有沒有候選能做到「使用者接手登入、交還後 agent 繼續」 | `[推測]` | Steel（steel-mcp-server handoff）、Cloudflare Browser Run（`Cloudflare.handoff`）有正式機制；**手機上能否操作，託管的沒有一家官方寫支援**（noVNC 支援手機，但交還要自己做） | 上方第 4 層表 | 方案 B 反而比較有把握：DCV Web Client SDK 1.10.1 起官方支援手機瀏覽器 `[官方已寫]`；hephclaw 的 iOS App 已在 Simulator 的真 WKWebView 收到 AgentCore Live View 串流（1280×720，`canvasHasContent: true`），實體 iPhone 的觸控與鍵盤未驗證（hephclaw `docs/agent-workspace/mobile-browser-research-20260930.md`）。方案 C 選託管瀏覽器時要自己實機驗證。AgentCore 已在 iOS 模擬器 Safari 實測接手、英數與中文輸入、交還後繼續都可行（[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md)），條件是 viewer 自己加輸入框轉送按鍵；實體手機的螢幕鍵盤與注音輸入仍未驗證 |
 | 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | **無** | 下方「#8 門檻」 | 方案 C 不用為了省錢再投入 |
 
 **#6 鎖緊後還要補的三件事**
@@ -462,7 +477,7 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 - [x] 沒有建立 AWS 資源
 - [x] OpenClaw gateway 已停止；裝在暫存目錄，`~/.openclaw` 不存在、沒有裝 launchd 服務；`/tmp/openclaw/` log 已刪除
 - [x] 子 agent 的暫存測試檔在 session scratchpad，不在 repo
-- [ ] Cloudflare 帳號（第 4 層實測用）：實測後確認沒有啟用付費方案
+- [x] 第 4 層實測的兩個 AgentCore Browser session 已關閉，`list-browser-sessions --status READY` 為空；沒有註冊 Cloudflare
 
 #### 要更正研究庫的段落
 
