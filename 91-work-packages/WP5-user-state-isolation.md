@@ -168,7 +168,7 @@
   - 沒有 Browser MCP server，這次用不到。
   - migration 合成一個 `036`。
   - todo 改成每人一份資料（`wp2_todos`），這樣 #10 才有「B 的資料」可以讀。
-  - 本機與 EC2 版都先跑過 `scripts/wp2/check.sh`，15 項全過。
+  - 先跑過 `scripts/wp2/check.sh`：本機 16 項（含每小時上限）、EC2 版 15 項（不跑每小時上限）全過。
 - 架構：
   - EC2 `t4g.medium` 跑 HephAgora，開關為 `HEPHAGORA_REQUIRE_ACTOR=1`、`HEPHAGORA_MCP_FACADE=1`。
   - Runtime `wp5_agent`：PUBLIC 網路；execution role 只能拉映像、寫 log、呼叫 Haiku，沒有任何 Browser 權限。
@@ -183,13 +183,13 @@
 
 #### 費用
 
-| 資源 | 用量 | 用量來源 | 單價（官網，2026-10-04 查） | 估算金額（USD） |
+| 資源 | 用量 | 用量來源 | 單價（沿用 WP2 回填，官網 2026-10-02 查） | 估算金額（USD） |
 |---|---|---|---|---|
 | Runtime `wp5_agent`，3 個 session（含 1 次 token 沒換進去的失敗呼叫） | 0.005760 vCPU-h、0.640581 GB-h（共 998 秒，每個 session 含 5 分鐘閒置） | `USAGE_LOGS`（`usage_cost.py`，2026-10-04 10:28 UTC，最後 session 結束後 1 小時） | $0.0895／vCPU-h、$0.00945／GB-h | 0.0066 |
 | EC2 `t4g.medium` | 0.1944 h（09:10:04–09:21:44 UTC，700 秒） | 啟動與終止時間 | $0.0432／h | 0.0084 |
 | EBS gp3 30 GB | 0.1944 h | 同上 | $0.096／GB-月（÷730 h） | 0.0008 |
 | 公有 IPv4 | 0.1944 h | 同上 | $0.005／h | 0.0010 |
-| **合計** | | | | **≈ 0.0168** |
+| **合計** | | | | **≈ 0.0167** |
 
 - 算式：Runtime 0.005760 × 0.0895 + 0.640581 × 0.00945 = 0.000516 + 0.006053；EC2 0.1944 × 0.0432；EBS 30 × 0.096 × 0.1944 ÷ 730；IPv4 0.1944 × 0.005。
 - 不含 ECR、S3（存放約 20 分鐘，可忽略）與 CloudWatch Logs。這次沒有呼叫模型。
