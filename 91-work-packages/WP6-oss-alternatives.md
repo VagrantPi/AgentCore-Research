@@ -155,7 +155,7 @@
 | 3 | 每人每月成本有官網價，標日期；閒置另列 | 成本 | 通過（A 半，估算） | 下方「實際費用」、`evidence/WP6/` | — |
 | 4 | 自架要自己維運的元件與估點 | `[推測]` | 通過（A 半） | 下方「維運元件」 | — |
 | 5 | 第 1 層：100 人每人一台常駐 VM 的月費 | 成本 | 24h：自架約 $9.0k、託管約 $12.2k；8h：自架約 $3.3k、託管約 $4.2k | 下方算式 | 自架 8h 情境的前提是全體同時段使用、host 能整台停機 |
-| 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | 第 1 層：**無**（隨需價下，自架每 GB-h 的價格是 AgentCore 的 3.1 倍，跟人數無關）；全方案：未判定 | 下方「第 1 層判定」 | 全方案的門檻要等 B 半的第 2–4 層，合併時再算 |
+| 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | 第 1 層：**無**（隨需價下，自架每 GB-h 的價格是 AgentCore 的 3.1 倍，跟人數無關）；全方案：**無**（見 B 半「#8 門檻」） | 下方「第 1 層判定」、B 半「#8 門檻」 | — |
 
 #### 實際費用（全部是官網單價加假設用量的估算，本階段沒有花費）
 
@@ -290,4 +290,184 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 
 ### B 半：第 2、3、4 層
 
-（RomanChen 回填）
+- 負責人：Kais（2026-10-04 從 RomanChen 接手）
+- 執行日期：2026-10-04
+- 區域：本機實測；模型呼叫東京 Bedrock（`jp.anthropic.claude-haiku-4-5-20251001-v1:0`）
+- 資源 tag：本階段沒有建立 AWS 資源
+- 使用的 AWS 帳號：050571774557（只呼叫 Bedrock）
+- 價格截圖：[`evidence/WP6/`](evidence/WP6/)，檔名 `L4-<候選>-pricing-2026-10-04.png`
+- 實測腳本：第 2 層 [`90-integrations/experiments/chatroom-concurrency/`](../90-integrations/experiments/chatroom-concurrency/README.md)、第 3 層 [`08-policy/experiments/cedar-skill-gating/`](../08-policy/experiments/cedar-skill-gating/README.md)
+
+#### 結論（三句內）
+
+1. 第 2 層：OpenClaw 可以只靠設定檔在框架外鎖掉 exec、上網（實測），但預設全開、經 HTTP 進來的請求等同 owner、官方明說一個租戶一個 gateway；自架就是每人一台機器，100 人 24h 約 $3.5k／月，跟 AgentCore 保守估算（$3.4k）差不多、是實測值（$832）的 4 倍。Strands 本身不帶多餘工具，但每個聊天室要一個 Agent 實例。
+2. 第 3 層：授權函式庫（Cedar、OPA、Casbin）省不了程式碼，手寫 70 行換成 Cedar 還有約 60 行（查 DB、403／429、限流、計量都還在）；多得到的是型別檢查與日後的形式驗證。MCP gateway 類專案要多養一個服務、購買資料要多一份，不值得。**維持 WP2 的手寫做法。**
+3. 第 4 層：沒有任何託管瀏覽器在官方文件寫明支援「手機上操作 Live View」，AgentCore 也一樣；Steel、Cloudflare Browser Run 有正式的接手、交還機制。價格上只有 Cloudflare 比 AgentCore Browser 便宜一點（每小時 $0.09 vs $0.101），Live View 實測待做。
+
+#### 第 2 層：Agent 框架與技能
+
+| 能力 | OpenClaw 自架 | Strands | LangGraph | Claude Agent SDK |
+|---|---|---|---|---|
+| SKILL.md | 有，遵循 AgentSkills 規格；每個 agent 可設 skills 白名單 `[官方已寫]` | 有，`AgentSkills` plugin `[官方已寫]` | 核心沒有；建在其上的 Deep Agents 有 `[官方已寫]` | 有，只能從檔案系統載入 `[官方已寫]` |
+| 框架外強制工具白名單 | **可以，但要自己鎖**：`tools.deny` 整組關掉後，exec、上網被擋（實測）；預設全開（實測）。細節見下方 #6 | 有：只有程式碼傳進去的工具 `[官方已寫]` | 有：工具在程式碼裡綁定 `[推測]` | 要自己做：Bash、WebFetch 等預設就在，要用 `disallowed_tools` 或 PreToolUse hook 擋 `[官方已寫]` |
+| 一個程序服務同一人的多個聊天室 | 有：每個 session 一條 lane，不同 session 並行，同一 session 排隊（實測） | 要每個聊天室一個 `Agent`；同一個實例並行會丟 `ConcurrencyException`（實測） | 有：每個聊天室一個 thread_id ＋ checkpointer `[推測]` | 有：一個 session 一個子程序 `[官方已寫]` |
+| 一個程序服務多位使用者 | **沒有**，官方要求一個租戶一個 gateway `[官方已寫]` | 要自己做 `[官方已寫]` | 有：custom auth ＋ owner filter（LangSmith 部署）`[官方已寫]` | 有條件可以：每個租戶獨立 cwd 與設定目錄 `[官方已寫]` |
+| 每個請求帶不同使用者 token 給 MCP server | 沒有：`mcp.servers` 的 headers 是靜態的 `[官方已寫]` | 要每個請求重建 MCP client `[推測]`；WP2 的 Runtime agent 就是這樣做 | 有：graph factory 裡依使用者建 client `[官方已寫]` | 有：每次 `query()` 可給 headers `[官方已寫]` |
+| 授權／最近 release | MIT；2026.9.8（2026-10-03），一天出好幾版 | Apache-2.0；1.57.2（2026-10-01） | MIT；1.2.12（2026-09-21） | repo 標 MIT，README 寫受 Anthropic 商業條款規範 `[矛盾]`；0.2.163（2026-09-30） |
+
+- 來源：[OpenClaw tool policy](https://docs.openclaw.ai/gateway/config-tools/tool-policy)、[OpenClaw queue](https://docs.openclaw.ai/concepts/queue)、[OpenClaw multi-tenant](https://docs.openclaw.ai/gateway/multi-tenant-hosting)、[OpenClaw MCP](https://docs.openclaw.ai/tools/mcp)、[OpenClaw OpenAI HTTP API](https://docs.openclaw.ai/gateway/openai-http-api)、[Strands skills](https://strandsagents.com/docs/user-guide/harness/configure/skills/)、[Strands exceptions](https://strandsagents.com/docs/api/python/strands.types.exceptions/)、[LangChain MCP auth](https://docs.langchain.com/oss/python/langchain/mcp/auth)、[LangSmith resource auth](https://docs.langchain.com/langsmith/resource-auth)、[Claude Agent SDK permissions](https://code.claude.com/docs/en/agent-sdk/permissions)、[Claude Agent SDK hosting](https://code.claude.com/docs/en/agent-sdk/hosting) `[官方已寫]`
+- OpenClaw 的 Bedrock provider 不是內建的，要另外裝 `@openclaw/amazon-bedrock-provider`；沒裝時回 500：`No API provider registered for api: bedrock-converse-stream`。
+- `[矛盾]` OpenClaw main lane 的預設並行上限：官方 queue 頁寫 `max(8, CPU×4)`，舊版第三方鏡像寫 4。
+
+**實測：一個程序兩個聊天室同時發訊**（[腳本與原始數據](../90-integrations/experiments/chatroom-concurrency/README.md)）
+
+| 框架 | 次數 | 重疊執行 | 答對、沒串到另一個聊天室 | 單次延遲 |
+|---|---|---|---|---|
+| Strands 1.57.2（每聊天室一個 Agent） | 5 | 5／5 | 10／10 | 468–592 ms |
+| OpenClaw 2026.9.8（每聊天室一個 session key） | 5 | 5／5 | 10／10 | 793–1,048 ms |
+
+- 同一個 Strands `Agent` 實例同時收兩個請求：第二個直接丟 `ConcurrencyException`。
+- 同一個 OpenClaw session 同時兩個請求：session 已存在時排隊（約 0.9 秒、1.6–1.8 秒完成）；新 session 的第一則訊息就並行時，一個回 500 `SessionWorkStartChangedError ... Retry.`，呼叫端要重試。
+
+#### 第 3 層：工具閘道與授權
+
+| 能力 | OPA（opa-wasm） | Cedar（cedar-wasm） | Casbin（node-casbin） | agentgateway | IBM ContextForge |
+|---|---|---|---|---|---|
+| 依使用者過濾工具清單 | 要自己做：逐工具判斷；wasm 版沒寫支援 partial eval `[推測]` | 逐工具 `isAuthorized`（實測）；`isAuthorizedPartial` 有匯出但上游標為實驗功能 `[推測]` | 有：`batchEnforce` 一次判多筆 `[官方已寫]` | 有：CEL 規則自動濾掉 `tools/list`，但只看得到 JWT claims，已購買清單要塞進 JWT `[官方已寫]` | 有：RBAC、team、virtual server；購買紀錄要同步進它的 DB `[官方已寫]` |
+| 限流與計量 | 要自己做 | 要自己做 | 要自己做 | 限流有（依 JWT claim、可依工具分）；計量要自己做 `[官方已寫]` | 有 RateLimiter 外掛，多實例要 Redis `[官方已寫]` |
+| 形式驗證 | 沒有 SMT；有 `opa test`、`opa check --strict` `[官方已寫]` | 型別檢查有（實測）；SMT 用 Rust 的 `cedar-policy-symcc`（要 cvc5），npm 沒有 `[官方已寫]` | 沒有 | 沒有 | 沒有 |
+| Node 整合 | 1.10.0，最後 release 2024-11，README 自稱 Work in Progress `[官方已寫]` | 4.13.0（2026-09-15），有 TS 型別 `[官方已寫]` | 5.51.1（2026-06）`[官方已寫]` | 獨立的 Rust 執行檔 | Python 服務 |
+| 每次判斷延遲 | Go 版 RBAC 範例約 45 µs `[官方已寫]` | 本機 wasm：preparse 後約 83 µs、不 preparse 約 300 µs（實測）；論文 4–5 µs 是原生 Rust | Go 版約 0.16 ms；Node 版官方沒寫 | 官方沒寫 | 官方沒寫 |
+| 要多養的元件 | 無 | 無 | 無 | gateway 本身 `[推測]` | gateway ＋ SQLite／Postgres，Redis 選配 `[官方已寫]` |
+| 授權條款 | Apache-2.0 | Apache-2.0 | Apache-2.0 | Apache-2.0 | Apache-2.0 |
+
+- 來源：[cedar-wasm](https://github.com/cedar-policy/cedar/tree/main/cedar-wasm)、[Cedar analysis](https://aws.amazon.com/blogs/opensource/introducing-cedar-analysis-open-source-tools-for-verifying-authorization-policies)、[Cedar 論文](https://arxiv.org/abs/2403.04651)、[npm-opa-wasm](https://github.com/open-policy-agent/npm-opa-wasm)、[OPA policy performance](https://www.openpolicyagent.org/docs/policy-performance)、[Casbin benchmark](https://casbin.apache.org/docs/benchmark/)、[agentgateway tool access](https://agentgateway.dev/docs/kubernetes/latest/mcp/tool-access/)、[ContextForge](https://ibm.github.io/mcp-context-forge/latest/) `[官方已寫]`。版本與 release 日期是 2026-10-04 查 npm registry、GitHub API。
+- Docker MCP Gateway、MCPJungle 沒查到依 JWT 使用者過濾工具的功能，不列。
+
+**實測：「買了才能用」用 Cedar 寫要幾行**（[腳本](../08-policy/experiments/cedar-skill-gating/README.md)）：授權本體 25 行（schema、policy、DB 資料轉 entities、判斷、`tools/list` 過濾），A 的清單沒有 flight、B 有、A 呼叫 flight 被拒。查 DB、403／429、限流、帳本這些手寫版大部分的行數都省不掉。
+
+- 跟函式庫無關、但該修的：WP2 的限流是「先數再放行」，不是原子操作。改成 `UPDATE … WHERE count < limit RETURNING`，或用 Redis `INCR`。
+- 什麼時候改用 Cedar：規則超過「買了沒」一種（方案分級、組織共享、試用期），或要對外證明權限邊界時。
+
+#### 第 4 層：雲端瀏覽器與接手
+
+| 能力 | Browserbase | Steel 託管 | Steel 自架（steel-browser） | 自架 Chromium＋noVNC | Cloudflare Browser Run |
+|---|---|---|---|---|---|
+| Live View 可互動 | 有，可唯讀或可讀寫 `[官方已寫]` | 有，預設可互動 `[官方已寫]` | 有內建除錯頁 `[官方已寫]` | 要自己做；noVNC 本身可互動 | 有 `[官方已寫]` |
+| 接手、交還後 agent 繼續 | 原始 session 沒有正式機制，只能靠「可互動＋agent 自己等」；pause／resume 只限它自家的 Agents API `[官方已寫]` | 有：`steel-mcp-server`（MIT）的 `steel_session_handoff`，Take control／Hand back `[官方已寫]` | 要自己做，可接 steel-mcp-server `[推測]` | 要自己做 | 有：CDP 指令 `Cloudflare.handoff`，等 `handoffComplete`，最長 30 分 `[官方已寫]` |
+| 手機上操作 | **沒有正式支援**：「Mobile keyboards aren't officially supported」`[官方已寫]` | 官方沒寫 | 官方沒寫 | noVNC 寫支援 iOS、Android `[官方已寫]`；KasmVNC 直連不支援 Safari `[官方已寫]` | 官方沒寫 |
+| profile 保存 | 有，Context 設 `persist: true` 無限期保存；一人一個 Context 要自己管 `[官方已寫]` | 有，30 天沒用自動刪除、單一 300 MB `[官方已寫]` | 第三方說沒有 `[推測]` | 要自己做 | 官方沒寫跨 session profile |
+| 網域白名單 | 有 `allowedDomains`，只擋主框架跳轉 `[官方已寫]` | 官方沒寫 | 要自己做 | 要自己做（Chromium 政策或代理） | 官方沒寫 |
+| Live View 開啟時間 | 官方沒寫 | 官方沒寫 | 官方沒寫 | 要自己量 | 官方沒寫；待實測 |
+| 授權 | 商用 | 商用 | Apache-2.0，仍標 beta | noVNC MPL-2.0 | 商用 |
+
+- 來源：[Browserbase live view](https://docs.browserbase.com/features/session-live-view)、[Browserbase contexts](https://docs.browserbase.com/features/contexts)、[Browserbase pause/resume](https://www.browserbase.com/changelog/pause-and-resume-for-agents)、[Steel human-in-the-loop](https://docs.steel.dev/overview/sessions-api/human-in-the-loop)、[steel-mcp-server](https://github.com/steel-dev/steel-mcp-server)、[Steel profiles](https://docs.steel.dev/overview/profiles-api/overview)、[noVNC](https://github.com/novnc/noVNC)、[Cloudflare live view](https://developers.cloudflare.com/browser-run/features/live-view/)、[Cloudflare human-in-the-loop](https://developers.cloudflare.com/browser-run/features/human-in-the-loop/) `[官方已寫]`
+- browserless 是 SSPL-1.0，閉源商用要買商業授權，不採用。
+- 風險：Cloudflare 官方寫 Browser Run 一律被標成 bot 流量，有些網站即使是人在登入也可能被擋；Cloudflare Live View 連結預設 5 分鐘內要開始連線（最長可設 1 小時），推播後使用者晚開就會失效。Browserbase 每個 session 最少算 1 分鐘，頻繁開短 session 比 AgentCore（實測每次約 5–6 秒計費）貴。
+- `[矛盾]` Browserbase API 文件寫 `keepAlive` 是「Hobby Plan and above」，定價頁沒有 Hobby 方案；Steel 2025-10 部落格的方案名稱與現行文件對不上。
+
+**價格**（定價頁讀取日 2026-10-04）
+
+| 方案 | 月費 | 含時數 | 超量單價 | 計費單位 | 並發 |
+|---|---|---|---|---|---|
+| AgentCore Browser（對照） | — | — | 約 $0.101／browser-hour | 秒 | — |
+| Browserbase Developer | $20 | 100 h | $0.12／h | 分鐘，每 session 最少 1 分 | 25 |
+| Browserbase Startup | $99 | 500 h | $0.10／h | 同上 | 100 |
+| Steel Launch | $0 ＋ 用量 | 一次性 $30 額度 | $0.10／h | 分鐘，無條件進位 | 10；單 session 最長 15 分 |
+| Steel Scale | $250 ＋ 用量 | 每月 $100 額度 | $0.08／h | 同上 | 100；單 session 最長 1 小時 |
+| Cloudflare Workers Paid | $5 | 10 h | $0.09／h | 每天以秒累計，月底四捨五入 | 含 10 個（每日峰值取月平均），超過每個 $2 |
+| Cloudflare Workers Free | $0 | 每天 10 分鐘 | 不能超量 | — | 3 |
+
+- AgentCore 對照值的算法：WP2 實測 5 個 session 共 28 秒、0.005707 vCPU-h、0.029116 GB-h（[WP2 #11](WP2-capability-boundary.md#實際費用-1)），回推平均 0.73 vCPU、3.74 GB，0.734 × $0.0895 + 3.743 × $0.00945 = $0.101／h。
+
+| 100 人月費 | 每人 1 h（共 100 h） | 每人 5 h（共 500 h） |
+|---|---|---|
+| AgentCore Browser | $10.1 | $50.5 |
+| Browserbase | $20（Developer） | $68（Developer：20 + 400 × 0.12） |
+| Steel | $10（Launch，但單 session 15 分、並發 10） | $250（Scale：250 + max(0, 40 − 100)） |
+| Cloudflare | $13.1（5 + 90 × 0.09） | $49.1（5 + 490 × 0.09） |
+
+依 A 半的範圍規則，只有 Cloudflare 比 AgentCore 便宜，只實測 Cloudflare（免費方案每天 10 分鐘就夠量 Live View 開啟時間）。
+
+#### 檢核表（B 半負責的部分）
+
+| # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
+|---|---|---|---|---|---|
+| 1 | 第 2、3、4 層填完「有 / 沒有 / 要自己做」 | `[官方已寫]` / `[推測]` 逐格標 | 通過（B 半） | 上方三張表 | 和 A 半合起來六層都填完 |
+| 2 | 每層至少一個候選有實測數字 | — | 第 2 層：兩個聊天室並行 Strands 468–592 ms、OpenClaw 793–1,048 ms，10／10 沒串；第 3 層：Cedar 25 行、83 µs；**第 4 層：待實測（Cloudflare Live View 開啟時間）** | [chatroom-concurrency](../90-integrations/experiments/chatroom-concurrency/README.md)、[cedar-skill-gating](../08-policy/experiments/cedar-skill-gating/README.md) | — |
+| 3 | 每人每月成本有官網價，標日期；閒置另列 | 成本 | 通過（B 半，估算） | 上方價格表、下方「實際費用」、`evidence/WP6/L4-*` | — |
+| 4 | 自架要自己維運的元件與估點 | `[推測]` | 通過（B 半） | 下方「維運元件」 | — |
+| 6 | OpenClaw 自架時，能否在框架外強制工具白名單 | `[推測]` | **可以，但不是預設**：`tools.deny` 關掉 exec、上網後，以使用者身分要求執行指令、讀網頁都被拒（實測）；預設設定兩者都會照做（實測） | [探測結果](../90-integrations/experiments/chatroom-concurrency/README.md#結果2026-10-04) | 不是阻斷項，但要另外補三件事，見下方 |
+| 7 | 有沒有候選能做到「使用者接手登入、交還後 agent 繼續」 | `[推測]` | Steel（steel-mcp-server handoff）、Cloudflare Browser Run（`Cloudflare.handoff`）有正式機制；**手機上能否操作，沒有一家官方寫支援**（noVNC 支援手機，但交還要自己做） | 上方第 4 層表 | 方案 B（AgentCore DCV 不支援手機）和方案 C 卡在同一個問題，要實機驗證 |
+| 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | **無** | 下方「#8 門檻」 | 方案 C 不用為了省錢再投入 |
+
+**#6 鎖緊後還要補的三件事**
+
+1. **經 HTTP 進來的請求等同 owner**（[官方已寫]）：後端轉送使用者原文時，`/` 指令會以 owner 身分處理。`commands.config`、`commands.bash`、`commands.mcp`、`commands.debug` 預設就關；`/elevated` 要用 `tools.elevated.enabled: false` 關，最好再加 `commands.text: false`。
+2. **內建 plugin 的工具不在 deny 的群組裡**：鎖緊後模型還看得到 `file_fetch`、`file_write`、`dir_list` 等（`group:plugins`），這次因為沒有配對節點用不了。嚴格白名單要連 `group:plugins` 一起 deny 再只放行 MCP，寫法官方沒寫、未測。OpenClaw 一天出好幾版、工具群組一直加，deny 清單要隨版本重審。
+3. **網路要另外擋**：OpenClaw 本身不限制對外連線 `[官方已寫]`，要靠 Security Group 或 egress proxy 只放行 Bedrock 與自家 MCP server（跟方案 B 的 [WP3](WP3-sandbox-egress.md) 同一套做法）。授權判定仍然在自家 MCP server。
+
+- 探測的教訓：第一版用 `echo WP6_EXEC_$((6*7))` 當標記，鎖緊後模型沒有呼叫 exec 卻回出 `WP6_EXEC_42`（自己算的），從 session 資料庫確認後改用隨機 nonce 重跑。拿模型回覆判定「有沒有執行」時，標記一定要是模型猜不到的值。
+
+#### 實際費用
+
+**本階段花費**：只有 Bedrock Haiku 4.5 呼叫，token 數沒量到（OpenClaw 的 log 不記用量，同時段 WP7 也在呼叫同一個模型）。本機 docker／程序不計費。
+
+**第 2 層：OpenClaw 自架，每人一台**（官方建議 2 vCPU／4 GB／40 GB；東京 `t4g.medium` $0.0432／h、gp3 $0.096／GB-月，與 [WP2](WP2-capability-boundary.md#實際費用-1) 同一組單價）
+
+| | 24h 常駐 | 每天 8h（其餘停機） |
+|---|---|---|
+| 每人 | 0.0432 × 730 + 40 × 0.096 = **$35.38** | 0.0432 × 243.3 + 3.84 = **$14.35** |
+| 100 人 | **$3,538** | **$1,435** |
+| AgentCore Runtime 對照（100 人，A 半「第 1 層判定」） | 實測 $832、保守 $3,409 | 實測 $277、保守 $1,136 |
+
+- 不含公網 IPv4（每台 $3.65／月）、模型 token、維運人力。每人一台 EC2 本身就是 VM 隔離，所以這個數字同時涵蓋第 1、2 層。
+- 停機再開機要等 EC2 開機加 OpenClaw 啟動，首句延遲會遠大於 AgentCore 的預喚醒（WP1 實測 p50 170–196 ms），沒實測。
+- Strands、LangGraph、Claude Agent SDK 是函式庫，費用落在第 1 層的執行環境上，不另計。
+
+**第 3 層**：函式庫都是開源、內嵌在自家 server，不另收費；gateway 類要多一台主機（agentgateway 約 `t4g.small` $15.8／月起；ContextForge 再加 Postgres）`[推測]`。方案 B 的授權也是在自家 server 手寫，這一層兩案成本相同。
+
+**第 4 層**：見上方價格表。
+
+#### 自架要自己維運的元件與估點（`[推測]`，費氏數列）
+
+| 層 | 路線 | 主要元件 | 估點合計 |
+|---|---|---|---|
+| 2 | OpenClaw 每人一台 | 每人一台機器的開通、啟停與回收（8）、版本升級與 deny 清單隨版重審（5）、對外網路控管（3）、使用者 token 輪換（MCP headers 是靜態的，要改 ENV 加重啟，3） | 約 19 |
+| 2 | Strands／LangGraph 自寫 | 框架本身不用維運；聊天室對應實例、session 路由（3），執行環境算在第 1 層 | 約 3 |
+| 3 | 手寫（同方案 B） | 無額外；限流改原子操作（1） | 約 1 |
+| 3 | 改用 Cedar | 規則與 schema、DB → entities 轉換（2） | 約 2 |
+| 3 | agentgateway／ContextForge | 部署與升級（3）、購買資料同步進 JWT 或它的 DB（5）、限流計量接回自家帳本（3） | 約 11 |
+| 4 | 託管（Cloudflare、Steel） | 接手交還接進 App（3）、手機實機驗證與鍵盤補強（3） | 約 6 |
+| 4 | 自架 Chromium＋noVNC | 一人一容器的隔離與擴展（8）、瀏覽器更新（3）、接手交還狀態機與逾時（5）、手機觸控與鍵盤（5）、profile 加密保存（3）、網域白名單代理（3） | 約 27 |
+
+#### #8 門檻：方案 C 比方案 B 便宜的使用者規模
+
+合併 A、B 兩半，逐層看「自架或託管」相對 AgentCore 的成本結構：
+
+| 層 | 方案 C 最便宜的路線 | 跟 AgentCore 比 | 門檻 |
+|---|---|---|---|
+| 1＋2 執行環境＋框架 | OpenClaw 或自寫 agent，每人一台 EC2 | 24h：$35.4 vs 實測 $8.3、保守 $34.1／人；8h：$14.4 vs $2.8、$11.4／人。都隨人數線性，每人都比較貴 | **無** |
+| 3 授權 | 手寫（兩案相同） | 相同 | — |
+| 4 瀏覽器 | Cloudflare Browser Run | 每小時便宜 11%，但有 $5 月費：(5 − 0.9) ÷ (0.101 − 0.09) ≈ 每月 373 browser-hours 以上才便宜，約 75 人（每人 5 h）；100 人、500 h 時也只省 $1.4 | 約 75 人，金額可忽略 |
+| 5 記憶 | 自管 pgvector（RDS 單 AZ $76.5 固定）＋ Nova Micro 萃取（每人 $0.111） | AgentCore 每人約 $0.45：76.5 ÷ (0.45 − 0.111) ≈ 226 人以上才便宜；萃取用 Haiku 4.5（每人 $2.97）時永遠不會便宜 | 約 226 人（Nova Micro）／無（Haiku） |
+| 6 觀測 | — | A 半已判定 AgentCore 便宜 | 無 |
+
+- **結論：無門檻。** 金額最大的是第 1、2 層的執行環境，自架每人每月都比較貴，而且隨人數線性增加，沒有規模效益。第 4、5 層雖然在 75、226 人以上有門檻，每月省下的是幾十美元等級，抵不過第 1、2 層每人多出的 $3–27，也抵不過維運估點（上表加 A 半，挑最省的路線也有約 60 點：OpenClaw 每人一台 19、授權 1、託管瀏覽器 6、Mem0 自架 19、Langfuse Cloud 約 13）。
+- 但書：AgentCore 的實測值來自不呼叫模型的最小 agent（WP1 #10）。真實 agent 的記憶體若接近保守估算（4 GB），第 1、2 層的差距會縮到每人 $1–3，那時要用正式 agent 的 `USAGE_LOGS` 重算。
+
+#### 清理確認
+
+- [x] 沒有建立 AWS 資源
+- [x] OpenClaw gateway 已停止；裝在暫存目錄，`~/.openclaw` 不存在、沒有裝 launchd 服務；`/tmp/openclaw/` log 已刪除
+- [x] 子 agent 的暫存測試檔在 session scratchpad，不在 repo
+- [ ] Cloudflare 帳號（第 4 層實測用）：實測後確認沒有啟用付費方案
+
+#### 要更正研究庫的段落
+
+| 檔案:行號 | 原本寫的 | 調研結果 |
+|---|---|---|
+| `00-overview/build-vs-buy.md:19` | Harness：框架都已經處理好了，低 | 框架本身低；但 OpenClaw 預設全開、一個租戶一個 gateway，每人一台機器；Strands 每個聊天室要一個 Agent 實例 |
+| `00-overview/build-vs-buy.md:24` | Gateway：自己架 MCP server，中 | 技能授權放自家 MCP server 手寫即可（WP2 實證），MCP gateway 類專案要多養服務、購買資料多一份，不值得 |
+| `00-overview/build-vs-buy.md:27` | Policy：在工具 proxy 前面放 OPA 或 Cedar，中 | 「買了才能用」這種規則，函式庫省不了程式碼（70 行→約 60 行），多得到的是型別檢查與形式驗證；規則變複雜再用 Cedar |
+| `00-overview/build-vs-buy.md:29` | Browser：自己維運一組 headless Chrome，中–高 | 託管（Cloudflare、Steel）有接手交還機制、價格與 AgentCore 相近；手機上操作 Live View 沒有一家官方支援；自架要做接手狀態機與手機觸控，約 27 點 |
