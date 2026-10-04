@@ -59,7 +59,7 @@
 | 前置 | [WP0](WP0-cost-baseline.md) | 成本量測基礎 | 之後每包的費用怎麼估算 | — | 前置 | 2 | — | A | Kais | ✅ 完成（2026-10-02） |
 | 1 | [WP2](WP2-capability-boundary.md) | 能力邊界：自家 MCP server 依技能授權 | 「只能用買到的技能」能不能由自家 MCP server 強制、agent 繞不過；Browser 包成自家工具可不可行；還要不要 Gateway | 高 | 高 | 8 | WP0、自家 MCP server 測試執行個體 | B | RomanChen | 🟡 #0–#7、#9–#12 完成（2026-10-02，本機＋東京實測）；#8 接手登入未做 |
 | 2 | [WP3](WP3-sandbox-egress.md) | 沙箱連外 | 「agent 能寫程式但不能上網」擋不擋得死；不能上網時仍連得到自家 MCP server | 高 | 高 | A 半 2、B 半 3 | A 半：WP0；B 半：WP0、WP2 的自家 MCP server 測試執行個體 | A、B 各半 | Kais、RomanChen | ✅ 完成（A 半、B 半皆 2026-10-02） |
-| 3 | [WP5](WP5-user-state-isolation.md) | 使用者狀態與隔離、每使用者成本 | 資料不外洩、每人成本算得出來 | 高 | 高 | 5 | WP0、一個最小的 Runtime（WP1 步驟 1） | A | Kais | 🟡 阻斷級 #1–#4 通過，無否定（2026-10-02）；#5、#7 完成；#8 1 天版約 $2.83 / 人 / 月，3 天版跑到 2026-10-04；#6 決定不驗、#9 無法驗證；#10、#11 等待 WP2 |
+| 3 | [WP5](WP5-user-state-isolation.md) | 使用者狀態與隔離、每使用者成本 | 資料不外洩、每人成本算得出來 | 高 | 高 | 5 | WP0、一個最小的 Runtime（WP1 步驟 1） | A | Kais | ✅ 完成（2026-10-04）：阻斷級 #1–#4、#10 都通過，無否定；#11 通過；#8 約 $2.53–2.83 / 人 / 月（3 天版與 1 天版）；#6 決定不驗、#9 無法驗證 |
 | 4 | [WP1](WP1-runtime-session.md) | Runtime 冷啟動與「一人一實體」 | microVM 撐不撐得住對話體驗？V2 值不值得？ | 中 | 高 | 5 | WP0 | A | Kais | 🟡 PUBLIC 組完成（2026-10-02）；#10 20 位使用者 2 小時 $0.55、100 人月費約 $82.6；#11 VPC 組未做 |
 | ~~5~~ | ~~[WP4](WP4-browser-takeover.md)~~ | ~~Browser 接手登入~~ | ~~Muse 式的接手流程能不能在 AgentCore 做出來~~ | ~~中~~ | ~~中~~ | ~~8~~ | ~~WP0~~ | — | 其他工程師 | ✅ 已由其他工程師完成 |
 | 6 | [WP6](WP6-oss-alternatives.md) | 不用 AgentCore 的開源方案 | 自架的真實成本與缺口 | 低 | 中 | A 半 5、B 半 5 | — | A、B 各半 | Kais、RomanChen | 🟡 A 半文件與價格調研完成、第 5 層實測完成；第 1、6 層的託管方案比 AgentCore 貴，不實測（2026-10-02）；只剩 #8 等 B 半；B 半未開始 |
@@ -93,7 +93,6 @@
 | 自家 MCP server 的測試執行個體（含 `todo`、包了 Browser 的 `flight` 技能） | B，WP2 步驟 0–2 | B 在 WP3 測連線；A 在 WP5 測使用者 token 被濫用的範圍 |
 | 不開 NAT 的 VPC | B，WP3 | A 在 WP1 的 VPC 組沿用；B 在 WP7 的能力邊界測試沿用 |
 | 最小的 Runtime：`wp0_min-HsBwOc6VWU`（東京，PUBLIC，image `wp-agentcore-coldstart:small`，execution role `/wp/wp0-runtime-exec`） | A，WP0 已部署 | WP0 驗證 `USAGE_LOGS`；WP5 測 VM 內的憑證；之後 WP1 繼續用 |
-| **運作中**：EC2 `i-06afed7f19deb7f4f`（`t4g.nano`，tag `wp=WP5`、`owner=kais`、`project=hyfai`）+ Memory `wp5_cost3d-tc3SBsE1IR` + S3 `wp5-cost3d-6eaa8b19` + role `/wp/wp5-cost-runner` | A，WP5 成本 3 天版，2026-10-02 起 | 跑到約 2026-10-04 12:15 UTC 後自己關機終止；收尾與刪除見 [WP5 回填](WP5-user-state-isolation.md#實際費用)，資源 ID 也記在 [`cost3d-resources.json`](../02-memory/experiments/tenant-guard/aws/cost3d-resources.json) |
 | 區域 | 已定：東京（`ap-northeast-1`） | 兩人。公司機器與自家 MCP server 都在東京；亞太區只有東京支援 V2 |
 
 跨群要交接的數字：WP4 的 Browser 每次 session 費用改從其他工程師的結果取得，由 A 放進 WP5 的「每位使用者月費」；A 把 WP1 的冷啟動數字交給 B，當 WP6 比較開源方案、WP7 對照方案 A 的基準。
@@ -134,8 +133,8 @@
 | 首句延遲（冷 / 暖） | WP1 | WP7 | WP6 |
 | 能力邊界能否在 agent 外強制 | WP2 + WP3 | WP7 | WP6 |
 | 接手登入 | WP4 | — | WP6 |
-| 資料隔離 | [WP5](WP5-user-state-isolation.md#回填)：Memory、臨時憑證通過；使用者 token（#10、#11）等 WP2 | WP7 | WP6 |
-| 每位使用者每月實際成本 | [WP5](WP5-user-state-isolation.md#實際費用)：約 $2.83（1 天版估算，不含模型 token；3 天版進行中） | WP7 | WP6 |
+| 資料隔離 | [WP5](WP5-user-state-isolation.md#回填)：通過（Memory、臨時憑證、VM 裡的使用者 token、Browser profile） | WP7 | WP6 |
+| 每位使用者每月實際成本 | [WP5](WP5-user-state-isolation.md#實際費用)：約 $2.53–2.83（估算，不含模型 token） | WP7 | WP6 |
 | 要自己維運的元件 | 少 | 中 | WP6 |
 | 關鍵否定項（阻斷） | | | |
 
@@ -175,7 +174,7 @@ VM 要存取使用者資料時，由後端 AssumeRole 加 session policy 發範�
 | （選配）Gateway Policy 能依 JWT 內的「已購買能力」陣列過濾 `tools/list` | `[推測]` | WP2 選配 G3 |
 | Code Interpreter 的 Sandbox 模式擋得住任意外網 | `[推測]`；WP3 已實證：擋得住，但放行同區域任意 S3 bucket | WP3 |
 | Runtime 的 VM 不能上網時仍連得到自家 MCP server | `[推測]`；WP3 已實證（VPC 無 NAT＋VPC peering） | WP3 |
-| 使用者 token 進到 VM，被濫用時最多只能做該使用者本來能做的事 | `[推測]` | WP5 |
+| 使用者 token 進到 VM，被濫用時最多只能做該使用者本來能做的事 | ✅ 已證實（前提：server 依 actor 取資料，不信任工具參數裡的使用者 ID） | WP5 #10 |
 | Live View + `take_control` 能做出「使用者登入後交還給 agent」 | `[官方已寫]` 機制、`[推測]` 流程 | WP4（已完成）；改由 server 主導後由 WP2 #8 重新驗證 |
 | Memory `actorId` 加 IAM 能擋住跨使用者讀取；episodic reflection 不會跨使用者 | ✅ 已證實（每位使用者一個 principal 時；reflection 要設在 actor 層級） | WP5 #1、#2 |
 | 後端發範圍縮小的臨時憑證，VM 讀不到其他使用者的資料；VM 不能自己取得範圍外的憑證 | ✅ 已證實（前提：trust 只信任後端） | WP5 #3、#4 |
