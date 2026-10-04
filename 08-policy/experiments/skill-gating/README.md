@@ -55,17 +55,21 @@ EC2 上的 HephAgora 測試版：POST /mcp（標準 MCP 入口）
 
 **本機（HephAgora repo 根目錄）**
 
+以下是 2026-10-04 重建版的步驟。原版另有 `check-rate.sh`、`check-mcp.sh`、`check-browser.sh`、`trim-demo-services.sql`，重建版已併進 `check.sh`、`seed.sql`；Browser（#7）沒有重建。
+
 ```bash
-# .env：HEPHAGORA_REQUIRE_ACTOR=1、HEPHAGORA_MCP_FACADE=1、WP2_BROWSER_ID=<browser id>；DATABASE_URL 要註解掉
-docker compose -f docker-compose.yml -f docker-compose.wp2-local.yml up -d --build
-bash scripts/wp2/setup-consumer.sh      # 測試 consumer wp2-test：產金鑰到 .wp2-keys/、公鑰寫進本機 DB
-docker compose exec -T db psql -U hephagora -d hephagora -v ON_ERROR_STOP=1 < scripts/wp2/seed.sql
-docker compose exec -T db psql -U hephagora -d hephagora < scripts/wp2/trim-demo-services.sql
-bash scripts/wp2/check.sh               # #1、#2
-bash scripts/wp2/check-rate.sh          # #9
-bash scripts/wp2/check-mcp.sh           # 標準 MCP 入口
-bash scripts/wp2/check-browser.sh       # #7（會開真的 Browser session）
+npm ci                                  # 簽 actor JWT 要用 repo 裡的 jose
+# 獨立 project、port 13100，不碰日常開發的 DB；開關寫在 docker-compose.wp2-local.yml
+APP_PORT=13100 docker compose -p hephagora-wp2 --profile localdb \
+  -f docker-compose.yml -f docker-compose.wp2-local.yml up -d --build db app
+export PSQL="docker compose -p hephagora-wp2 exec -T db psql -U hephagora -d hephagora"
+bash scripts/wp2/setup-consumer.sh      # 測試 consumer wp2-test：產金鑰到 .wp2-keys/、公鑰寫進 DB
+$PSQL -v ON_ERROR_STOP=1 < scripts/wp2/seed.sql   # wp2 服務、購買、每人 todo；其他 demo service 下架
+RATE=1 bash scripts/wp2/check.sh        # #1、#2、/mcp 入口、過期 token；RATE=1 加跑 #9（把 userA 的 todo 打滿 30 次）
+docker compose -p hephagora-wp2 down -v # 收掉（含測試 DB）
 ```
+
+重跑 `RATE=1` 前，先清掉 userA 這一小時的帳：`$PSQL -c "DELETE FROM tool_invocations WHERE billed_consumer_id='wp2-test'"`。
 
 **AWS（東京，2026-10-02 建、當天刪）**
 
