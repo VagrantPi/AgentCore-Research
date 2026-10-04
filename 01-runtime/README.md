@@ -190,6 +190,8 @@ app.complete_async_task(task_id)         # 所有任務完成後，/ping 會回�
   - **放在 public subnet 並不會讓它連得到網際網路**，必須放在 private subnet，並透過 NAT 出去。
   - **只支援特定的 AZ。** 以東京為例，只支援 `apne1-az1`、`az2`、`az4`，**不支援 `az3`**。放錯 AZ，建立時就會失敗。
   - 建議加上 ECR、S3 gateway、CloudWatch Logs 的 VPC endpoint。Container 型的 agent 會定期從 ECR 重新拉取 image，沒有 S3 gateway endpoint 的話，這些流量都會算進 NAT 的處理費。
+    - 不開 NAT 時，ECR `api`、`dkr` interface endpoint 是**必要的**：缺了 Runtime 建得起來（READY）但呼叫回 502（[WP3](../91-work-packages/WP3-sandbox-egress.md) #5）。
+    - `[矛盾]` S3 gateway endpoint 政策照官方文件只放行 `prod-<region>-starport-layer-bucket` 時，Runtime 拉不到映像；「全允許＋拒絕匿名請求」可行（WP3 B 半）。
   - Runtime 刪除後，ENI 最多會在 VPC 裡**殘留 8 小時**才自動清掉。
 - **呼叫端也可以走私有網路：** 用 PrivateLink 建立 `bedrock-agentcore`（資料面）與 `bedrock-agentcore-control`（控制面）的 interface endpoint。
 

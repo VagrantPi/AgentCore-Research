@@ -120,4 +120,129 @@ Cedar 規則可以先用 [`08-policy/experiments/prompt-to-policy/`](../08-polic
 
 ## 回填
 
-（複製 [`_template.md`](_template.md) 的內容到這裡）
+### 本機部分（#0、#1、#2、#9、#12）
+
+- 負責人：RomanChen
+- 執行日期：2026-10-02
+- 區域：本機（HephAgora 以 docker compose 跑在開發機，資料庫為本機 Postgres）；AWS 部分預定東京 `ap-northeast-1`
+- 資源 tag：本機部分未建 AWS 資源
+- 使用的 AWS 帳號：本機部分未使用
+- 自家 MCP server：**HephAgora**（`hephai/HephAgora`），實驗分支 `wp2/skill-gating`
+- 實作、重現步驟、#12 清單：[`08-policy/experiments/skill-gating/`](../08-policy/experiments/skill-gating/README.md)
+
+#### 結論（三句內）
+
+1. **HephAgora 有依使用者驗身分的機制但不強制**：actor JWT（`ai_family_backend` 簽、60 秒）已有，但 `/v1/discover`、`/v1/invoke` 不帶 token 也放行；本機加一個開關改成必帶。
+2. **「只能用買到的技能」在 server 端做得到，而且改動小**：加兩張表（付費技能、購買紀錄），discover 不列未購買的、invoke 未購買回 403、每小時上限超過回 429；一次性約 70 行，之後新增技能只動資料、不改程式。
+3. **但還沒有證明 agent 繞不過**：本次測的是 HephAgora 自己的 HTTP API，不是標準 MCP；HephAgora 對外也不是 MCP server，agent 要接得先包一層 MCP 轉接。真正的 agent 要等 AgentCore 權限後做 #3–#8。
+
+#### 檢核表
+
+| # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
+|---|---|---|---|---|---|
+| 0 | 自家 server 有沒有依使用者驗證身分 | — | **有，但不強制**。補上：開關 `HEPHAGORA_REQUIRE_ACTOR=1` 讓 discover / invoke 必帶（4 檔約 20 行） | 不帶 token：改前 200、改後 401；壞 token 401；帶 A、B 的 token 200，調用帳本分別記成 `user-a`、`user-b` | 身分驗證不是 WP2 最大的工作量，現有 actor JWT 可沿用 |
+| 1 | A 的工具清單沒有 flight；B 的有 | `[推測]` | 通過（以 `/v1/discover` 代替 `tools/list`） | `check.sh`：A 查「機票」無結果、B 有 `com.wp2.flight`；A 自帶白名單指定 flight 仍無 | 過濾由 server 決定，caller 的白名單只能縮小 |
+| 2 | A 直接呼叫 flight 被拒 | `[推測]` | 通過 | `403 {"error":"skill not purchased","service_id":"com.wp2.flight"}`；B 呼叫 200；免費技能不受影響 | — |
+| 3 | Runtime 的 agent 把使用者 token 帶到 server | `[推測]` | 未做 | — | 待 AgentCore 權限；HephAgora 測試版要放上 AWS |
+| 4 | Harness `remote_mcp` 每次帶不同使用者 token | `[推測]` | 未做 | — | 同上 |
+| 5 | Harness 覆寫 `allowedTools` 後模型不知道被排除的工具 | `[官方已寫]`，未實證 | 未做 | — | 同上 |
+| 6 | VM 裡 `StartBrowserSession` 收到 `AccessDenied` | `[官方已寫]` | 未做 | — | 同上 |
+| 7 | Browser 包成自家工具：B 成功、A 被拒、白名單外被擋 | `[推測]` | 未做 | — | 同上 |
+| 8 | 接手登入由 server 主導 | `[推測]` | 未做 | — | 同上 |
+| 9 | 技能限流與計量 | 自家實作 | 通過 | `check-rate.sh`：35 次中第 1–30 次 200、第 31–35 次 429；帳本 `ok` 30、`http_429` 5 | 計數沿用既有調用帳本，不必另建計數器；先數再放行非原子，並發可能多放行（未測） |
+| 10 | 延遲 | — | 未做 | — | 待 AgentCore 權限 |
+| 11 | 費用 | 成本 | 未做 | — | 同上 |
+| 12 | 新增一個技能要碰的東西 | — | 完成 | [清單](../08-policy/experiments/skill-gating/README.md#12-新增一個技能要碰的東西) | 未決：購買紀錄的來源（`ai_family_backend` 同步或回查）、Browser 技能、agent 端 Skill 檔、MCP 轉接 |
+
+- #9 用的不是 B 本人：B 在 #1、#2 已用掉額度，改用和 B 買一樣東西的新使用者，才能從 0 驗「第 31 次被擋」。
+
+#### 實際費用
+
+| 資源 | 用量 | 用量來源 | 單價 | 估算金額（USD） |
+|---|---|---|---|---|
+| 本機 docker | — | — | — | 0 |
+
+#### 否定項目的替代方案
+
+本機部分沒有否定項目。
+
+#### 清理確認
+
+- [x] 本機部分未建任何 AWS 資源
+- [ ] 本機 docker（HephAgora、Postgres）保留，給後續檢核點沿用
+
+#### 要更正研究庫的段落
+
+| 檔案:行號 | 原本寫的 | 實測結果 |
+|---|---|---|
+| `91-work-packages/WP2-capability-boundary.md:36` | 自家 MCP server 能依使用者身分過濾、拒絕未購買工具：`[推測]` | 本機實證可行（HephAgora，需上述改動）；agent 端未驗 |
+| `91-work-packages/README.md:171` | 同上：`[推測]` | 同上 |
+
+### AWS 部分（#3–#7、#10、#11）
+
+- 負責人：RomanChen
+- 執行日期：2026-10-02（資源當天建、當天刪）
+- 區域：ap-northeast-1（東京）
+- 資源 tag：`wp=WP2`、`owner=roman`、`project=hyfai`
+- 使用的 AWS 帳號：050571774557（IAM user `RomanChen`，加掛 inline policy `wp-roman-agentcore`：`bedrock-agentcore:*`、`cognito-idp:*`，限東京；B 群全部做完後移除）
+- 架構、資源清單、重現步驟：[`08-policy/experiments/skill-gating/`](../08-policy/experiments/skill-gating/README.md)
+
+#### 結論（三句內）
+
+1. **agent 繞不過自家 server 的技能授權**：Runtime 與 Harness 的 agent 都帶使用者 token 經標準 MCP 連 HephAgora，模型只看得到該使用者買過的工具；VM 的 execution role 開不了 Browser，Browser 只能經 server 代開，白名單外的網址被 MANAGED 政策擋下。**不需要 Gateway。**
+2. **Harness 也能用**：`InvokeHarness` 每次覆寫 `tools` 就能帶不同使用者的 token，`allowedTools` 覆寫後模型確實不知道被排除的工具；代價是第一次呼叫約 38 秒冷啟動，且 token 由後端明文組進呼叫參數。
+3. **延遲與費用都小**：agent → 自家 server 一般工具 p50 約 21 ms；Browser 工具端到端約 5.8 秒，大部分是開 session。費用見下方。
+
+#### 檢核表
+
+| # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
+|---|---|---|---|---|---|
+| 3 | Runtime 的 agent 把每位使用者的 token 帶到 server，身分正確 | `[推測]` | 通過 | EC2 帳本：`user-a` todo_add、`user-b` flight_search；A 的工具清單無 flight | 技能授權放自家 server 可行 |
+| 4 | Harness 的 `remote_mcp` 能不能每次帶不同使用者的 token | `[推測]` | **能** | `InvokeHarness` 覆寫 `tools` 的 headers；帳本 `user-a` todo_add、`user-b` flight_search | 主 agent 不必限定 Runtime；但 token 要由後端每次組進參數 |
+| 5 | Harness 覆寫 `allowedTools` 後模型不知道被排除的工具 | `[官方已寫]`，未實證 | 通過 | B 帶 `["@ha/com_wp2_todo__*"]`：「我目前沒有查詢機票的能力」；列工具只列 2 個 todo 工具 | 可當第二層防線；第一層仍是 server |
+| 6 | VM 裡直接呼叫 `StartBrowserSession` 收到 `AccessDenied` | `[官方已寫]` | 通過 | `wp2-agent-exec` 對自訂 browser 與 `aws.browser.v1` 皆 `AccessDeniedException` | VM 碰不到 Browser |
+| 7 | 包成自家工具的 Browser：B 成功、A 被拒、白名單外被擋 | `[推測]` | 通過 | B：Example Domain；A：工具不可見，直打 `/v1/invoke` 403；B 開 google.com：`ERR_BLOCKED_BY_ADMINISTRATOR` | Browser 依技能收費可行 |
+| 8 | 接手登入由 server 主導 | `[推測]` | 未做（改天） | — | 要另測手機能否開 Live View（DCV 網頁客戶端官方不支援 iOS／Android） |
+| 10 | 一般工具延遲 p50；Browser 工具端到端 | — | 21 ms（p90 23 ms，n=20）；5.8 s（n=3） | Runtime 內 `probe=mcp_latency` | — |
+| 11 | Browser 工具費用；測試 server 費用 | 成本 | Browser 每次呼叫約 **$0.00016**（實跑 5 次、計費約 5–6 秒／次），20 次換算約 $0.003；測試 server（EC2 27 分鐘）約 $0.024 | `USAGE_LOGS` → `usage_cost.py`（10:06 UTC，最後 session 結束後 1 小時）；EC2 用量×官網價 | Browser 依次計費、極便宜；Harness 一個 session 約是自寫 Runtime 的 5 倍（記憶體大） |
+
+- 與文件的差異：server 端操作網頁用固定流程的 Playwright，不是瀏覽子 agent（browser-use／Nova Act）；沒測子 agent 自己亂逛。
+
+#### 實際費用
+
+| 資源 | 用量 | 用量來源 | 單價（官網） | 估算金額（USD） |
+|---|---|---|---|---|
+| Runtime `wp2_agent`，9 個 session（各 1–3 次呼叫＋5 分鐘閒置） | 0.029106 vCPU-h、1.372662 GB-h | `USAGE_LOGS` | $0.0895／vCPU-h、$0.00945／GB-h | 0.015578 |
+| Harness `wp2_harness`（底層 Runtime），4 個 session | 0.070659 vCPU-h、3.042300 GB-h | `USAGE_LOGS` | 同上 | 0.035073 |
+| Browser `wp2_browser`，5 個 session | 0.005707 vCPU-h、0.029116 GB-h（共 28 秒） | `USAGE_LOGS` | 同上 | 0.000786 |
+| EC2 `t4g.medium`（HephAgora 測試版） | 0.456 h（08:33:29–09:00:51 UTC） | 啟動／終止時間 | $0.0432／h | 0.0197 |
+| EBS 30 GB gp3 | 0.456 h | 同上 | $0.096／GB-月 | 0.0018 |
+| 公網 IPv4 | 0.456 h | 同上 | $0.005／h | 0.0023 |
+| **合計** | | | | **約 0.076** |
+
+- 不含 Haiku 4.5 的 token 費（未量）、ECR／S3 儲存、CloudWatch Logs（量很小）。
+- Browser 只記到 5 個 session：本機開發時在建立投遞前開的 2 個沒有補送（Code Interpreter 會補送，Browser 沒有）。
+- 文件要求 20 次 Browser 呼叫，本次實跑 7 次（記到 5 次），20 次以每次 $0.00016 換算。
+- Harness 每個 session 的 GB-h 約是 `wp2_agent` 的 5 倍（約 0.76 vs 0.15），同樣 5 分鐘閒置下單次約 $0.0087 vs $0.0017。
+
+#### 否定項目的替代方案
+
+AWS 部分沒有否定項目。
+
+#### 清理確認
+
+- [x] Runtime `wp2_agent`、Harness `wp2_harness`（含底層 Runtime）已刪除
+- [x] Browser `wp2_browser` 已刪除；session 都已主動關閉，無殘留
+- [x] EC2、EBS、VPC、子網路、IGW、路由表、安全群組已刪除（2026-10-02 09:00 UTC）
+- [x] `USAGE_LOGS` 投遞（WP2 的 3 個 source／delivery）已刪除
+- [x] IAM 角色 `/wp/wp2-hephagora-ec2`（含 instance profile）、`/wp/wp2-harness-exec` 已刪除
+- [x] ECR `wp2-hephagora`、`wp2-agent`、角色 `/wp/wp2-agent-exec`、S3 `wp2-roman-browser-policy-…`、log group `wp2-usage`：與 WP3 一起刪除（11:00 UTC）
+- [ ] IAM user `RomanChen` 的 `wp-roman-agentcore`：B 群全部做完後移除
+
+#### 要更正研究庫的段落
+
+| 檔案:行號 | 原本寫的 | 實測結果 |
+|---|---|---|
+| `91-work-packages/README.md:171`–`:174` | 自家 server 過濾、token 帶到 server、Browser 包裝、`allowedTools` 覆寫：`[推測]` / 未實證 | 已實證；#8 接手登入未做 |
+| `00-overview/harness-vs-runtime.md:29` | `remote_mcp` 的 header 引用 token vault；每次呼叫能不能帶不同使用者的 token 沒寫 | 每次 `InvokeHarness` 覆寫 `tools` 就能帶不同使用者的 header（token 由後端明文組進參數） |
+| `00-overview/harness-vs-runtime.md:36` | `allowedTools` 可以限制模型能看到的工具 | 實證：覆寫後模型不知道被排除的工具；`remote_mcp` 的工具寫成 `@<server 名>/<工具名>` |

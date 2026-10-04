@@ -57,8 +57,8 @@
 | 優先序 | 編號 | 題目 | 回答的選型問題 | 風險 | 價值 | 估點 | 前置 | 分群 | 負責人 | 狀態 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 前置 | [WP0](WP0-cost-baseline.md) | 成本量測基礎 | 之後每包的費用怎麼估算 | — | 前置 | 2 | — | A | Kais | ✅ 完成（2026-10-02） |
-| 1 | [WP2](WP2-capability-boundary.md) | 能力邊界：自家 MCP server 依技能授權 | 「只能用買到的技能」能不能由自家 MCP server 強制、agent 繞不過；Browser 包成自家工具可不可行；還要不要 Gateway | 高 | 高 | 8 | WP0、自家 MCP server 測試執行個體 | B | RomanChen | ⬜ |
-| 2 | [WP3](WP3-sandbox-egress.md) | 沙箱連外 | 「agent 能寫程式但不能上網」擋不擋得死；不能上網時仍連得到自家 MCP server | 高 | 高 | A 半 2、B 半 3 | A 半：WP0；B 半：WP0、WP2 的自家 MCP server 測試執行個體 | A、B 各半 | Kais、RomanChen | 🟡 A 半完成（2026-10-02），B 半未開始 |
+| 1 | [WP2](WP2-capability-boundary.md) | 能力邊界：自家 MCP server 依技能授權 | 「只能用買到的技能」能不能由自家 MCP server 強制、agent 繞不過；Browser 包成自家工具可不可行；還要不要 Gateway | 高 | 高 | 8 | WP0、自家 MCP server 測試執行個體 | B | RomanChen | 🟡 #0–#7、#9–#12 完成（2026-10-02，本機＋東京實測）；#8 接手登入未做 |
+| 2 | [WP3](WP3-sandbox-egress.md) | 沙箱連外 | 「agent 能寫程式但不能上網」擋不擋得死；不能上網時仍連得到自家 MCP server | 高 | 高 | A 半 2、B 半 3 | A 半：WP0；B 半：WP0、WP2 的自家 MCP server 測試執行個體 | A、B 各半 | Kais、RomanChen | ✅ 完成（A 半、B 半皆 2026-10-02） |
 | 3 | [WP5](WP5-user-state-isolation.md) | 使用者狀態與隔離、每使用者成本 | 資料不外洩、每人成本算得出來 | 高 | 高 | 5 | WP0、一個最小的 Runtime（WP1 步驟 1） | A | Kais | 🟡 阻斷級 #1–#4 通過，無否定（2026-10-02）；#5、#7 完成；#8 1 天版約 $2.83 / 人 / 月，3 天版跑到 2026-10-04；#6 決定不驗、#9 無法驗證；#10、#11 等待 WP2 |
 | 4 | [WP1](WP1-runtime-session.md) | Runtime 冷啟動與「一人一實體」 | microVM 撐不撐得住對話體驗？V2 值不值得？ | 中 | 高 | 5 | WP0 | A | Kais | 🟡 PUBLIC 組完成（2026-10-02）；#10 20 位使用者 2 小時 $0.55、100 人月費約 $82.6；#11 VPC 組未做 |
 | ~~5~~ | ~~[WP4](WP4-browser-takeover.md)~~ | ~~Browser 接手登入~~ | ~~Muse 式的接手流程能不能在 AgentCore 做出來~~ | ~~中~~ | ~~中~~ | ~~8~~ | ~~WP0~~ | — | 其他工程師 | ✅ 已由其他工程師完成 |
@@ -168,13 +168,13 @@ VM 要存取使用者資料時，由後端 AssumeRole 加 session policy 發範�
 |---|---|---|
 | microVM 冷啟動可以用預喚醒藏起來，使用者感受不到 | `[推測]`；WP1 已實證（PUBLIC）：預喚醒後首句 p50 170–196 ms | WP1 |
 | 同一個 session ID 可以讓一位使用者的多個聊天室共用一台 microVM，並行請求不會卡住 `/ping` | `[推測]`；WP1 已實證（PUBLIC），條件是 handler 為 async 或多執行緒 | WP1 |
-| 自家 MCP server 能依使用者身分過濾 `tools/list`、拒絕未購買工具的呼叫 | `[推測]` | WP2 |
-| Runtime 的 agent 能把每位使用者的 token 帶到自家 MCP server；Harness 的 `remote_mcp` 能不能做到未知 | `[推測]` | WP2 |
-| Browser 包成自家 MCP server 的工具後，依技能收費、網域白名單、接手登入都能運作；VM 開不了 Browser | `[推測]` | WP2 |
-| Harness 呼叫時覆寫 `allowedTools` / `skills` 能限制模型看到的工具 | `[官方已寫]`，未實證 | WP2 |
+| 自家 MCP server 能依使用者身分過濾 `tools/list`、拒絕未購買工具的呼叫 | `[推測]`；WP2 已實證（HephAgora，本機與 `/mcp` 標準入口；需加購買表與開關） | WP2 |
+| Runtime 的 agent 能把每位使用者的 token 帶到自家 MCP server；Harness 的 `remote_mcp` 能不能做到未知 | `[推測]`；WP2 已實證：Runtime 可以；Harness 每次 `InvokeHarness` 覆寫 `tools` 也可以 | WP2 |
+| Browser 包成自家 MCP server 的工具後，依技能收費、網域白名單、接手登入都能運作；VM 開不了 Browser | `[推測]`；WP2 部分實證：依技能收費、白名單、VM 開不了 Browser 都成立；接手登入（#8）未做 | WP2 |
+| Harness 呼叫時覆寫 `allowedTools` / `skills` 能限制模型看到的工具 | `[官方已寫]`；WP2 已實證 `allowedTools`（`skills` 未測） | WP2 |
 | （選配）Gateway Policy 能依 JWT 內的「已購買能力」陣列過濾 `tools/list` | `[推測]` | WP2 選配 G3 |
-| Code Interpreter 的 Sandbox 模式擋得住任意外網 | `[推測]` | WP3 |
-| Runtime 的 VM 不能上網時仍連得到自家 MCP server | `[推測]` | WP3 |
+| Code Interpreter 的 Sandbox 模式擋得住任意外網 | `[推測]`；WP3 已實證：擋得住，但放行同區域任意 S3 bucket | WP3 |
+| Runtime 的 VM 不能上網時仍連得到自家 MCP server | `[推測]`；WP3 已實證（VPC 無 NAT＋VPC peering） | WP3 |
 | 使用者 token 進到 VM，被濫用時最多只能做該使用者本來能做的事 | `[推測]` | WP5 |
 | Live View + `take_control` 能做出「使用者登入後交還給 agent」 | `[官方已寫]` 機制、`[推測]` 流程 | WP4（已完成）；改由 server 主導後由 WP2 #8 重新驗證 |
 | Memory `actorId` 加 IAM 能擋住跨使用者讀取；episodic reflection 不會跨使用者 | ✅ 已證實（每位使用者一個 principal 時；reflection 要設在 actor 層級） | WP5 #1、#2 |
