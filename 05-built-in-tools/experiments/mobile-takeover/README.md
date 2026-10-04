@@ -61,7 +61,20 @@ curl -X POST localhost:8765/stop
 - 換算 100 人、每人每月 5 小時都開著 Live View：1280×720 $45.3 vs 390×844 $43.8，**每月差 $1.5**。改手機尺寸是為了看得清楚，不是為了省錢。
 - 這組工作負載的單價（$0.086–0.092／h）比 WP2 估的 $0.101 低，費用會隨網頁與操作而變。
 
-**開著 Live View 時自動化會卡死**：開 Live View 的 session 跑了 11 次（含除錯用的第 0 輪），**3 次**在載完第一頁後的捲動階段卡住（第 1 輪用 `mouse.wheel`、之後用 `page.evaluate`），直到 session 逾時才結束；沒開 Live View 的 8 次都沒有卡。兩種尺寸都發生過，沒有跳出 JS 對話框，根本原因沒查出來。卡住的 session 不算進上表（秒數 602、361，標為 INVALID）。正式 agent 要對每個瀏覽器操作設逾時，卡住就重連 CDP 或重開 session，不能只靠 session 逾時。
+**自動化偶爾卡死（AgentCore 自動化通道的問題，不是 Live View）**：尺寸費用實驗中有 3 個 session 在載完第一頁後的捲動階段卡住，`page.evaluate`／`mouse.wheel` 永遠不返回，直到 session 逾時。追查結果（重現腳本 `lv_hang.py`、`hang_batch.sh`，時間線 `hang_timeline.py`）：
+
+| 證據 | 說明 |
+|---|---|
+| 卡住後遠端 Chrome 的 vCPU 立刻掉到閒置（每 10 秒平均 0.05–0.10），一直到 session 被關；正常的 session 在 0.17–1.00 之間起伏 | 瀏覽器沒當掉也沒在忙，是**指令沒送到瀏覽器** |
+| Playwright 沒收到斷線事件，直到 session 逾時才 `TargetClosedError` | WebSocket 沒斷，指令或回應在 AgentCore 的 automation stream 中間不見了 |
+| 只卡在沒有逾時的指令（`evaluate`、`mouse.wheel`）；`goto` 有 30 秒逾時從沒卡死 | 有逾時就會報錯而不是卡死 |
+| 同一時間開的 4 個 session（2 個開 Live View、2 個沒開）CDP 連線都慢到 21 秒；平常中位數 1.4 秒（34 次） | AgentCore 自動化端點會整體性地短暫變慢（[`hang_batch_full-1.md`](hang_batch_full-1.md)） |
+| 重現：簡化版系統 browser 8 次、自訂 Browser 12 次、完整工作負載 24 次（各一半開 Live View），**都沒重現出無限卡死** | 偶發，原因在服務端，本機無法穩定觸發 |
+
+- **跟 Live View 的關聯不成立**：開 Live View 43 次卡 3 次（約 7%），沒開 20 次卡 0 次，樣本太少分不出差別。先前寫的「開著 Live View 會卡死」是錯的。
+- 也排除：自訂 vs 系統 browser、視窗尺寸（兩種都卡過）。
+- 能做的是在我們這端防護：**每個 CDP 指令都設逾時（`evaluate` 也要，例如包一層 `asyncio.wait_for`），逾時就重連 CDP 並重試一次**；正式環境監控卡死率。卡住的 session 不算進上表（秒數 602、361，標為 INVALID）。
+- 除錯花費：自訂 Browser 36 個 session，至 14:39 UTC 已到的 27 個 `USAGE_LOGS` 實測 $0.072，全部估約 $0.16；系統 browser 8 個（沒有投遞）以秒數估約 $0.01。臨時建的 `wp6_viewport-M5wOn5rphr` 與投遞已刪。
 
 - 費用：19 個 session（含第 1 輪、除錯與卡住的）共 6,403 秒，`USAGE_LOGS` 實測 **$0.136**。
 - 清理：Browser `wp6_viewport`、delivery source／delivery 已刪。
@@ -72,7 +85,7 @@ curl -X POST localhost:8765/stop
 2. **agent 端在交還後重新連 CDP**，不能沿用接手前的連線。
 3. **Browser 視窗設成手機尺寸**（`viewPort`），不然 1280 寬縮到手機上字太小。
 4. 一個 session 同時只能有有限個 Live View 連線：換裝置或重開頁面前要先斷開舊的。
-5. **每個瀏覽器操作都要有逾時**：開著 Live View 時，11 次有 3 次自動化卡死（見上一節）。
+5. **每個 CDP 指令都要有逾時，逾時就重連重試**：AgentCore 的 automation stream 偶爾會吞掉指令（約 7%，與 Live View 無關，見上一節）。
 
 ## 限制
 

@@ -27,7 +27,13 @@ import takeover
 HERE = Path(__file__).parent
 REGION = "ap-northeast-1"
 RUN_SECONDS = 60
-STALL_SECONDS = 20
+STALL_SECONDS = 45  # goto 有 30 秒逾時；20 秒時會把 21 秒的慢連線誤判成卡死
+PAGES = [
+    "https://zh.wikipedia.org/",
+    "https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101",
+    "https://github.com/explore",
+    "https://www.bbc.com/news",
+]
 takeover.OUT = HERE / "lv_hang_events.csv"
 
 
@@ -125,13 +131,15 @@ def main():
     ap.add_argument("--port", type=int, default=8771)
     ap.add_argument("--viewport", default="1280x720")
     ap.add_argument("--no-liveview", action="store_true")
+    ap.add_argument("--full", action="store_true", help="完整工作負載：300 秒、4 個網站")
+    ap.add_argument("--browser-id", default="aws.browser.v1", help="卡住的 3 次都在自訂 Browser；預設系統 browser")
     a = ap.parse_args()
     w, h = map(int, a.viewport.split("x"))
     client = BrowserClient(REGION)
-    sid = client.start(viewport={"width": w, "height": h}, session_timeout_seconds=180)
+    sid = client.start(identifier=a.browser_id, viewport={"width": w, "height": h}, session_timeout_seconds=420)
     out = HERE / "hang" / sid
     p = Progress()
-    p.mark(f"session {sid}")
+    p.mark(f"session {sid} browser {a.browser_id}")
     server = None
     if not a.no_liveview:
         shim = type("S", (), {"client": client, "width": w, "height": h, "run": f"hang-{sid}"})
@@ -140,7 +148,8 @@ def main():
         subprocess.run(["xcrun", "simctl", "openurl", a.sim, f"http://localhost:{a.port}/"], check=True)
         p.mark("liveview opened")
     stop, found = threading.Event(), []
-    threading.Thread(target=watchdog, args=(p, client, a.sim, stop, out, found), daemon=True).start()
+    dog = threading.Thread(target=watchdog, args=(p, client, a.sim, stop, out, found), daemon=True)
+    dog.start()
     with sync_playwright() as pw:
         ws_url, headers = client.generate_ws_headers()
         browser = pw.chromium.connect_over_cdp(ws_url, headers=headers)
@@ -152,21 +161,35 @@ def main():
         page.on("crash", lambda: p.mark("page crash"))
         page.on("close", lambda: p.mark("page close"))
         browser.on("disconnected", lambda: p.mark("browser disconnected"))
-        p.mark("goto")
-        page.goto("https://zh.wikipedia.org/", wait_until="domcontentloaded")
-        p.mark("loaded")
+        # --full：跟 viewport_cost.py 一樣的 300 秒、4 個網站（卡住的 3 次都是這個工作負載）
+        pages = PAGES if a.full else PAGES[:1]
+        seconds = 300 if a.full else RUN_SECONDS
         i = 0
-        while time.time() - p.t0 < RUN_SECONDS and not found:
-            i += 1
-            p.mark(f"evaluate scroll #{i}")
-            try:
-                page.evaluate("window.scrollBy(0, 400)")
-            except Exception as e:
-                p.mark(f"evaluate error {type(e).__name__}: {str(e)[:120]}")
-                break
-            p.mark(f"wait #{i}")
-            page.wait_for_timeout(500)
+        while time.time() - p.t0 < seconds:
+            for url in pages:
+                if time.time() - p.t0 >= seconds:
+                    break
+                p.mark(f"goto {url}")
+                try:
+                    page.goto(url, wait_until="domcontentloaded", timeout=30000)
+                except Exception as e:
+                    p.mark(f"goto error {type(e).__name__}: {str(e)[:120]}")
+                    continue
+                p.mark("loaded")
+                for _ in range(20 if a.full else 10_000):
+                    if time.time() - p.t0 >= seconds:
+                        break
+                    i += 1
+                    p.mark(f"evaluate scroll #{i}")
+                    try:
+                        page.evaluate("window.scrollBy(0, 400)")
+                    except Exception as e:
+                        p.mark(f"evaluate error {type(e).__name__}: {str(e)[:120]}")
+                        break
+                    p.mark(f"wait #{i}")
+                    page.wait_for_timeout(500)
     stop.set()
+    dog.join(timeout=90)  # 等看門狗把證據寫完，不然 daemon 執行緒會被砍
     client.stop()
     if server:
         server.shutdown()
