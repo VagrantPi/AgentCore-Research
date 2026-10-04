@@ -163,7 +163,10 @@ python3 -c "import gzip, sys; from usage_cost import aggregate, write_csv; write
 
 - 長期儲存的算法：record 一個月內線性累積，平均存量 = 月底的一半（38 × 30 ÷ 2 = 570 筆）。同主題的 record 會被合併，實際可能更少；但這次有 8 個萃取工作因 `LTM_RATE_EXCEEDED` 失敗，也可能低估。
 - Runtime 用的是最小 agent（不呼叫模型、約 1 GB），**不含模型 token 費用**；真的 agent 記憶體更大，閒置費用會等比例增加。費用 92% 是記憶體（2.35 GB-h × $0.00945 = $0.0222），CPU 只占 8%。
-- Browser 的規格與用量要等 WP2（瀏覽器改由自家 MCP server 開）實測後更新。WP4 的回填沒有費用數字。
+- Browser 維持假設值（1 vCPU、4 GB）。[WP2 回填](WP2-capability-boundary.md)（AWS 部分的「實際費用」）已有實測：5 個 session 共 28 秒、0.005707 vCPU-h、0.029116 GB-h，平均約 0.73 vCPU、3.7 GB。
+  - 套進「每天 10 分鐘」：(0.734 × 0.0895 + 3.74 × 0.00945) × 10/60 × 30 ≈ **$0.51／月**，比假設的 $0.64 低，每人月費會是約 $2.40–2.71。
+  - 不直接採用：WP2 的 session 每個只有 5–6 秒（開頁讀內文就關），不一定代表 10 分鐘長 session 的資源用量。
+  - WP4 的回填沒有費用數字。
 - 原始輸出：`02-memory/experiments/tenant-guard/aws/results/cost-day.txt`（2026-10-02 當時的輸出，Runtime 是放寬時間窗前的 7216 秒；重算依據 `usage-logs-wp5.jsonl.gz`）。
 
 ### 否定項目的替代方案
