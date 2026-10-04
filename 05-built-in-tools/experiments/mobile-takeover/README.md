@@ -43,12 +43,36 @@ curl -X POST localhost:8765/stop
 | 手機尺寸視窗（390×844） | 網站改成手機版排版，字在手機上看得清楚 | [`viewport-390x844.png`](viewport-390x844.png) |
 | 同一個 session 同時兩個 Live View | 第二個連線回 `Connection limit reached` | `results.csv` 的 `viewer_connect_error` |
 
+## 視窗尺寸與 Live View 對費用的影響（`viewport_cost.py`，2026-10-04）
+
+自訂 Browser `wp6_viewport`（tag `wp=WP6`），`USAGE_LOGS` 投遞到 `wp0-usage-dst`。每個 session 跑同一段工作負載 300 秒（依序開維基首頁、維基「台北101」、GitHub Explore、BBC News，每頁捲 20 次），時間到立刻 `stop()`。4 個條件同一輪並行，「開 Live View」用兩台模擬器的 Safari 各連一個。每個條件 3 筆有效，原始數據 [`viewport_report.csv`](viewport_report.csv)、[`viewport_runs.csv`](viewport_runs.csv)。
+
+| 視窗 | Live View | 每 browser-hour（平均，範圍） | 平均 vCPU | 平均記憶體 |
+|---|---|---|---|---|
+| 1280×720 | 不開 | **$0.0870**（0.0864–0.0876） | 0.550 | 3.99 GB |
+| 390×844 | 不開 | **$0.0857**（0.0832–0.0905） | 0.536 | 3.99 GB |
+| 1280×720 | 開 | **$0.0906**（0.0895–0.0919） | 0.591 | 3.99 GB |
+| 390×844 | 開 | **$0.0876**（0.0862–0.0884） | 0.563 | 3.94 GB |
+
+- **不開 Live View 時，尺寸對費用沒有可分辨的差異**：兩者範圍重疊，平均只差 1.5%。
+- **開 Live View 時，手機尺寸便宜約 3.3%**（範圍不重疊），因為串流的像素少。
+- **開 Live View 多花 2–4%**（1280×720 +4.1%、390×844 +2.2%），只在使用者看的時候發生。
+- 記憶體固定約 4 GB、不隨尺寸變，佔每小時費用約 43%（3.99 × $0.00945 = $0.0377）。
+- 換算 100 人、每人每月 5 小時都開著 Live View：1280×720 $45.3 vs 390×844 $43.8，**每月差 $1.5**。改手機尺寸是為了看得清楚，不是為了省錢。
+- 這組工作負載的單價（$0.086–0.092／h）比 WP2 估的 $0.101 低，費用會隨網頁與操作而變。
+
+**開著 Live View 時自動化會卡死**：開 Live View 的 session 跑了 11 次（含除錯用的第 0 輪），**3 次**在載完第一頁後的捲動階段卡住（第 1 輪用 `mouse.wheel`、之後用 `page.evaluate`），直到 session 逾時才結束；沒開 Live View 的 8 次都沒有卡。兩種尺寸都發生過，沒有跳出 JS 對話框，根本原因沒查出來。卡住的 session 不算進上表（秒數 602、361，標為 INVALID）。正式 agent 要對每個瀏覽器操作設逾時，卡住就重連 CDP 或重開 session，不能只靠 session 逾時。
+
+- 費用：19 個 session（含第 1 輪、除錯與卡住的）共 6,403 秒，`USAGE_LOGS` 實測 **$0.136**。
+- 清理：Browser `wp6_viewport`、delivery source／delivery 已刪。
+
 ## 實作時要做的事
 
 1. **viewer 上要有自己的輸入框**，把 `keydown`／`keyup` 轉給 `connection.sendKeyboardEvent`；輸入法選字中（`isComposing`）的按鍵不轉，`compositionend` 拿到的字串逐字送，事件之間留間隔。
 2. **agent 端在交還後重新連 CDP**，不能沿用接手前的連線。
 3. **Browser 視窗設成手機尺寸**（`viewPort`），不然 1280 寬縮到手機上字太小。
 4. 一個 session 同時只能有有限個 Live View 連線：換裝置或重開頁面前要先斷開舊的。
+5. **每個瀏覽器操作都要有逾時**：開著 Live View 時，11 次有 3 次自動化卡死（見上一節）。
 
 ## 限制
 
