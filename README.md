@@ -18,6 +18,8 @@ User Request → Runtime → Gateway → Policy (Cedar) → Backend / Tools
 
 Nova Act 不取代 AgentCore，而是疊在上面：workflow 程式跑在 Runtime，瀏覽器用 Browser，Identity / Observability / Gateway 照常接上（見 [nova-act/04](nova-act/04-agentcore/)）。
 
+> **專案決策（2026-10-04）：技能授權不走 Gateway + Policy。** 上圖是 AgentCore 的通用架構。我們的專案要接自家的工具市集 HephAgora，「誰買了什麼」記在 `ai_family_backend`，由 backend → hephmind → HephAgora 這條既有的檢查鏈擋下沒買的技能，不用 AgentCore Policy。Gateway + Policy 降為選配，只在之後要接 AWS connector（例如 Web Search）時才加。理由、現有檢查鏈的程式位置、剩下的缺口與補強見 [08 延伸：技能授權改由自家系統負責](08-policy/skill-gating-hephagora.md)。
+
 ## 元件索引
 
 | # | 元件 | 一句話定位 | 狀態 | 延伸調研 |
@@ -30,7 +32,7 @@ Nova Act 不取代 AgentCore，而是疊在上面：workflow 程式跑在 Runtim
 | 05 | [Built-in Tools](05-built-in-tools/) | Code Interpreter、Browser、Web Search | ✅ 完成 | ✅ 3 篇 |
 | 06 | [Observability](06-observability/) | OTel 追蹤與監控 | ✅ 完成 | ⬜ |
 | 07 | [Evaluations](07-evaluations/) | agent 品質評估與 Optimization（建議 + A/B test） | ✅ 完成 | ✅ 3 篇 |
-| 08 | [Policy](08-policy/) | 用 Cedar / Dogwood 做工具呼叫的確定性授權（含 temporal、Guardrails） | ✅ 完成 | ✅ 3 篇 |
+| 08 | [Policy](08-policy/) | 用 Cedar / Dogwood 做工具呼叫的確定性授權（含 temporal、Guardrails） | ✅ 完成 | ✅ 4 篇 |
 | 09 | [Payments](09-payments/) | agent 自動付費（x402 / MPP）與預算控管 | ✅ 完成 | ⬜ |
 | 90 | [框架整合](90-integrations/) | 框架 × 元件對照：Strands、LangGraph、Claude Agent SDK 等 | ✅ 完成 | ⬜ |
 | 91 | [技術選型調研工作包](91-work-packages/) | 把「每人一台對話 agent」的關鍵假設切成 8 個可發包的 AWS 實測工作包，每個檢核點標示來源等級、要求帳單數字 | 🔲 待領取 | — |
