@@ -14,9 +14,8 @@ def rec(session, vcpu, gb):
     })
 
 
-# 建立投遞時 AWS 會寫一筆非 JSON 的驗證訊息，要略過
-VALIDATION = "Permissions are set correctly to allow AWS CloudWatch Logs to write into your logs while creating a subscription."
-totals = aggregate([rec("s1", 1.0, 10.0), VALIDATION, rec("s1", 1.0, 10.0), rec("s2", 0.0, 1.0)])
+PERMISSION_NOTICE = "Permissions are set correctly to allow AWS CloudWatch Logs to write into your logs while creating a subscription."
+totals = aggregate([PERMISSION_NOTICE, rec("s1", 1.0, 10.0), rec("s1", 1.0, 10.0), rec("s2", 0.0, 1.0)])
 assert totals[("wp0_min", "s1")] == [2.0, 2.0, 20.0]
 
 out = io.StringIO()

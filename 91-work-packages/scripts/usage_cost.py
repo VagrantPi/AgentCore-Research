@@ -29,11 +29,10 @@ def aggregate(messages):
     """把 USAGE_LOGS 的 JSON 訊息依 (resource, session) 加總成 {key: [秒數, vcpu_h, gb_h]}。"""
     totals = defaultdict(lambda: [0.0, 0.0, 0.0])
     for raw in messages:
-        try:
-            rec = json.loads(raw)
-        except json.JSONDecodeError:
-            continue  # 建立投遞時 AWS 寫入的驗證訊息（非 JSON）
-
+        # 建 delivery 時 CloudWatch 會寫一行純文字的權限確認訊息，不是用量紀錄
+        if not raw.lstrip().startswith("{"):
+            continue
+        rec = json.loads(raw)
         attrs = rec["attributes"]
         key = (attrs.get("agent.name") or rec["resource_arn"].rsplit("/", 1)[-1], attrs["session.id"])
         t = totals[key]

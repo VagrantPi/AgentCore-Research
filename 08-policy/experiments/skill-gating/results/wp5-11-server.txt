@@ -1,0 +1,7 @@
+Success	aws-cli/2.36.47 Python/3.9.25 Linux/6.18.51-120.163.amzn2023.aarch64 source/aarch64.amzn.2023
+arn:aws:sts::050571774557:assumed-role/wp5-hephagora-ec2/i-0aab33e1d4a2bcafb
+userB__example_com-LX75w0kfGa	READY
+userA__example_com-yxhNOKhfsC	READY
+userA__example_com-yxhNOKhfsC	READY	userA__example_com
+userB__example_com-LX75w0kfGa	READY	userB__example_com
+	

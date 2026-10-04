@@ -1,5 +1,6 @@
 {
   "_說明": "成本 3 天版（2026-10-02 起）用到的 AWS 資源。state.json 不存在時（換電腦、worktree 被清掉）腳本讀這裡，所以要 commit。收尾見 README。",
+  "_狀態": "2026-10-04 13:08 UTC 已全部刪除（EC2 自行終止；bucket、role、instance profile、Memory 由 cleanup 刪除）",
   "memoryId": "wp5_cost3d-tc3SBsE1IR",
   "memoryArn": "arn:aws:bedrock-agentcore:ap-northeast-1:050571774557:memory/wp5_cost3d-tc3SBsE1IR",
   "strategies": {
