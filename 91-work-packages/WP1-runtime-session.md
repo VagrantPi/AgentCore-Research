@@ -71,6 +71,8 @@
 ## 回填
 
 > **部分回填（2026-10-02）：** 除了 #11 都跑完了，全部是 PUBLIC。#11（VPC 組）等 B 在 WP3 建好 VPC。#10（成本情境）用 `USAGE_LOGS` 實測，見檢核表與下方「#10 成本情境」。
+>
+> **#11 回填（2026-10-04）：** 借 WP7 建的無 NAT VPC 量完，VPC 不增加冷啟動時間。
 
 - 負責人：kais
 - 執行日期：2026-10-02
@@ -100,6 +102,7 @@
 | 8′ | 阻塞版本是否在閒置逾時後被砍 | `[官方已寫]` | 通過，而且範圍更大：180 秒的請求（閒置逾時 60 秒）在阻塞版（156.7 s）和**回 `Healthy` 的多執行緒版**（246.8 s）都收到 `RuntimeClientError`、session 被終止；處理中回 `HealthyBusy` 的版本 180.2 s 成功 | `concurrent.csv` | 長任務一定要回 `HealthyBusy`。正式環境閒置逾時預設 15 分鐘，所以超過 15 分鐘的請求適用 |
 | 9 | Session 建立速率上限 | `[矛盾]` | 沒有碰到上限：100 個新 session 在約 1 秒內送出，0 次 throttle | `burst.csv` | 1.6/s 不成立；25/s 是持續速率還是上限，這個規模分辨不出來。不影響選型 |
 | 10 | 20 位使用者 2 小時的費用；換算 100 位使用者月費 | 成本 | 20 位：0.5114 vCPU-h、53.45 GB-h，**$0.551**（依實測用量計價）。每人一次 2 小時在線 $0.0275 → 100 人 × 30 天 **約 $82.6 / 月** | `wp1-cost.csv`、`cost_scenario.csv`、原始 log `wp1_cost_usage_logs.jsonl.gz`；見下方「#10 成本情境」 | 費用只跟 session 活著的秒數成正比，跟呼叫次數幾乎無關；九成以上是記憶體。最後一次使用後立刻 `StopRuntimeSession` 可省掉閒置的 21%（約 $65 / 月） |
+| 11 | VPC 模式比 PUBLIC 多出的冷啟動時間 | `[官方已寫]`（官方只說「可能增加」） | **約 0 ms**（2026-10-04，同一個 `:wp1` 映像、同一段時間交錯量測）。從池子：V1 PUBLIC 611 / 660 ms、VPC 612 / 684 ms；V2 PUBLIC 1998 / 2362 ms、VPC 1914 / 1988 ms（p50 / p90，各 20 次）。池子用光後的真冷啟動（burst 30）：V1 PUBLIC 3793 / 3802 ms、VPC 3603 / 3683 ms。唯一的差別在建立：V2 VPC 等 READY **527 s**，PUBLIC 183 s（V1 都在 10 s 內） | `results.csv`、`burst.csv`（`wp1_cs_*_img_vpc`）；[結果表](../01-runtime/experiments/cold-start/README.md#結果)。VPC 是 WP7 建的無 NAT、無 IGW VPC（`apne1-az4`、`az1`，S3 gateway＋ECR `api`／`dkr`＋Logs 等 interface endpoint） | 冷啟動不必為 VPC 加預算，選 VPC 只看 endpoint 月費（見 [WP3 回填 B 半](WP3-sandbox-egress.md#回填)）。V2 的部署時間要多算約 6 分鐘 |
 
 - 平台在 handler 忙碌時約每 2 秒打一次 `/ping`。
 - 阻塞版那次 87 s、換了 `boot_token`：和 8′ 一致，阻塞約 60 秒、超過閒置逾時後 VM 被換掉。
