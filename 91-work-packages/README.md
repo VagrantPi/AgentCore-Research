@@ -57,7 +57,7 @@
 | 優先序 | 編號 | 題目 | 回答的選型問題 | 風險 | 價值 | 估點 | 前置 | 分群 | 負責人 | 狀態 |
 |---|---|---|---|---|---|---|---|---|---|---|
 | 前置 | [WP0](WP0-cost-baseline.md) | 成本量測基礎 | 之後每包的費用怎麼估算 | — | 前置 | 2 | — | A | Kais | ✅ 完成（2026-10-02） |
-| 1 | [WP2](WP2-capability-boundary.md) | 能力邊界：自家 MCP server 依技能授權 | 「只能用買到的技能」能不能由自家 MCP server 強制、agent 繞不過；Browser 包成自家工具可不可行；還要不要 Gateway | 高 | 高 | 8 | WP0、自家 MCP server 測試執行個體 | B | RomanChen | 🟡 #0–#7、#9–#12 完成（2026-10-02，本機＋東京實測）；#8 接手登入未做 |
+| 1 | [WP2](WP2-capability-boundary.md) | 能力邊界：自家 MCP server 依技能授權 | 「只能用買到的技能」能不能由自家 MCP server 強制、agent 繞不過；Browser 包成自家工具可不可行；還要不要 Gateway | 高 | 高 | 8 | WP0、自家 MCP server 測試執行個體 | B | RomanChen | 🟡 #0–#7、#9–#12 完成（2026-10-02，本機＋東京實測）；#8 接手登入無法驗證（阻斷：WP4 接手程式不存在，2026-10-04） |
 | 2 | [WP3](WP3-sandbox-egress.md) | 沙箱連外 | 「agent 能寫程式但不能上網」擋不擋得死；不能上網時仍連得到自家 MCP server | 高 | 高 | A 半 2、B 半 3 | A 半：WP0；B 半：WP0、WP2 的自家 MCP server 測試執行個體 | A、B 各半 | Kais、RomanChen | ✅ 完成（A 半、B 半皆 2026-10-02） |
 | 3 | [WP5](WP5-user-state-isolation.md) | 使用者狀態與隔離、每使用者成本 | 資料不外洩、每人成本算得出來 | 高 | 高 | 5 | WP0、一個最小的 Runtime（WP1 步驟 1） | A | Kais | ✅ 完成（2026-10-04）：阻斷級 #1–#4、#10 都通過，無否定；#11 通過；#8 約 $2.53–2.84 / 人 / 月（3 天版與 1 天版）；#6 決定不驗、#9 無法驗證 |
 | 4 | [WP1](WP1-runtime-session.md) | Runtime 冷啟動與「一人一實體」 | microVM 撐不撐得住對話體驗？V2 值不值得？ | 中 | 高 | 5 | WP0 | A | Kais | 🟡 PUBLIC 組完成（2026-10-02）；#10 20 位使用者 2 小時 $0.55、100 人月費約 $82.6；#11 VPC 組未做 |
