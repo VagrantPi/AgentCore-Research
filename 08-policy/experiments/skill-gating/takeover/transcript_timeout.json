@@ -1,0 +1,86 @@
+{
+  "user": "userB",
+  "prompt": "幫我登入測試網站，然後告訴我登入結果。",
+  "tools": [
+    "com_wp2_flight__search_flights",
+    "com_wp2_login-web__login_and_check",
+    "com_wp2_todo__list_todos"
+  ],
+  "messages": [
+    {
+      "role": "user",
+      "content": [
+        {
+          "text": "幫我登入測試網站，然後告訴我登入結果。"
+        }
+      ],
+      "tracking_id": "33ec2497-016f-4cae-bffe-a9249a4c277f"
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "text": "我幫您登入測試網站。"
+        },
+        {
+          "toolUse": {
+            "toolUseId": "tooluse_x6u9jFW2p2EcWTJP4SxJTJ",
+            "name": "com_wp2_login-web__login_and_check",
+            "input": {}
+          }
+        }
+      ],
+      "metadata": {
+        "usage": {
+          "inputTokens": 1134,
+          "outputTokens": 60,
+          "totalTokens": 1194
+        },
+        "metrics": {
+          "latencyMs": 831,
+          "timeToFirstByteMs": 1127
+        }
+      },
+      "tracking_id": "80fc1b16-8b62-4b4d-9995-82084a31f282"
+    },
+    {
+      "role": "user",
+      "content": [
+        {
+          "toolResult": {
+            "status": "success",
+            "toolUseId": "tooluse_x6u9jFW2p2EcWTJP4SxJTJ",
+            "content": [
+              {
+                "text": "{\"speak\":\"{\\n  \\\"status\\\": \\\"user_did_not_complete_login\\\",\\n  \\\"waited_seconds\\\": 270\\n}\",\"data\":{\"text\":\"{\\n  \\\"status\\\": \\\"user_did_not_complete_login\\\",\\n  \\\"waited_seconds\\\": 270\\n}\"}}"
+              }
+            ],
+            "isError": false
+          }
+        }
+      ],
+      "tracking_id": "fbdc425d-9ea2-4a8f-a2fb-6ae57c37f18a"
+    },
+    {
+      "role": "assistant",
+      "content": [
+        {
+          "text": "登入結果如下：\n\n**狀態：登入未完成**\n- 系統等待了 270 秒（約 4.5 分鐘）\n- 您需要在手機瀏覽器上完成登入操作\n\n請在您的手機上打開瀏覽器並完成登入流程。"
+        }
+      ],
+      "metadata": {
+        "usage": {
+          "inputTokens": 1282,
+          "outputTokens": 93,
+          "totalTokens": 1375
+        },
+        "metrics": {
+          "latencyMs": 1122,
+          "timeToFirstByteMs": 586
+        }
+      },
+      "tracking_id": "f2bc3d44-bd84-4d53-9268-203ae8e83260"
+    }
+  ],
+  "reply": "登入結果如下：\n\n**狀態：登入未完成**\n- 系統等待了 270 秒（約 4.5 分鐘）\n- 您需要在手機瀏覽器上完成登入操作\n\n請在您的手機上打開瀏覽器並完成登入流程。\n"
+}
