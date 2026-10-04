@@ -261,7 +261,10 @@ AWS 部分沒有否定項目。
    - 步驟 8 寫的「沿用 WP4 的程式」不存在。[WP4 回填](WP4-browser-takeover.md#回填)是空的，`05-built-in-tools/experiments/takeover-demo/` 從沒建立。
    - WP2 的 HephAgora 分支 `wp2/skill-gating` 沒有推上 GitLab。
 2. HephAgora 已由 Kais 重建，用來做 WP5 #10、#11。重建版**不含** Browser MCP server，也沒有 `take_control`、Live View、推播端點。
-3. 手機能不能開 Live View 也還沒測。DCV 網頁客戶端官方不支援 iOS／Android，這仍然是 `[推測]` 的風險。
+3. **手機開 Live View 官方有支援**：[DCV Web Client SDK release notes](https://docs.aws.amazon.com/dcv/latest/websdkguide/doc-history-release-notes.html) 1.10.1（2025-10-22）起支援 iOS Safari／Chrome、Android Chrome 與觸控 `[官方已寫]`。
+   - WP6 已在 iOS 模擬器的 Mobile Safari 實測：Live View 顯示、點擊、`take_control`／`release_control` 都成功。打字要在 viewer 加 HTML 輸入框轉送按鍵。結果在 `05-built-in-tools/experiments/mobile-takeover/`（MR !10，2026-10-04 時尚未合併）。
+   - #8 剩下要驗的是：server 主導的流程、URL 不經 agent，以及真機。
+   - 本節初版寫「DCV 網頁客戶端官方不支援 iOS／Android」，是照任務說明寫、沒有查證，已更正。
 
 #### 檢核表
 
@@ -277,11 +280,12 @@ AWS 部分沒有否定項目。
    - 產生 Live View 預簽 URL（最長 300 秒）。
    - 推到模擬的 App 推播端點。
    - 等使用者交還後 `release_control`，再繼續。
-2. 一個嵌入 DCV 網頁客戶端（`BrowserLiveView`）的頁面，讓手機打開推播帶的連結。
-3. 一支真的 iOS 和一支 Android 手機，由人實際操作登入。
-4. 估計工時：程式 3–5 小時，加上 AWS 一個時段約 1 小時。
+2. 一個嵌入 DCV 網頁客戶端（`BrowserLiveView`）的頁面，讓手機打開推播帶的連結。可以沿用 WP6 mobile-takeover 的 viewer，含「HTML 輸入框轉送按鍵」的作法。
+3. 一支真的 iOS 和一支 Android 手機，由人實際操作登入。WP6 只測過模擬器。
+4. 先看 WP6 正在查的「開著 Live View 時自動化偶爾卡住」有沒有結論，卡住會直接影響「交還後繼續」。
+5. 估計工時：程式 3–5 小時，加上 AWS 一個時段約 1 小時。
 
-#### 手機打不開時的替代方案（未驗證，供補做時比較）
+#### 真機若有問題時的替代方案（未驗證，供補做時比較）
 
 | 方案 | 做法 | 代價 |
 |---|---|---|
