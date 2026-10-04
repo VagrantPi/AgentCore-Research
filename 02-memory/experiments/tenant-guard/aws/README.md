@@ -17,6 +17,7 @@ uv run check7_delete.py                     # #7
 uv run cost_day.py                          # #5、#8（1 天版）
 uv run cost_report.py                       # #5、#8：session 結束、log 到齊後換算月費
 uv run ec2_runner.py launch|status|fetch|cleanup   # #8 3 天版：在 EC2 t4g.nano 上跑 cost_day.py 3
+uv run export_raw.py                        # 把 USAGE_LOGS、metric、每天的 session 存進 results/（log 只保留 14 天）
 uv run cleanup.py iam-s3 | memory           # 清理
 ```
 
@@ -131,3 +132,35 @@ API 順序：ListSessions → (ListEvents → DeleteEvent×N) ×8 session → (L
 - **record 刪除有延遲**：剛刪完立刻列，semantic 還列出 5 筆；5 分鐘後歸零。刪除作業要「刪完等幾分鐘再掃一次」。
 - **actorId、sessionId 刪不掉**：event 全刪後，`ListSessions` 仍列出 A 的 8 個 session（每個 0 個 event），`ListActors` 仍列出 `wp5-user-a`。沒有刪除 actor 或 session 的 API。**actorId 不能用 email 這類個資**，要用不透明的 ID。
 - 64 個 event 刪除耗時約 11 秒（單執行緒、未碰到 `DeleteEvent` 每 actor + session 5 TPS 的限制）。
+
+### #5、#8 每位使用者的成本
+
+情境：一位使用者一天 100 個 event、20 次檢索、Runtime 在線 2 小時、Browser 10 分鐘（Browser 未實跑，用單價估算）。費用算法、單價與逐項表格見 [WP5 回填的「實際費用」](../../../../91-work-packages/WP5-user-state-isolation.md#實際費用)。
+
+| 版本 | 怎麼跑 | Memory | Runtime | Browser | 合計（USD / 月） |
+|---|---|---|---|---|---|
+| 3 天版（2026-10-02 – 10-04） | EC2 `t4g.nano` 上 `cost_day.py 3` | 1.1587 | 0.7352 | 0.6365 | **2.5304** |
+| 1 天版（2026-10-02） | 本機 `cost_day.py` | 1.4775 | 0.7237 | 0.6365 | **2.8377** |
+
+- 兩版只差在 Memory 長期儲存：3 天版每天寫同樣 5 句話，後兩天被合併進既有 record（每天 9.7 筆 vs 38 筆）。
+- `USAGE_LOGS` 依 session 加總與 metric 差 0%（#5）。
+- **VM 開機的用量記在第一次呼叫之前**：每個 session 都有約 7 秒、約 1 vCPU 的紀錄，時間戳在第一次呼叫前 6–43 分鐘，之後空白。VM 從預先開好的池子分配，開機用量算在後來拿到它的 session 頭上。算費用的時間窗要往前多抓（`cost_report.py` 抓開始前 60 分鐘）。
+- event 每筆間隔 1 秒寫入，3 天 0 個萃取失敗；連續寫入（1 天版）有 8 個 `LTM_RATE_EXCEEDED`。
+
+### 原始資料（`results/`）
+
+| 檔案 | 內容 |
+|---|---|
+| `usage-logs-wp5.jsonl.gz` | `USAGE_LOGS` 裡所有 `wp5-` 開頭 session 的原始紀錄（30,536 筆），含 #3、#4、#10、#11 與兩版成本的 session |
+| `metrics-wp0_min.csv` | `wp0_min` 的 `CPUUsed-vCPUHours`、`MemoryUsed-GBHours`，5 分鐘一點 |
+| `cost-days.json` | 兩版每天的 session ID、時間、3 天版的 record 數 |
+| `cost-3day.txt`、`cost-day.txt` | `cost_report.py` 的輸出 |
+| `check1-*.json`、`check2-records.json`、`check7-delete.txt` | #1、#2、#7 的原始輸出 |
+
+沒有留下的：EC2 上的執行 log（S3 清理時一起刪了），以及成本用 Memory 的 record 內容（只留數量）。
+
+用原始資料重算（在 `91-work-packages/scripts/` 下）：
+
+```bash
+python3 -c "import gzip, sys; from usage_cost import aggregate, write_csv; write_csv(aggregate(gzip.open('../../02-memory/experiments/tenant-guard/aws/results/usage-logs-wp5.jsonl.gz', 'rt').read().splitlines()), sys.stdout)"
+```

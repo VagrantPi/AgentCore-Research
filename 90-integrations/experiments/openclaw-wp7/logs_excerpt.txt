@@ -1,0 +1,539 @@
+02:53:07.474 6f8e5a199af6 [contract] Init for user=user_002bbc11198479af actor=test:f01 namespace=test_f01
+02:53:07.530 6f8e5a199af6 [contract] Scoped S3 credentials created and applied
+02:53:07.555 6f8e5a199af6 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_f01/.openclaw/
+02:53:07.601 6f8e5a199af6 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:53:07.624 6f8e5a199af6 [contract] Routing via lightweight agent (warm-up)
+02:53:10.020 6f8e5a199af6 [proxy:out] [proxy] Response: 2518in/22out tokens
+02:53:10.830 6f8e5a199af6 [proxy:out] [proxy] Response: 5392in/81out tokens
+02:53:17.644 6f8e5a199af6 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:53:26.131 6f8e5a199af6 [proxy:out] [proxy] Stream complete: 25824in/25out tokens
+02:53:54.230 6e80ea28928c [contract] Init for user=user_d40fc45cfea5508a actor=test:f02 namespace=test_f02
+02:53:54.278 6e80ea28928c [contract] Scoped S3 credentials created and applied
+02:53:54.301 6e80ea28928c [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_f02/.openclaw/
+02:53:54.350 6e80ea28928c [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:53:54.369 6e80ea28928c [contract] Routing via lightweight agent (warm-up)
+02:53:56.856 6e80ea28928c [proxy:out] [proxy] Response: 2518in/19out tokens
+02:53:59.881 6e80ea28928c [proxy:out] [proxy] Response: 5409in/87out tokens
+02:54:04.390 6e80ea28928c [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:54:09.733 6e80ea28928c [proxy:out] [proxy] Stream complete: 25826in/25out tokens
+02:54:23.252 ab7420f55e8b [contract] Init for user=user_e6f075ab137d327f actor=test:f03 namespace=test_f03
+02:54:23.310 ab7420f55e8b [contract] Scoped S3 credentials created and applied
+02:54:23.333 ab7420f55e8b [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_f03/.openclaw/
+02:54:23.386 ab7420f55e8b [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:54:23.402 ab7420f55e8b [contract] Routing via lightweight agent (warm-up)
+02:54:25.968 ab7420f55e8b [proxy:out] [proxy] Response: 2518in/25out tokens
+02:54:26.842 ab7420f55e8b [proxy:out] [proxy] Response: 5392in/78out tokens
+02:54:33.423 ab7420f55e8b [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:54:42.106 ab7420f55e8b [proxy:out] [proxy] Stream complete: 25825in/25out tokens
+02:55:05.721 66c885eacad0 [contract] Init for user=user_85a7698cc1367365 actor=test:f04 namespace=test_f04
+02:55:05.783 66c885eacad0 [contract] Scoped S3 credentials created and applied
+02:55:05.804 66c885eacad0 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_f04/.openclaw/
+02:55:05.850 66c885eacad0 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:55:05.866 66c885eacad0 [contract] Routing via lightweight agent (warm-up)
+02:55:09.261 66c885eacad0 [proxy:out] [proxy] Response: 2518in/23out tokens
+02:55:09.675 4fedc3beb288 [contract] Init for user=user_09644f5a5df75c0f actor=test:i01 namespace=test_i01
+02:55:09.717 4fedc3beb288 [contract] Scoped S3 credentials created and applied
+02:55:09.746 4fedc3beb288 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_i01/.openclaw/
+02:55:09.760 66c885eacad0 [proxy:out] [proxy] Response: 5392in/85out tokens
+02:55:15.881 66c885eacad0 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:55:24.134 4fedc3beb288 [workspace-sync] Restored 500 file(s) to /root/.openclaw
+02:55:24.166 4fedc3beb288 [contract] Routing via lightweight agent (warm-up)
+02:55:24.874 66c885eacad0 [proxy:out] [proxy] Stream complete: 25825in/25out tokens
+02:55:26.400 4fedc3beb288 [proxy:out] [proxy] Response: 5380in/23out tokens
+02:55:26.781 4fedc3beb288 [proxy:out] [proxy] Response: 2518in/23out tokens
+02:55:37.260 bfad02c55298 [contract] Init for user=user_bc925acf65ed315f actor=test:f05 namespace=test_f05
+02:55:37.305 bfad02c55298 [contract] Scoped S3 credentials created and applied
+02:55:37.327 bfad02c55298 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_f05/.openclaw/
+02:55:37.392 bfad02c55298 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:55:37.406 bfad02c55298 [contract] Routing via lightweight agent (warm-up)
+02:55:39.206 4fedc3beb288 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:55:39.781 bfad02c55298 [proxy:out] [proxy] Response: 2518in/19out tokens
+02:55:40.671 bfad02c55298 [proxy:out] [proxy] Response: 5392in/81out tokens
+02:55:47.418 bfad02c55298 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:55:55.627 bfad02c55298 [proxy:out] [proxy] Stream complete: 25827in/30out tokens
+02:56:07.593 d71181e045a6 [contract] Init for user=user_004b45759970617c actor=test:f06 namespace=test_f06
+02:56:07.631 d71181e045a6 [contract] Scoped S3 credentials created and applied
+02:56:07.654 d71181e045a6 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_f06/.openclaw/
+02:56:07.703 d71181e045a6 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:56:07.722 d71181e045a6 [contract] Routing via lightweight agent (warm-up)
+02:56:10.361 d71181e045a6 [proxy:out] [proxy] Response: 2518in/24out tokens
+02:56:10.857 d71181e045a6 [proxy:out] [proxy] Response: 5392in/81out tokens
+02:56:17.739 d71181e045a6 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:56:26.052 d71181e045a6 [proxy:out] [proxy] Stream complete: 25825in/25out tokens
+02:56:38.748 c99499208834 [contract] Init for user=user_11f9621fca3be265 actor=test:f07 namespace=test_f07
+02:56:38.800 c99499208834 [contract] Scoped S3 credentials created and applied
+02:56:38.823 c99499208834 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_f07/.openclaw/
+02:56:38.878 c99499208834 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:56:38.894 c99499208834 [contract] Routing via lightweight agent (warm-up)
+02:56:41.193 c99499208834 [proxy:out] [proxy] Response: 2518in/24out tokens
+02:56:42.543 c99499208834 [proxy:out] [proxy] Response: 5392in/74out tokens
+02:56:48.954 c99499208834 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:56:57.689 c99499208834 [proxy:out] [proxy] Stream complete: 25824in/25out tokens
+02:57:10.225 6bef13e39fd9 [contract] Init for user=user_d31aacf1f23b9de4 actor=test:f08 namespace=test_f08
+02:57:10.270 6bef13e39fd9 [contract] Scoped S3 credentials created and applied
+02:57:10.292 6bef13e39fd9 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_f08/.openclaw/
+02:57:10.343 6bef13e39fd9 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:57:10.360 6bef13e39fd9 [contract] Routing via lightweight agent (warm-up)
+02:57:12.618 6bef13e39fd9 [proxy:out] [proxy] Response: 2518in/20out tokens
+02:57:14.089 6bef13e39fd9 [proxy:out] [proxy] Response: 5392in/79out tokens
+02:57:20.384 6bef13e39fd9 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:57:29.309 6bef13e39fd9 [proxy:out] [proxy] Stream complete: 25828in/25out tokens
+02:58:03.069 e78669a0d8cc [contract] Init for user=user_e7a852799ff4ec7d actor=test:b17 namespace=test_b17
+02:58:03.115 ca08abdb17af [contract] Init for user=user_c1125672471049ac actor=test:b09 namespace=test_b09
+02:58:03.117 e78669a0d8cc [contract] Scoped S3 credentials created and applied
+02:58:03.141 e78669a0d8cc [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b17/.openclaw/
+02:58:03.144 4034be0aafd5 [contract] Init for user=user_9b93ae1a9570b11b actor=test:b18 namespace=test_b18
+02:58:03.150 ebb1580041fd [contract] Init for user=user_dc3dbc9667bbb303 actor=test:b10 namespace=test_b10
+02:58:03.167 ca08abdb17af [contract] Scoped S3 credentials created and applied
+02:58:03.182 e78669a0d8cc [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:03.187 c650a56ec1e2 [contract] Init for user=user_2996bf682bb5f026 actor=test:b07 namespace=test_b07
+02:58:03.191 ca08abdb17af [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b09/.openclaw/
+02:58:03.197 4034be0aafd5 [contract] Scoped S3 credentials created and applied
+02:58:03.200 ebb1580041fd [contract] Scoped S3 credentials created and applied
+02:58:03.201 e78669a0d8cc [contract] Routing via lightweight agent (warm-up)
+02:58:03.221 4034be0aafd5 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b18/.openclaw/
+02:58:03.221 ebb1580041fd [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b10/.openclaw/
+02:58:03.230 71a6c65f00d3 [contract] Init for user=user_73d709142b469ac4 actor=test:b01 namespace=test_b01
+02:58:03.234 ca08abdb17af [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:03.237 c650a56ec1e2 [contract] Scoped S3 credentials created and applied
+02:58:03.249 ca08abdb17af [contract] Routing via lightweight agent (warm-up)
+02:58:03.264 c650a56ec1e2 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b07/.openclaw/
+02:58:03.267 ebb1580041fd [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:03.271 4034be0aafd5 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:03.272 71a6c65f00d3 [contract] Scoped S3 credentials created and applied
+02:58:03.279 ccd4c3cc690e [contract] Init for user=user_280bf35d03a2f663 actor=test:b13 namespace=test_b13
+02:58:03.283 ebb1580041fd [contract] Routing via lightweight agent (warm-up)
+02:58:03.286 4034be0aafd5 [contract] Routing via lightweight agent (warm-up)
+02:58:03.302 71a6c65f00d3 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b01/.openclaw/
+02:58:03.322 c650a56ec1e2 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:03.326 ccd4c3cc690e [contract] Scoped S3 credentials created and applied
+02:58:03.344 c650a56ec1e2 [contract] Routing via lightweight agent (warm-up)
+02:58:03.349 ccd4c3cc690e [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b13/.openclaw/
+02:58:03.351 71a6c65f00d3 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:03.377 71a6c65f00d3 [contract] Routing via lightweight agent (warm-up)
+02:58:03.389 2881d0c2eac4 [contract] Init for user=user_4bec9777aa6e931f actor=test:b04 namespace=test_b04
+02:58:03.407 ccd4c3cc690e [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:03.421 ccd4c3cc690e [contract] Routing via lightweight agent (warm-up)
+02:58:03.435 2881d0c2eac4 [contract] Scoped S3 credentials created and applied
+02:58:03.454 20908bfb8d2f [contract] Init for user=user_69e0f441a83c6b18 actor=test:b15 namespace=test_b15
+02:58:03.458 2881d0c2eac4 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b04/.openclaw/
+02:58:03.502 20908bfb8d2f [contract] Scoped S3 credentials created and applied
+02:58:03.507 2881d0c2eac4 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:03.524 2881d0c2eac4 [contract] Routing via lightweight agent (warm-up)
+02:58:03.527 20908bfb8d2f [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b15/.openclaw/
+02:58:03.602 20908bfb8d2f [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:03.622 20908bfb8d2f [contract] Routing via lightweight agent (warm-up)
+02:58:03.862 a0b33af04987 [contract] Init for user=user_d7e51cfd8c91cbbb actor=test:b05 namespace=test_b05
+02:58:03.913 a0b33af04987 [contract] Scoped S3 credentials created and applied
+02:58:03.949 a0b33af04987 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b05/.openclaw/
+02:58:04.088 a0b33af04987 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:04.126 a0b33af04987 [contract] Routing via lightweight agent (warm-up)
+02:58:05.363 e78669a0d8cc [proxy:out] [proxy] Response: 2518in/25out tokens
+02:58:05.491 ca08abdb17af [proxy:out] [proxy] Response: 2518in/24out tokens
+02:58:05.577 2881d0c2eac4 [proxy:out] [proxy] Response: 2518in/21out tokens
+02:58:05.601 c650a56ec1e2 [proxy:out] [proxy] Response: 2518in/21out tokens
+02:58:05.664 71a6c65f00d3 [proxy:out] [proxy] Response: 2518in/20out tokens
+02:58:05.672 20908bfb8d2f [proxy:out] [proxy] Response: 2518in/24out tokens
+02:58:05.734 ebb1580041fd [proxy:out] [proxy] Response: 2518in/22out tokens
+02:58:05.871 ccd4c3cc690e [proxy:out] [proxy] Response: 2518in/20out tokens
+02:58:06.181 ebb1580041fd [proxy:out] [proxy] Response: 5392in/79out tokens
+02:58:06.231 a0b33af04987 [proxy:out] [proxy] Response: 2518in/23out tokens
+02:58:06.282 e78669a0d8cc [proxy:out] [proxy] Response: 5392in/78out tokens
+02:58:06.292 2881d0c2eac4 [proxy:out] [proxy] Response: 5428in/74out tokens
+02:58:06.293 c650a56ec1e2 [proxy:out] [proxy] Response: 5392in/74out tokens
+02:58:06.367 ca08abdb17af [proxy:out] [proxy] Response: 5392in/76out tokens
+02:58:06.558 4034be0aafd5 [proxy:out] [proxy] Response: 5392in/78out tokens
+02:58:06.564 4034be0aafd5 [proxy:out] [proxy] Response: 2518in/25out tokens
+02:58:06.579 20908bfb8d2f [proxy:out] [proxy] Response: 5392in/75out tokens
+02:58:06.668 71a6c65f00d3 [proxy:out] [proxy] Response: 5392in/76out tokens
+02:58:06.778 ccd4c3cc690e [proxy:out] [proxy] Response: 5392in/76out tokens
+02:58:07.187 a0b33af04987 [proxy:out] [proxy] Response: 5392in/78out tokens
+02:58:15.760 d81e1ec0d261 [contract] Init for user=user_69b1b027230b73b7 actor=test:b11 namespace=test_b11
+02:58:15.799 d81e1ec0d261 [contract] Scoped S3 credentials created and applied
+02:58:15.800 8b2b2a7450da [contract] Init for user=user_0819249976f4b1b0 actor=test:b03 namespace=test_b03
+02:58:15.805 e94d04d6283b [contract] Init for user=user_648960a93180d9af actor=test:b19 namespace=test_b19
+02:58:15.816 23cbb9af2baa [contract] Init for user=user_c80641e0b59cad93 actor=test:b06 namespace=test_b06
+02:58:15.817 29e053365ddc [contract] Init for user=user_f5507e8a8b28e680 actor=test:b14 namespace=test_b14
+02:58:15.822 d81e1ec0d261 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b11/.openclaw/
+02:58:15.855 e94d04d6283b [contract] Scoped S3 credentials created and applied
+02:58:15.865 8b2b2a7450da [contract] Scoped S3 credentials created and applied
+02:58:15.868 29e053365ddc [contract] Scoped S3 credentials created and applied
+02:58:15.870 d81e1ec0d261 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:15.871 23cbb9af2baa [contract] Scoped S3 credentials created and applied
+02:58:15.878 e94d04d6283b [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b19/.openclaw/
+02:58:15.886 d81e1ec0d261 [contract] Routing via lightweight agent (warm-up)
+02:58:15.888 8b2b2a7450da [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b03/.openclaw/
+02:58:15.889 29e053365ddc [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b14/.openclaw/
+02:58:15.895 23cbb9af2baa [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b06/.openclaw/
+02:58:15.924 e94d04d6283b [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:15.927 8b2b2a7450da [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:15.933 29e053365ddc [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:15.938 565c453c24ed [contract] Init for user=user_5519675479d88c6a actor=test:b20 namespace=test_b20
+02:58:15.942 e94d04d6283b [contract] Routing via lightweight agent (warm-up)
+02:58:15.943 23cbb9af2baa [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:15.950 8b2b2a7450da [contract] Routing via lightweight agent (warm-up)
+02:58:15.954 29e053365ddc [contract] Routing via lightweight agent (warm-up)
+02:58:15.964 23cbb9af2baa [contract] Routing via lightweight agent (warm-up)
+02:58:15.997 565c453c24ed [contract] Scoped S3 credentials created and applied
+02:58:16.020 565c453c24ed [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b20/.openclaw/
+02:58:16.066 565c453c24ed [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:16.089 565c453c24ed [contract] Routing via lightweight agent (warm-up)
+02:58:16.203 8ed1a37790e2 [contract] Init for user=user_b47b65f5e9a2b96f actor=test:b08 namespace=test_b08
+02:58:16.212 5d6c981de67f [contract] Init for user=user_9be76ecd1340a32a actor=test:b12 namespace=test_b12
+02:58:16.259 8ed1a37790e2 [contract] Scoped S3 credentials created and applied
+02:58:16.268 5d6c981de67f [contract] Scoped S3 credentials created and applied
+02:58:16.280 8ed1a37790e2 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b08/.openclaw/
+02:58:16.286 744d2ed85d01 [contract] Init for user=user_9dcbf4743e89b8c0 actor=test:b16 namespace=test_b16
+02:58:16.289 5d6c981de67f [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b12/.openclaw/
+02:58:16.326 8ed1a37790e2 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:16.335 744d2ed85d01 [contract] Scoped S3 credentials created and applied
+02:58:16.336 5d6c981de67f [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:16.341 8ed1a37790e2 [contract] Routing via lightweight agent (warm-up)
+02:58:16.351 5d6c981de67f [contract] Routing via lightweight agent (warm-up)
+02:58:16.356 744d2ed85d01 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b16/.openclaw/
+02:58:16.410 744d2ed85d01 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:16.424 744d2ed85d01 [contract] Routing via lightweight agent (warm-up)
+02:58:18.041 8b2b2a7450da [proxy:out] [proxy] Response: 2518in/23out tokens
+02:58:18.044 23cbb9af2baa [proxy:out] [proxy] Response: 2518in/23out tokens
+02:58:18.280 5d6c981de67f [proxy:out] [proxy] Response: 2518in/20out tokens
+02:58:18.319 d81e1ec0d261 [proxy:out] [proxy] Response: 2518in/25out tokens
+02:58:18.341 565c453c24ed [proxy:out] [proxy] Response: 2518in/23out tokens
+02:58:18.630 744d2ed85d01 [proxy:out] [proxy] Response: 2518in/23out tokens
+02:58:18.662 e94d04d6283b [proxy:out] [proxy] Response: 2518in/26out tokens
+02:58:18.678 8ed1a37790e2 [proxy:out] [proxy] Response: 2518in/21out tokens
+02:58:18.876 d81e1ec0d261 [proxy:out] [proxy] Response: 5392in/81out tokens
+02:58:18.877 e94d04d6283b [proxy:out] [proxy] Response: 5392in/81out tokens
+02:58:19.016 5d6c981de67f [proxy:out] [proxy] Response: 5653in/76out tokens
+02:58:19.030 29e053365ddc [proxy:out] [proxy] Response: 2518in/20out tokens
+02:58:19.086 23cbb9af2baa [proxy:out] [proxy] Response: 5392in/85out tokens
+02:58:19.271 29e053365ddc [proxy:out] [proxy] Response: 5392in/76out tokens
+02:58:19.362 8b2b2a7450da [proxy:out] [proxy] Response: 5392in/78out tokens
+02:58:19.408 744d2ed85d01 [proxy:out] [proxy] Response: 5392in/78out tokens
+02:58:19.589 8ed1a37790e2 [proxy:out] [proxy] Response: 5392in/73out tokens
+02:58:19.818 5411544d4107 [contract] Init for user=user_16c072f402ca685e actor=test:b02 namespace=test_b02
+02:58:19.864 5411544d4107 [contract] Scoped S3 credentials created and applied
+02:58:19.893 5411544d4107 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_b02/.openclaw/
+02:58:19.906 565c453c24ed [proxy:out] [proxy] Response: 5392in/78out tokens
+02:58:19.940 5411544d4107 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+02:58:19.961 5411544d4107 [contract] Routing via lightweight agent (warm-up)
+02:58:22.367 5411544d4107 [proxy:out] [proxy] Response: 2518in/25out tokens
+02:58:22.975 5411544d4107 [proxy:out] [proxy] Response: 5392in/78out tokens
+02:58:47.045 857becebc4ea [contract] Init for user=user_f1c24d84df89a5ca actor=test:r01 namespace=test_r01
+02:58:47.095 857becebc4ea [contract] Scoped S3 credentials created and applied
+02:58:47.117 857becebc4ea [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_r01/.openclaw/
+02:59:01.566 857becebc4ea [workspace-sync] Restored 500 file(s) to /root/.openclaw
+02:59:01.590 857becebc4ea [contract] Routing via lightweight agent (warm-up)
+02:59:04.083 857becebc4ea [proxy:out] [proxy] Response: 5380in/23out tokens
+02:59:04.360 857becebc4ea [proxy:out] [proxy] Response: 2518in/21out tokens
+02:59:11.615 857becebc4ea [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+02:59:19.198 857becebc4ea [proxy:out] [proxy] Stream complete: 25829in/99out tokens, 1 tool call(s)
+02:59:19.239 857becebc4ea [openclaw:out] 2026-10-04T02:59:19.238+00:00 [agent/embedded] embedded run tool start: runId=a66cce04-0ede-44e5-ac10-11c5dc9670a6 tool=exec toolCallId=tooluse_42tItA8hUarHLMAymO7pLQ
+02:59:22.993 857becebc4ea [proxy:out] [proxy] Stream complete: 25987in/116out tokens
+02:59:40.591 c4ad616e5674 [contract] Init for user=user_7d00791770e0b3c3 actor=test:r02 namespace=test_r02
+02:59:40.648 c4ad616e5674 [contract] Scoped S3 credentials created and applied
+02:59:40.671 c4ad616e5674 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_r02/.openclaw/
+02:59:55.463 c4ad616e5674 [workspace-sync] Restored 500 file(s) to /root/.openclaw
+02:59:55.485 c4ad616e5674 [contract] Routing via lightweight agent (warm-up)
+02:59:57.589 c4ad616e5674 [proxy:out] [proxy] Response: 2518in/21out tokens
+02:59:57.710 c4ad616e5674 [proxy:out] [proxy] Response: 5641in/23out tokens
+03:00:05.513 c4ad616e5674 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:00:12.812 c4ad616e5674 [proxy:out] [proxy] Stream complete: 25829in/102out tokens, 1 tool call(s)
+03:00:12.852 c4ad616e5674 [openclaw:out] 2026-10-04T03:00:12.852+00:00 [agent/embedded] embedded run tool start: runId=4608a1a6-ae46-4d2a-a7a5-c48c1512cfac tool=exec toolCallId=tooluse_m7GPi82yVXH6GWp1wOhnIc
+03:00:17.132 c4ad616e5674 [proxy:out] [proxy] Stream complete: 25990in/176out tokens, 1 tool call(s)
+03:00:17.196 c4ad616e5674 [openclaw:out] 2026-10-04T03:00:17.195+00:00 [agent/embedded] embedded run tool start: runId=4608a1a6-ae46-4d2a-a7a5-c48c1512cfac tool=exec toolCallId=tooluse_z01R6Kx9pavl82tuZF7PCg
+03:00:21.130 c4ad616e5674 [proxy:out] [proxy] Stream complete: 41241in/83out tokens
+03:00:37.911 de6cac3efcde [contract] Init for user=user_6efb2cbed0fcdecd actor=test:r03 namespace=test_r03
+03:00:37.971 de6cac3efcde [contract] Scoped S3 credentials created and applied
+03:00:37.994 de6cac3efcde [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_r03/.openclaw/
+03:00:52.380 de6cac3efcde [workspace-sync] Restored 500 file(s) to /root/.openclaw
+03:00:52.405 de6cac3efcde [contract] Routing via lightweight agent (warm-up)
+03:00:54.736 de6cac3efcde [proxy:out] [proxy] Response: 5380in/23out tokens
+03:00:55.072 de6cac3efcde [proxy:out] [proxy] Response: 2518in/23out tokens
+03:01:02.429 de6cac3efcde [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:01:10.095 de6cac3efcde [proxy:out] [proxy] Stream complete: 25831in/99out tokens, 1 tool call(s)
+03:01:10.144 de6cac3efcde [openclaw:out] 2026-10-04T03:01:10.144+00:00 [agent/embedded] embedded run tool start: runId=fd7419e4-27cf-4fea-9304-d122922d7dcd tool=exec toolCallId=tooluse_rG674b9jEq7XXMgtkUhU8k
+03:01:15.120 de6cac3efcde [proxy:out] [proxy] Stream complete: 25989in/177out tokens, 1 tool call(s)
+03:01:15.186 de6cac3efcde [openclaw:out] 2026-10-04T03:01:15.186+00:00 [agent/embedded] embedded run tool start: runId=fd7419e4-27cf-4fea-9304-d122922d7dcd tool=exec toolCallId=tooluse_4jXkNizN7dlcJa7Lu5dYOT
+03:01:19.354 de6cac3efcde [proxy:out] [proxy] Stream complete: 41240in/90out tokens
+03:01:47.690 04ea3c142ce8 [contract] Init for user=user_1536903e225e8308 actor=test:x01 namespace=test_x01
+03:01:47.750 04ea3c142ce8 [contract] Scoped S3 credentials created and applied
+03:01:47.793 04ea3c142ce8 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_x01/.openclaw/
+03:01:47.876 04ea3c142ce8 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:01:50.134 04ea3c142ce8 [proxy:out] [proxy] Response: 2518in/23out tokens
+03:01:57.906 04ea3c142ce8 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:02:02.500 04ea3c142ce8 [proxy:out] [proxy] Stream complete: 25824in/83out tokens, 1 tool call(s)
+03:02:02.542 04ea3c142ce8 [openclaw:out] 2026-10-04T03:02:02.542+00:00 [agent/embedded] embedded run tool start: runId=709f48e0-541c-4ecc-a6e6-b21aa1b34d8e tool=web_search toolCallId=tooluse_PlaTJRuhoo4Ta7UZYOQWDn
+03:02:02.587 04ea3c142ce8 [openclaw:err] 2026-10-04T03:02:02.583+00:00 [tools] web_search failed: SECURITY NOTICE: The following content is from an EXTERNAL, UNTRUSTED source (e.g., email, webhook).
+03:02:05.437 04ea3c142ce8 [proxy:out] [proxy] Stream complete: 26174in/126out tokens, 1 tool call(s)
+03:02:05.477 04ea3c142ce8 [openclaw:out] 2026-10-04T03:02:05.476+00:00 [agent/embedded] embedded run tool start: runId=709f48e0-541c-4ecc-a6e6-b21aa1b34d8e tool=web_fetch toolCallId=tooluse_rM3HXPfmLXo6blf7V1KZ2m
+03:02:10.022 04ea3c142ce8 [proxy:out] [proxy] Stream complete: 27952in/235out tokens
+03:02:14.605 04ea3c142ce8 [proxy:out] [proxy] Stream complete: 28027in/220out tokens, 1 tool call(s)
+03:02:14.625 04ea3c142ce8 [openclaw:out] 2026-10-04T03:02:14.625+00:00 [agent/embedded] embedded run tool start: runId=c7e0f502-33c2-4008-8ced-299cec764a8e tool=exec toolCallId=tooluse_hjBQEJepwvEHnnreIrnZUU
+03:02:20.592 04ea3c142ce8 [proxy:out] [proxy] Stream complete: 28281in/346out tokens
+03:03:02.321 34274e160e86 [contract] Init for user=user_f418a70c80b8d0a5 actor=test:load01 namespace=test_load01
+03:03:02.377 34274e160e86 [contract] Scoped S3 credentials created and applied
+03:03:02.405 34274e160e86 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load01/.openclaw/
+03:03:02.456 34274e160e86 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:03:02.481 34274e160e86 [contract] Routing via lightweight agent (warm-up)
+03:03:04.760 34274e160e86 [proxy:out] [proxy] Response: 2518in/22out tokens
+03:03:05.738 34274e160e86 [proxy:out] [proxy] Response: 5654in/69out tokens
+03:03:05.946 34274e160e86 [contract] Routing via lightweight agent (warm-up)
+03:03:12.255 34274e160e86 [proxy:out] [proxy] Response: 5701in/330out tokens
+03:03:12.458 34274e160e86 [contract] Routing via lightweight agent (warm-up)
+03:03:17.186 0a1a4fd0a2be [contract] Init for user=user_cb7ad6af6f18d4fa actor=test:load02 namespace=test_load02
+03:03:17.239 0a1a4fd0a2be [contract] Scoped S3 credentials created and applied
+03:03:17.262 0a1a4fd0a2be [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load02/.openclaw/
+03:03:17.325 0a1a4fd0a2be [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:03:17.341 0a1a4fd0a2be [contract] Routing via lightweight agent (warm-up)
+03:03:17.506 34274e160e86 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:03:18.640 34274e160e86 [proxy:out] [proxy] Response: 5701in/245out tokens
+03:03:19.322 0a1a4fd0a2be [proxy:out] [proxy] Response: 2518in/24out tokens
+03:03:20.896 0a1a4fd0a2be [proxy:out] [proxy] Response: 5429in/94out tokens
+03:03:21.130 0a1a4fd0a2be [contract] Routing via lightweight agent (warm-up)
+03:03:24.150 34274e160e86 [proxy:out] [proxy] Stream complete: 25823in/54out tokens
+03:03:26.805 0a1a4fd0a2be [proxy:out] [proxy] Response: 5701in/283out tokens
+03:03:27.028 0a1a4fd0a2be [contract] Routing via lightweight agent (warm-up)
+03:03:27.373 0a1a4fd0a2be [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:03:28.476 34274e160e86 [proxy:out] [proxy] Stream complete: 25909in/52out tokens
+03:03:32.238 0a1a4fd0a2be [proxy:out] [proxy] Response: 5701in/250out tokens
+03:03:32.254 612fc6d74d21 [contract] Init for user=user_3e2a5254672d5c11 actor=test:load03 namespace=test_load03
+03:03:32.309 612fc6d74d21 [contract] Scoped S3 credentials created and applied
+03:03:32.330 612fc6d74d21 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load03/.openclaw/
+03:03:32.364 34274e160e86 [proxy:out] [proxy] Stream complete: 26008in/103out tokens
+03:03:32.380 612fc6d74d21 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:03:32.395 612fc6d74d21 [contract] Routing via lightweight agent (warm-up)
+03:03:34.674 612fc6d74d21 [proxy:out] [proxy] Response: 2518in/23out tokens
+03:03:35.812 612fc6d74d21 [proxy:out] [proxy] Response: 5393in/101out tokens
+03:03:36.008 612fc6d74d21 [contract] Routing via lightweight agent (warm-up)
+03:03:36.906 34274e160e86 [proxy:out] [proxy] Stream complete: 26143in/123out tokens
+03:03:37.008 0a1a4fd0a2be [proxy:out] [proxy] Stream complete: 25820in/54out tokens
+03:03:40.678 0a1a4fd0a2be [proxy:out] [proxy] Stream complete: 25906in/56out tokens
+03:03:40.725 612fc6d74d21 [proxy:out] [proxy] Response: 5701in/211out tokens
+03:03:40.913 612fc6d74d21 [contract] Routing via lightweight agent (warm-up)
+03:03:42.428 612fc6d74d21 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:03:45.110 34274e160e86 [proxy:out] [proxy] Stream complete: 26300in/398out tokens
+03:03:45.750 612fc6d74d21 [proxy:out] [proxy] Response: 5701in/212out tokens
+03:03:46.299 0a1a4fd0a2be [proxy:out] [proxy] Stream complete: 26009in/119out tokens
+03:03:48.364 010f1d192544 [contract] Init for user=user_e568faf3b7549016 actor=test:load04 namespace=test_load04
+03:03:48.418 010f1d192544 [contract] Scoped S3 credentials created and applied
+03:03:48.442 010f1d192544 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load04/.openclaw/
+03:03:48.493 010f1d192544 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:03:48.511 010f1d192544 [contract] Routing via lightweight agent (warm-up)
+03:03:50.792 612fc6d74d21 [proxy:out] [proxy] Stream complete: 25819in/55out tokens
+03:03:50.820 010f1d192544 [proxy:out] [proxy] Response: 2518in/24out tokens
+03:03:51.028 34274e160e86 [proxy:out] [proxy] Stream complete: 26729in/211out tokens
+03:03:51.157 0a1a4fd0a2be [proxy:out] [proxy] Stream complete: 26160in/128out tokens
+03:03:51.567 010f1d192544 [proxy:out] [proxy] Response: 5393in/67out tokens
+03:03:51.767 010f1d192544 [contract] Routing via lightweight agent (warm-up)
+03:03:54.165 34274e160e86 [proxy:out] [proxy] Stream complete: 26974in/36out tokens
+03:03:54.295 612fc6d74d21 [proxy:out] [proxy] Stream complete: 25906in/49out tokens
+03:03:57.435 010f1d192544 [proxy:out] [proxy] Response: 5701in/255out tokens
+03:03:57.723 010f1d192544 [contract] Routing via lightweight agent (warm-up)
+03:03:58.579 612fc6d74d21 [proxy:out] [proxy] Stream complete: 26002in/116out tokens
+03:03:58.630 010f1d192544 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:03:59.244 0a1a4fd0a2be [proxy:out] [proxy] Stream complete: 26322in/418out tokens
+03:04:02.139 60ddd7569f6a [contract] Init for user=user_1d78311fd7308951 actor=test:load05 namespace=test_load05
+03:04:02.201 60ddd7569f6a [contract] Scoped S3 credentials created and applied
+03:04:02.224 60ddd7569f6a [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load05/.openclaw/
+03:04:02.277 60ddd7569f6a [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:04:02.292 60ddd7569f6a [contract] Routing via lightweight agent (warm-up)
+03:04:02.524 010f1d192544 [proxy:out] [proxy] Response: 5701in/241out tokens
+03:04:03.220 612fc6d74d21 [proxy:out] [proxy] Stream complete: 26150in/135out tokens
+03:04:04.658 60ddd7569f6a [proxy:out] [proxy] Response: 2518in/22out tokens
+03:04:05.695 0a1a4fd0a2be [proxy:out] [proxy] Stream complete: 26771in/260out tokens
+03:04:07.855 60ddd7569f6a [proxy:out] [proxy] Response: 5393in/89out tokens
+03:04:08.056 60ddd7569f6a [contract] Routing via lightweight agent (warm-up)
+03:04:08.246 010f1d192544 [proxy:out] [proxy] Stream complete: 25821in/55out tokens
+03:04:09.000 0a1a4fd0a2be [proxy:out] [proxy] Stream complete: 27065in/48out tokens
+03:04:11.641 612fc6d74d21 [proxy:out] [proxy] Stream complete: 26319in/437out tokens
+03:04:11.893 010f1d192544 [proxy:out] [proxy] Stream complete: 25908in/48out tokens
+03:04:12.456 60ddd7569f6a [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:04:12.671 60ddd7569f6a [proxy:out] [proxy] Response: 5701in/214out tokens
+03:04:15.431 612fc6d74d21 [proxy:out] [proxy] Stream complete: 26787in/69out tokens
+03:04:15.470 010f1d192544 [proxy:out] [proxy] Stream complete: 26003in/67out tokens
+03:04:17.123 ad3100dd21f8 [contract] Init for user=user_dba8ec9752893fef actor=test:load06 namespace=test_load06
+03:04:17.224 ad3100dd21f8 [contract] Scoped S3 credentials created and applied
+03:04:17.249 ad3100dd21f8 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load06/.openclaw/
+03:04:17.301 ad3100dd21f8 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:04:17.316 ad3100dd21f8 [contract] Routing via lightweight agent (warm-up)
+03:04:18.373 612fc6d74d21 [proxy:out] [proxy] Stream complete: 26890in/34out tokens
+03:04:19.231 010f1d192544 [proxy:out] [proxy] Stream complete: 26102in/78out tokens
+03:04:19.572 ad3100dd21f8 [proxy:out] [proxy] Response: 2518in/23out tokens
+03:04:20.257 ad3100dd21f8 [proxy:out] [proxy] Response: 5393in/66out tokens
+03:04:20.406 ad3100dd21f8 [contract] Routing via lightweight agent (warm-up)
+03:04:22.320 60ddd7569f6a [proxy:out] [proxy] Stream complete: 25822in/362out tokens
+03:04:25.948 60ddd7569f6a [proxy:out] [proxy] Stream complete: 26218in/39out tokens
+03:04:26.396 010f1d192544 [proxy:out] [proxy] Stream complete: 26214in/333out tokens
+03:04:27.328 ad3100dd21f8 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:04:27.347 ad3100dd21f8 [proxy:out] [proxy] Response: 5701in/318out tokens
+03:04:29.720 60ddd7569f6a [proxy:out] [proxy] Stream complete: 26289in/75out tokens
+03:04:32.105 9bd8f0208050 [contract] Init for user=user_fa1c9f762223057e actor=test:load07 namespace=test_load07
+03:04:32.163 9bd8f0208050 [contract] Scoped S3 credentials created and applied
+03:04:32.184 9bd8f0208050 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load07/.openclaw/
+03:04:32.233 9bd8f0208050 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:04:32.248 9bd8f0208050 [contract] Routing via lightweight agent (warm-up)
+03:04:32.642 010f1d192544 [proxy:out] [proxy] Stream complete: 26578in/211out tokens
+03:04:34.356 9bd8f0208050 [proxy:out] [proxy] Response: 2518in/23out tokens
+03:04:35.201 ad3100dd21f8 [proxy:out] [proxy] Stream complete: 25825in/249out tokens
+03:04:35.857 9bd8f0208050 [proxy:out] [proxy] Response: 5393in/94out tokens
+03:04:35.937 010f1d192544 [proxy:out] [proxy] Stream complete: 26823in/37out tokens
+03:04:36.049 9bd8f0208050 [contract] Routing via lightweight agent (warm-up)
+03:04:36.108 60ddd7569f6a [proxy:out] [proxy] Stream complete: 26411in/242out tokens
+03:04:38.642 ad3100dd21f8 [proxy:out] [proxy] Stream complete: 26108in/36out tokens
+03:04:41.231 9bd8f0208050 [proxy:out] [proxy] Response: 5701in/225out tokens
+03:04:41.464 9bd8f0208050 [contract] Routing via lightweight agent (warm-up)
+03:04:41.575 60ddd7569f6a [proxy:out] [proxy] Stream complete: 26685in/151out tokens
+03:04:41.821 ad3100dd21f8 [proxy:out] [proxy] Stream complete: 26176in/52out tokens
+03:04:42.261 9bd8f0208050 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:04:45.933 ad3100dd21f8 [proxy:out] [proxy] Stream complete: 26275in/113out tokens
+03:04:47.040 11ade0584005 [contract] Init for user=user_a40b641d95e9dce7 actor=test:load08 namespace=test_load08
+03:04:47.097 11ade0584005 [contract] Scoped S3 credentials created and applied
+03:04:47.118 11ade0584005 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load08/.openclaw/
+03:04:47.170 11ade0584005 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:04:47.186 11ade0584005 [contract] Routing via lightweight agent (warm-up)
+03:04:48.298 9bd8f0208050 [proxy:out] [proxy] Response: 5701in/281out tokens
+03:04:49.901 11ade0584005 [proxy:out] [proxy] Response: 2518in/21out tokens
+03:04:50.277 11ade0584005 [proxy:out] [proxy] Response: 5393in/70out tokens
+03:04:50.475 11ade0584005 [contract] Routing via lightweight agent (warm-up)
+03:04:50.714 ad3100dd21f8 [proxy:out] [proxy] Stream complete: 26420in/136out tokens
+03:04:51.522 60ddd7569f6a [proxy:out] [proxy] Stream complete: 26870in/403out tokens
+03:04:54.481 9bd8f0208050 [proxy:out] [proxy] Stream complete: 25822in/55out tokens
+03:04:57.206 11ade0584005 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:04:57.541 11ade0584005 [proxy:out] [proxy] Response: 5701in/344out tokens
+03:04:58.124 9bd8f0208050 [proxy:out] [proxy] Stream complete: 25909in/46out tokens
+03:04:58.509 60ddd7569f6a [proxy:out] [proxy] Stream complete: 27304in/293out tokens
+03:04:59.501 ad3100dd21f8 [proxy:out] [proxy] Stream complete: 26590in/381out tokens
+03:05:02.215 9bd8f0208050 [proxy:out] [proxy] Stream complete: 26002in/75out tokens
+03:05:02.267 60ddd7569f6a [proxy:out] [proxy] Stream complete: 27631in/51out tokens
+03:05:03.093 bed1e7eb8758 [contract] Init for user=user_d11d877e2138e342 actor=test:load09 namespace=test_load09
+03:05:03.148 bed1e7eb8758 [contract] Scoped S3 credentials created and applied
+03:05:03.172 bed1e7eb8758 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load09/.openclaw/
+03:05:03.220 bed1e7eb8758 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:05:03.237 bed1e7eb8758 [contract] Routing via lightweight agent (warm-up)
+03:05:05.062 11ade0584005 [proxy:out] [proxy] Stream complete: 25815in/256out tokens
+03:05:05.609 bed1e7eb8758 [proxy:out] [proxy] Response: 2518in/27out tokens
+03:05:05.791 ad3100dd21f8 [proxy:out] [proxy] Stream complete: 27002in/207out tokens
+03:05:06.221 bed1e7eb8758 [proxy:out] [proxy] Response: 5393in/69out tokens
+03:05:06.415 9bd8f0208050 [proxy:out] [proxy] Stream complete: 26109in/81out tokens
+03:05:06.512 bed1e7eb8758 [contract] Routing via lightweight agent (warm-up)
+03:05:08.357 11ade0584005 [proxy:out] [proxy] Stream complete: 26105in/45out tokens
+03:05:09.619 ad3100dd21f8 [proxy:out] [proxy] Stream complete: 27243in/43out tokens
+03:05:12.179 11ade0584005 [proxy:out] [proxy] Stream complete: 26182in/72out tokens
+03:05:12.906 bed1e7eb8758 [proxy:out] [proxy] Response: 5701in/273out tokens
+03:05:13.096 bed1e7eb8758 [contract] Routing via lightweight agent (warm-up)
+03:05:13.259 bed1e7eb8758 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:05:14.153 9bd8f0208050 [proxy:out] [proxy] Stream complete: 26224in/330out tokens
+03:05:17.084 813f04f37eeb [contract] Init for user=user_4442944fdbeda9e6 actor=test:load10 namespace=test_load10
+03:05:17.134 813f04f37eeb [contract] Scoped S3 credentials created and applied
+03:05:17.157 813f04f37eeb [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_load10/.openclaw/
+03:05:17.208 813f04f37eeb [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:05:17.226 813f04f37eeb [contract] Routing via lightweight agent (warm-up)
+03:05:18.335 bed1e7eb8758 [proxy:err] [guardrail] intervention on non-streaming response
+03:05:18.335 bed1e7eb8758 [proxy:out] [proxy] Response: ?in/?out tokens
+03:05:18.489 11ade0584005 [proxy:out] [proxy] Stream complete: 26301in/236out tokens
+03:05:19.423 813f04f37eeb [proxy:out] [proxy] Response: 2518in/22out tokens
+03:05:19.931 9bd8f0208050 [proxy:out] [proxy] Stream complete: 26585in/193out tokens
+03:05:21.356 813f04f37eeb [proxy:out] [proxy] Response: 5393in/121out tokens
+03:05:21.535 813f04f37eeb [contract] Routing via lightweight agent (warm-up)
+03:05:23.285 9bd8f0208050 [proxy:out] [proxy] Stream complete: 26812in/44out tokens
+03:05:23.385 11ade0584005 [proxy:out] [proxy] Stream complete: 26569in/140out tokens
+03:05:23.741 bed1e7eb8758 [proxy:out] [proxy] Stream complete: 25819in/58out tokens
+03:05:26.739 813f04f37eeb [proxy:out] [proxy] Response: 5701in/246out tokens
+03:05:26.954 813f04f37eeb [contract] Routing via lightweight agent (warm-up)
+03:05:27.253 813f04f37eeb [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:05:28.804 bed1e7eb8758 [proxy:out] [proxy] Stream complete: 25909in/52out tokens
+03:05:32.354 bed1e7eb8758 [proxy:out] [proxy] Stream complete: 26008in/72out tokens
+03:05:33.056 813f04f37eeb [proxy:out] [proxy] Response: 5701in/261out tokens
+03:05:34.851 11ade0584005 [proxy:out] [proxy] Stream complete: 26743in/459out tokens
+03:05:37.845 813f04f37eeb [proxy:out] [proxy] Stream complete: 25821in/55out tokens
+03:05:38.000 bed1e7eb8758 [proxy:out] [proxy] Stream complete: 26112in/76out tokens
+03:05:40.916 11ade0584005 [proxy:out] [proxy] Stream complete: 27233in/225out tokens
+03:05:41.368 813f04f37eeb [proxy:out] [proxy] Stream complete: 25908in/53out tokens
+03:05:43.851 11ade0584005 [proxy:out] [proxy] Stream complete: 27492in/50out tokens
+03:05:44.640 bed1e7eb8758 [proxy:out] [proxy] Stream complete: 26222in/277out tokens
+03:05:45.840 813f04f37eeb [proxy:out] [proxy] Stream complete: 26008in/86out tokens
+03:05:50.395 bed1e7eb8758 [proxy:out] [proxy] Stream complete: 26530in/54out tokens
+03:05:51.047 813f04f37eeb [proxy:out] [proxy] Stream complete: 26126in/127out tokens
+03:05:53.372 bed1e7eb8758 [proxy:out] [proxy] Stream complete: 26618in/32out tokens
+03:05:57.889 813f04f37eeb [proxy:out] [proxy] Stream complete: 26287in/348out tokens
+03:06:04.033 813f04f37eeb [proxy:out] [proxy] Stream complete: 26666in/265out tokens
+03:06:07.541 813f04f37eeb [proxy:out] [proxy] Stream complete: 26965in/49out tokens
+03:27:24.153 34db5fcc0904 [contract] Init for user=user_09644f5a5df75c0f actor=test:i01 namespace=test_i01
+03:27:24.199 34db5fcc0904 [contract] Scoped S3 credentials created and applied
+03:27:24.589 34db5fcc0904 [contract] Session storage has existing data — restoring only missing files from S3
+03:27:24.604 34db5fcc0904 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_i01/.openclaw/ (missing files only — existing local files are kept)
+03:27:26.554 34db5fcc0904 [workspace-sync] Restored 0 file(s) to /root/.openclaw, kept 502 existing local file(s) (2 verified identical to S3)
+03:27:26.580 34db5fcc0904 [contract] Routing via lightweight agent (warm-up)
+03:27:28.302 34db5fcc0904 [proxy:out] [proxy] Response: 5709in/39out tokens
+03:27:28.697 34db5fcc0904 [proxy:out] [proxy] Response: 2828in/28out tokens
+03:27:31.431 34db5fcc0904 [proxy:out] [proxy] Response: 5794in/121out tokens
+03:27:36.605 34db5fcc0904 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:38:12.910 452e85b58414 [contract] Init for user=user_2a5113197590d700 actor=test:n01 namespace=test_n01
+03:44:51.283 452e85b58414 [contract] Scoped credentials failed (falling back to full role): connect ETIMEDOUT 52.195.200.123:443
+03:44:51.306 452e85b58414 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_n01/.openclaw/
+03:44:51.356 452e85b58414 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:44:51.359 452e85b58414 [contract] WARNING: Scoped credentials failed — starting OpenClaw with zero AWS access
+03:44:51.373 452e85b58414 [contract] Routing via lightweight agent (warm-up)
+03:45:01.398 452e85b58414 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:46:51.388 452e85b58414 [shim] Proxy call failed: Proxy request timed out
+03:48:34.540 452e85b58414 [proxy:err] [proxy] Bedrock invocation attempt 1 failed: Stream timed out because of no activity for 90000 ms
+03:48:34.592 452e85b58414 [proxy:err] [proxy] Bedrock invocation attempt 1 failed: Stream timed out because of no activity for 90000 ms
+03:50:15.575 65e7d770ef63 [contract] Init for user=user_93e98aa8613bf56a actor=test:n02 namespace=test_n02
+03:50:37.390 452e85b58414 [proxy:err] [proxy] Stream attempt 1 failed: Stream timed out because of no activity for 90000 ms
+03:51:23.003 452e85b58414 [proxy:out] [proxy] Stream complete: 25828in/25out tokens
+03:51:30.644 452e85b58414 [proxy:err] [proxy] Bedrock invocation attempt 2 failed: The pending stream has been canceled (caused by: connect ETIMEDOUT 13.196.121.205:443)
+03:51:30.644 452e85b58414 [proxy:err] [proxy] Bedrock invocation attempt 2 failed: The pending stream has been canceled (caused by: connect ETIMEDOUT 54.249.173.64:443)
+03:51:33.633 452e85b58414 [proxy:out] [proxy] Response: 2518in/23out tokens
+03:51:34.245 452e85b58414 [proxy:out] [proxy] Response: 5392in/81out tokens
+03:56:54.327 65e7d770ef63 [contract] Scoped credentials failed (falling back to full role): connect ETIMEDOUT 52.195.200.162:443
+03:56:54.350 65e7d770ef63 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_n02/.openclaw/
+03:56:54.399 65e7d770ef63 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+03:56:54.402 65e7d770ef63 [contract] WARNING: Scoped credentials failed — starting OpenClaw with zero AWS access
+03:56:54.431 65e7d770ef63 [contract] Routing via lightweight agent (warm-up)
+03:56:56.666 65e7d770ef63 [proxy:out] [proxy] Response: 2518in/25out tokens
+03:56:57.358 65e7d770ef63 [proxy:out] [proxy] Response: 5392in/78out tokens
+03:57:04.444 65e7d770ef63 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+03:57:12.596 65e7d770ef63 [proxy:out] [proxy] Stream complete: 25823in/25out tokens
+03:58:36.117 5a58009e10e4 [contract] Init for user=user_180484ca82394ffa actor=test:n03 namespace=test_n03
+04:00:48.433 5a58009e10e4 [contract] Scoped S3 credentials created and applied
+04:00:48.458 5a58009e10e4 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_n03/.openclaw/
+04:00:48.512 5a58009e10e4 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+04:00:48.539 5a58009e10e4 [contract] Routing via lightweight agent (warm-up)
+04:00:50.820 5a58009e10e4 [proxy:out] [proxy] Response: 2518in/24out tokens
+04:00:52.105 5a58009e10e4 [proxy:out] [proxy] Response: 5392in/76out tokens
+04:00:58.553 5a58009e10e4 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+04:01:07.738 5a58009e10e4 [proxy:out] [proxy] Stream complete: 25827in/30out tokens
+04:01:22.124 7c1d1ae89dc9 [contract] Init for user=user_d37181c5a40a6ece actor=test:n04 namespace=test_n04
+04:01:22.177 7c1d1ae89dc9 [contract] Scoped S3 credentials created and applied
+04:01:22.219 7c1d1ae89dc9 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_n04/.openclaw/
+04:01:22.284 7c1d1ae89dc9 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+04:01:24.557 7c1d1ae89dc9 [proxy:out] [proxy] Response: 2518in/23out tokens
+04:01:32.334 7c1d1ae89dc9 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+04:01:36.873 7c1d1ae89dc9 [proxy:out] [proxy] Stream complete: 25820in/83out tokens, 1 tool call(s)
+04:01:36.921 7c1d1ae89dc9 [openclaw:out] 2026-10-04T04:01:36.921+00:00 [agent/embedded] embedded run tool start: runId=77e2acd3-d703-4f58-bd4e-49740143814e tool=web_search toolCallId=tooluse_YJigPdS1Imp7He2GFz4cRc
+04:01:36.974 7c1d1ae89dc9 [openclaw:err] 2026-10-04T04:01:36.962+00:00 [tools] web_search failed: SECURITY NOTICE: The following content is from an EXTERNAL, UNTRUSTED source (e.g., email, webhook).
+04:01:41.289 7c1d1ae89dc9 [proxy:out] [proxy] Stream complete: 26170in/163out tokens
+04:01:44.513 7c1d1ae89dc9 [proxy:out] [proxy] Stream complete: 26388in/58out tokens, 1 tool call(s)
+04:01:44.532 7c1d1ae89dc9 [openclaw:out] 2026-10-04T04:01:44.531+00:00 [agent/embedded] embedded run tool start: runId=abfb877d-781a-4e91-abc7-0b375b96969d tool=web_fetch toolCallId=tooluse_EiuwbJip5OkP150ip7E1vV
+04:02:14.808 7c1d1ae89dc9 [openclaw:out] fetch failed | Connect Timeout Error (attempted address: example.com:443, timeout: 30000ms) | UND_ERR_CONNECT_TIMEOUT
+04:02:14.809 7c1d1ae89dc9 [openclaw:err] 2026-10-04T04:02:14.806+00:00 [tools] web_fetch failed: SECURITY NOTICE: The following content is from an EXTERNAL, UNTRUSTED source (e.g., email, webhook).
+04:02:14.811 7c1d1ae89dc9 [openclaw:err] fetch failed | Connect Timeout Error (attempted address: example.com:443, timeout: 30000ms) | UND_ERR_CONNECT_TIMEOUT
+04:02:22.091 7c1d1ae89dc9 [proxy:out] [proxy] Stream complete: 26741in/543out tokens
+04:02:53.743 4121e88576f5 [contract] Init for user=user_19f750f3477c6e39 actor=test:n05 namespace=test_n05
+04:02:53.791 4121e88576f5 [contract] Scoped S3 credentials created and applied
+04:02:53.814 4121e88576f5 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_n05/.openclaw/
+04:02:53.864 4121e88576f5 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+04:02:53.885 4121e88576f5 [contract] Routing via lightweight agent (warm-up)
+04:02:56.292 4121e88576f5 [proxy:out] [proxy] Response: 2518in/23out tokens
+04:02:57.118 4121e88576f5 [proxy:out] [proxy] Response: 5392in/81out tokens
+04:03:03.903 4121e88576f5 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+04:03:12.538 4121e88576f5 [proxy:out] [proxy] Stream complete: 25825in/30out tokens
+04:03:24.883 423c24bf4094 [contract] Init for user=user_f2f24ff8417c1e1a actor=test:n06 namespace=test_n06
+04:03:24.945 423c24bf4094 [contract] Scoped S3 credentials created and applied
+04:03:25.018 423c24bf4094 [workspace-sync] Restoring workspace from s3://wp7-openclaw-050571774557/test_n06/.openclaw/
+04:03:25.069 423c24bf4094 [workspace-sync] Restored 0 file(s) to /root/.openclaw (no saved state in S3 — new user)
+04:03:25.091 423c24bf4094 [contract] Routing via lightweight agent (warm-up)
+04:03:27.231 423c24bf4094 [proxy:out] [proxy] Response: 2518in/23out tokens
+04:03:28.082 423c24bf4094 [proxy:out] [proxy] Response: 5653in/75out tokens
+04:03:35.107 423c24bf4094 [contract] OpenClaw ready — switching from lightweight agent to full OpenClaw
+04:03:43.033 423c24bf4094 [proxy:out] [proxy] Stream complete: 25832in/30out tokens

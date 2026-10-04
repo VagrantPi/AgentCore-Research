@@ -1,0 +1,16 @@
+{
+ "caller": "arn:aws:sts::050571774557:assumed-role/wp5-agent-exec/BedrockAgentCore-5500e417-bf7e-46be-8eeb-3b35de2ca6c1",
+ "ListBrowserProfiles": {
+  "result": "AccessDeniedException",
+  "message": "User: arn:aws:sts::050571774557:assumed-role/wp5-agent-exec/BedrockAgentCore-5500e417-bf7e-46be-8eeb-3b35de2ca6c1 is not authorized to perform: bedrock-agentcore:ListBrowserProfiles on resource: arn:a"
+ },
+ "GetBrowserProfile userA__example_com-yxhNOKhfsC": {
+  "result": "AccessDeniedException",
+  "message": "User: arn:aws:sts::050571774557:assumed-role/wp5-agent-exec/BedrockAgentCore-5500e417-bf7e-46be-8eeb-3b35de2ca6c1 is not authorized to perform: bedrock-agentcore:GetBrowserProfile on resource: arn:aws"
+ },
+ "GetBrowserProfile userB__example_com-LX75w0kfGa": {
+  "result": "AccessDeniedException",
+  "message": "User: arn:aws:sts::050571774557:assumed-role/wp5-agent-exec/BedrockAgentCore-5500e417-bf7e-46be-8eeb-3b35de2ca6c1 is not authorized to perform: bedrock-agentcore:GetBrowserProfile on resource: arn:aws"
+ },
+ "client_roundtrip_ms": 1271
+}

@@ -11,6 +11,8 @@ agent 每個請求：用 actor_token 連 HephAgora 的 /mcp → 拿到「這位�
 - probe=browser：在 VM 裡直接呼叫 StartBrowserSession（browser_ids），預期 AccessDenied
 - probe=mcp_latency：帶 actor_token 直接用 MCP 連續呼叫 tool n 次，回傳 p50／p90
 - probe=egress：VM 能連到哪裡（外網、S3、STS、自家 MCP server），WP3 #8 用
+- probe=abuse：WP5 #10，VM 裡拿 A 的 token 試讀 victim 的 todo、呼叫沒買的技能，等過期再打一次
+- probe=profile：WP5 #11，用 execution role 讀 Browser profile（profile_ids），預期 AccessDenied
 
 回傳 answer 以外的證據欄位：
 - tools_visible：這次 MCP tools/list 拿到的工具名
@@ -157,9 +159,78 @@ def _probe_egress(actor_token: str | None) -> dict:
     return out
 
 
+def _probe_abuse(actor_token: str, victim: str) -> dict:
+    """WP5 #10：VM 裡拿到 A 的 token，能做到多少事。直接打 HTTP（不經 MCP client／模型），
+    每一步留狀態碼與回應前 300 字。最後等 token 過期再打一次。"""
+    import base64
+    import json
+    import urllib.error
+    import urllib.request
+
+    base = HA_MCP_URL.rsplit("/mcp", 1)[0]
+
+    def post(path: str, body: dict) -> dict:
+        req = urllib.request.Request(
+            base + path, data=json.dumps(body).encode(), method="POST",
+            headers={"authorization": f"Bearer {actor_token}", "content-type": "application/json",
+                     "accept": "application/json, text/event-stream"})
+        try:
+            with urllib.request.urlopen(req, timeout=10) as r:
+                return {"http": r.status, "body": r.read().decode()[:300]}
+        except urllib.error.HTTPError as e:
+            return {"http": e.code, "body": e.read().decode()[:300]}
+
+    def mcp(method: str, params: dict) -> dict:
+        return post("/mcp", {"jsonrpc": "2.0", "id": 1, "method": method, "params": params})
+
+    def invoke(service: str, cap: str, args: dict) -> dict:
+        return post("/v1/invoke", {"ref": {"service_id": service, "capability": cap}, "arguments": args})
+
+    out = {"steps": {}}
+    s = out["steps"]
+    s["1 /mcp tools/list"] = mcp("tools/list", {})
+    s["2 /mcp todo 帶 user_id=被害者"] = mcp("tools/call", {"name": "com_wp2_todo__list_todos", "arguments": {"user_id": victim}})
+    s["3 /v1/invoke todo 帶 user_id=被害者"] = invoke("com.wp2.todo", "list_todos", {"user_id": victim})
+    s["4 /mcp 呼叫沒買的 flight"] = mcp("tools/call", {"name": "com_wp2_flight__search_flights", "arguments": {"from": "TPE", "to": "NRT"}})
+    s["5 /v1/invoke 呼叫沒買的 flight"] = invoke("com.wp2.flight", "search_flights", {"from": "TPE", "to": "NRT"})
+
+    # 等到 exp 過後 10 秒（server 容許 5 秒時鐘誤差）
+    exp = json.loads(base64.urlsafe_b64decode(actor_token.split(".")[1] + "=="))["exp"]
+    wait = max(0, exp + 10 - time.time())
+    time.sleep(wait)
+    out["waited_s"] = round(wait, 1)
+    s["6 過期後 /mcp tools/list"] = mcp("tools/list", {})
+    s["7 過期後 /v1/invoke todo"] = invoke("com.wp2.todo", "list_todos", {})
+    return out
+
+
+def _probe_profile(profile_ids: list[str]) -> dict:
+    """WP5 #11：用 Runtime 的 execution role 讀 Browser profile，預期全部 AccessDenied。"""
+    import boto3
+    from botocore.exceptions import ClientError
+
+    out = {"caller": boto3.client("sts", region_name=REGION).get_caller_identity()["Arn"]}
+    ctl = boto3.client("bedrock-agentcore-control", region_name=REGION)
+    calls = {"ListBrowserProfiles": lambda: ctl.list_browser_profiles()}
+    for pid in profile_ids:
+        calls[f"GetBrowserProfile {pid}"] = lambda pid=pid: ctl.get_browser_profile(profileId=pid)
+    for name, fn in calls.items():
+        try:
+            r = fn()
+            r.pop("ResponseMetadata", None)
+            out[name] = {"result": "ALLOWED (unexpected)", "response": str(r)[:200]}
+        except ClientError as e:
+            out[name] = {"result": e.response["Error"]["Code"], "message": e.response["Error"]["Message"][:200]}
+    return out
+
+
 @app.entrypoint
 async def invoke(payload: dict) -> dict:
     probe = payload.get("probe")
+    if probe == "abuse":
+        return await asyncio.to_thread(_probe_abuse, payload["actor_token"], payload.get("victim", "userB"))
+    if probe == "profile":
+        return await asyncio.to_thread(_probe_profile, payload.get("profile_ids", []))
     if probe == "egress":
         return await asyncio.to_thread(_probe_egress, payload.get("actor_token"))
     if probe == "browser":

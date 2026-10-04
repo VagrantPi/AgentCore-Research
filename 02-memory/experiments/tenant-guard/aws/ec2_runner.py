@@ -120,8 +120,13 @@ def fetch():
 
 def cleanup():
     if iid := st.get("cost3dInstance"):
-        ec2.terminate_instances(InstanceIds=[iid])
-        print("terminate", iid)
+        try:
+            ec2.terminate_instances(InstanceIds=[iid])
+            print("terminate", iid)
+        except ec2.exceptions.ClientError as e:
+            if "InvalidInstanceID.NotFound" not in str(e):
+                raise
+            print(iid, "已自行終止")   # 跑完自己關機即終止，正常情況
     if bucket := st.get("cost3dBucket"):
         assert bucket.startswith("wp5-")
         for o in s3.list_objects_v2(Bucket=bucket).get("Contents", []):

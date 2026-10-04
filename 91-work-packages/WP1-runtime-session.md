@@ -71,6 +71,8 @@
 ## 回填
 
 > **部分回填（2026-10-02）：** 除了 #11 都跑完了，全部是 PUBLIC。#11（VPC 組）等 B 在 WP3 建好 VPC。#10（成本情境）用 `USAGE_LOGS` 實測，見檢核表與下方「#10 成本情境」。
+>
+> **#11 回填（2026-10-04）：** 借 WP7 建的無 NAT VPC 量完，VPC 不增加冷啟動時間。
 
 - 負責人：kais
 - 執行日期：2026-10-02
@@ -100,6 +102,7 @@
 | 8′ | 阻塞版本是否在閒置逾時後被砍 | `[官方已寫]` | 通過，而且範圍更大：180 秒的請求（閒置逾時 60 秒）在阻塞版（156.7 s）和**回 `Healthy` 的多執行緒版**（246.8 s）都收到 `RuntimeClientError`、session 被終止；處理中回 `HealthyBusy` 的版本 180.2 s 成功 | `concurrent.csv` | 長任務一定要回 `HealthyBusy`。正式環境閒置逾時預設 15 分鐘，所以超過 15 分鐘的請求適用 |
 | 9 | Session 建立速率上限 | `[矛盾]` | 沒有碰到上限：100 個新 session 在約 1 秒內送出，0 次 throttle | `burst.csv` | 1.6/s 不成立；25/s 是持續速率還是上限，這個規模分辨不出來。不影響選型 |
 | 10 | 20 位使用者 2 小時的費用；換算 100 位使用者月費 | 成本 | 20 位：0.5114 vCPU-h、53.45 GB-h，**$0.551**（依實測用量計價）。每人一次 2 小時在線 $0.0275 → 100 人 × 30 天 **約 $82.6 / 月** | `wp1-cost.csv`、`cost_scenario.csv`、原始 log `wp1_cost_usage_logs.jsonl.gz`；見下方「#10 成本情境」 | 費用只跟 session 活著的秒數成正比，跟呼叫次數幾乎無關；九成以上是記憶體。最後一次使用後立刻 `StopRuntimeSession` 可省掉閒置的 21%（約 $65 / 月） |
+| 11 | VPC 模式比 PUBLIC 多出的冷啟動時間 | `[官方已寫]`（官方只說「可能增加」） | **約 0 ms**（2026-10-04，同一個 `:wp1` 映像、同一段時間交錯量測）。從池子：V1 PUBLIC 611 / 660 ms、VPC 612 / 684 ms；V2 PUBLIC 1998 / 2362 ms、VPC 1914 / 1988 ms（p50 / p90，各 20 次）。池子用光後的真冷啟動（burst 30）：V1 PUBLIC 3793 / 3802 ms、VPC 3603 / 3683 ms。唯一的差別在建立：V2 VPC 等 READY **527 s**，PUBLIC 183 s（V1 都在 10 s 內） | `results.csv`、`burst.csv`（`wp1_cs_*_img_vpc`）；[結果表](../01-runtime/experiments/cold-start/README.md#結果)。VPC 是 WP7 建的無 NAT、無 IGW VPC（`apne1-az4`、`az1`，S3 gateway＋ECR `api`／`dkr`＋Logs 等 interface endpoint） | 冷啟動不必為 VPC 加預算，選 VPC 只看 endpoint 月費（見 [WP3 回填 B 半](WP3-sandbox-egress.md#回填)）。V2 的部署時間要多算約 6 分鐘 |
 
 - 平台在 handler 忙碌時約每 2 秒打一次 `/ping`。
 - 阻塞版那次 87 s、換了 `boot_token`：和 8′ 一致，阻塞約 60 秒、超過閒置逾時後 VM 被換掉。
@@ -132,7 +135,16 @@
 |---|---|---|---|---|
 | Runtime（7 個 wp1_ runtime） | 約 470 個 session，每個活幾秒到約 4 分鐘；burst 的 280 個沒有主動停止，閒置 60 秒後回收 | 自己計數；這批 runtime 沒開 `USAGE_LOGS` | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 遠低於 1（未精算） |
 | Runtime `wp1_cost_v1_img_pub`（#10，20 個 session + 2 個乾跑） | 0.512418 vCPU-h、53.511837 GB-h | `USAGE_LOGS`，與 metric 對帳見 #10 | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 0.551548 |
+| Runtime（#11：`wp1_cs_v1_img_pub`、`_vpc`、`wp1_cs_v2_img_pub`、`_vpc`，140 個 session） | 0.177087 vCPU-h、2.911031 GB-h | `USAGE_LOGS`（2026-10-04 07:18 UTC，`usage_cost.py` 跑兩次結果相同） | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 0.043361 |
+| VPC endpoint、NAT（#11 借用 WP7 的 VPC） | — | — | — | 計入 [WP7](WP7-openclaw-on-agentcore.md#實際費用) |
 | ECR | 約 1.1 GB（`:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy`，小的幾乎不佔空間） | 自己計數 | — | 每月約 0.1 |
+
+### 沒有補做的項目（成本高、對選型沒有影響）
+
+| 項目 | 為什麼沒做 | 要補的話 |
+|---|---|---|
+| #11 的 1 GB 映像 VPC 版 | `bench.py` 的矩陣本來就不建 `bigimg × vpc`；`:wp1-big` 映像已在清理時刪除，補測要重新 build、push 1 GB 映像並重建 VPC。小映像在池子內外都看不出 VPC 的差別，沒有理由認為大映像會不同 | 重建 `:wp1-big`，`bench.py` 拿掉 `bigimg × vpc` 的排除，再跑 `measure`、`burst` |
+| #11 多輪重複 | PUBLIC 與 VPC 各量 1 輪（`measure` 20 次、`burst` 30 次）。VPC 減 PUBLIC 的差距在 -374 到 +24 ms 之間，方向不一致（多數時候 VPC 反而稍快），不會改變「VPC 不增加冷啟動」的結論 | 在同一個 VPC 換時段再跑 2–3 輪 |
 
 ### 否定項目的替代方案
 
@@ -144,9 +156,9 @@
 ### 清理確認
 
 - [x] #10 的 runtime `wp1_cost_v1_img_pub`、delivery source `wp1_cost-usage-src` 與它的 delivery 已刪除（2026-10-02）；`wp0-usage-dst` 和 log group 是 WP0 的，保留
-- [ ] 其餘 Runtime 已刪除——**刻意保留**給 #11（VPC 組要跟 PUBLIC 比）：`wp1_cs_v1_img_pub`、`wp1_cs_v2_img_pub`、`wp1_cs_v1_bigimg_pub`、`wp1_cs_v2_bigimg_pub`、`wp1_cs_v1_img_pub_blk`、`wp1_cs_v1_img_pub_busy`、`wp1_ss_v1_img_pub`（含 endpoint `wp1_pinned`）。沒有 session 時不計運算費
-- [ ] ECR image `wp-agentcore-coldstart:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy` 待 WP1 全部跑完再刪
-- [ ] 隔天確認 Runtime 沒有仍在跑的 session
+- [x] 其餘 Runtime 已刪除（2026-10-04）：`wp1_cs_v1_bigimg_pub`、`wp1_cs_v2_bigimg_pub`、`wp1_cs_v1_img_pub_blk`、`wp1_cs_v1_img_pub_busy`、`wp1_ss_v1_img_pub`（含 endpoint `wp1_pinned`）06:30 UTC；#11 用的 `wp1_cs_v1_img_pub`、`wp1_cs_v2_img_pub`、`wp1_cs_v1_img_vpc`、`wp1_cs_v2_img_vpc` 與它們的 `USAGE_LOGS` 投遞 07:19 UTC
+- [x] ECR image `wp-agentcore-coldstart:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy` 已刪除（07:20 UTC）；repo 與 `:small` 屬於 WP0，保留
+- [ ] 隔天確認 Runtime 沒有仍在跑的 session；VPC 與服務連結角色的刪除見 [WP7 清理確認](WP7-openclaw-on-agentcore.md#清理確認)
 
 ### 要更正研究庫的段落
 
@@ -159,3 +171,5 @@
 | `01-runtime/README.md` 配額 | session 建立速率 1.6/s 或 25/s | 100 個在約 1 秒內送出都沒被 throttle |
 | `01-runtime/README.md:202` | 沒設定 `requireMMDSV2` 的 runtime 呼叫會失敗 | `CreateAgentRuntime` 新建的 runtime 預設就是 `requireMMDSV2: true` |
 | `01-runtime/README.md:210` 一節 | 冷啟動沒有數字 | 補上本次結果，連到實驗 README |
+| `01-runtime/README.md:220` | VPC 模式：官方提到可能增加 session 的啟動時間 | #11：冷啟動不增加（池子內外都約 0 ms）；只有 V2 建立 runtime 時等 READY 從 183 秒變 527 秒 |
+| `01-runtime/README.md:266` | 冷啟動實驗尚未在 AWS 上實跑 | PUBLIC 組 2026-10-02、VPC 組 2026-10-04 已實跑，見實驗 README |
