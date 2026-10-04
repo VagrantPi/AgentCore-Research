@@ -26,7 +26,7 @@
 | Identity：**outbound** | 為每個使用者走 OAuth 授權流程，並保管 refresh token | **高** | 每個 SaaS 的 OAuth 實作都有差異，還要處理 token 加密保存、自動刷新、撤銷，以及**「agent 代替這位使用者行事」的授權鏈** |
 | Policy | 在工具 proxy 前面放 OPA 或 Cedar | 中 | 引擎是現成的，但要在每次工具呼叫前都攔截，並把工具的參數轉成 policy 能評估的格式。「買了才能用」這種簡單規則，用 Cedar 也省不了程式碼（手寫 70 行約剩 60 行），多得到的是型別檢查與形式驗證；Node 內嵌的 opa-wasm 2024-11 後沒有新版（[WP6](../91-work-packages/WP6-oss-alternatives.md#第-3-層工具閘道與授權)） |
 | Code Interpreter | 自己架沙箱，或向 E2B 這類第三方購買 | **高** | 跟 Runtime 隔離是同一個問題，而且更嚴重，因為這裡**本來就是要執行任意程式碼** |
-| Browser | 自己維運一組 headless Chrome；或買 Browserbase、Steel、Cloudflare Browser Run | 中–高 | 並發擴展、錄製 session、live view、登入狀態保存、代理設定。託管的 Steel、Cloudflare 有接手交還機制，價格與 AgentCore 相近（每 browser-hour $0.09–0.12）；**手機上操作 Live View 沒有一家官方支援**，AgentCore 的 DCV 也不支援（[WP6](../91-work-packages/WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)） |
+| Browser | 自己維運一組 headless Chrome；或買 Browserbase、Steel、Cloudflare Browser Run | 中–高 | 並發擴展、錄製 session、live view、登入狀態保存、代理設定。託管的 Steel、Cloudflare 有接手交還機制，價格與 AgentCore 相近（每 browser-hour $0.09–0.12）；手機上操作 Live View 託管的沒有一家官方支援，AgentCore 的 DCV Web Client SDK 反而從 1.10.1 起官方支援 iOS、Android 瀏覽器（[WP6](../91-work-packages/WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)） |
 | Observability | OTel Collector 加上 Langfuse、Phoenix、Tempo 這類工具 | 中 | trace 與 LLM 成本換算成熟，但把 VM、記憶等非 LLM 成本分攤到每位使用者沒有現成方案。Langfuse 自架要六個元件（含 ClickHouse），OTLP 只收 HTTP（[WP6](../91-work-packages/WP6-oss-alternatives.md#第-6-層可觀測與成本分攤)） |
 | Evaluations | DeepEval、Ragas 等開源工具，外加自己的排程 pipeline | 中 | 「對正式流量做抽樣、持續評分」這條 pipeline 要自己寫 |
 | Payments | 自行串接加密貨幣錢包與 x402 | 高 | 應用領域很窄，大多數團隊用不到 |

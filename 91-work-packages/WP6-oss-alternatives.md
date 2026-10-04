@@ -302,7 +302,7 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 
 1. 第 2 層：OpenClaw 可以只靠設定檔在框架外鎖掉 exec、上網（實測），但預設全開、經 HTTP 進來的請求等同 owner、官方明說一個租戶一個 gateway；自架就是每人一台機器，100 人 24h 約 $3.5k／月，跟 AgentCore 保守估算（$3.4k）差不多、是實測值（$832）的 4 倍。Strands 本身不帶多餘工具，但每個聊天室要一個 Agent 實例。
 2. 第 3 層：授權函式庫（Cedar、OPA、Casbin）省不了程式碼，手寫 70 行換成 Cedar 還有約 60 行（查 DB、403／429、限流、計量都還在）；多得到的是型別檢查與日後的形式驗證。MCP gateway 類專案要多養一個服務、購買資料要多一份，不值得。**維持 WP2 的手寫做法。**
-3. 第 4 層：沒有任何託管瀏覽器在官方文件寫明支援「手機上操作 Live View」，AgentCore 也一樣；Steel、Cloudflare Browser Run 有正式的接手、交還機制。價格上只有 Cloudflare 比 AgentCore Browser 便宜一點（每小時 $0.09 vs $0.101），Live View 實測待做。
+3. 第 4 層：託管瀏覽器沒有一家在官方文件寫明支援「手機上操作 Live View」；反而 AgentCore 用的 DCV Web Client SDK 從 1.10.1（2025-10-22）起支援 iOS Safari／Chrome、Android Chrome 與觸控 `[官方已寫]`。Steel、Cloudflare Browser Run 有正式的接手、交還機制。價格上只有 Cloudflare 比 AgentCore Browser 便宜一點（每小時 $0.09 vs $0.101），Live View 實測待做。
 
 #### 第 2 層：Agent 框架與技能
 
@@ -364,6 +364,7 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 - 來源：[Browserbase live view](https://docs.browserbase.com/features/session-live-view)、[Browserbase contexts](https://docs.browserbase.com/features/contexts)、[Browserbase pause/resume](https://www.browserbase.com/changelog/pause-and-resume-for-agents)、[Steel human-in-the-loop](https://docs.steel.dev/overview/sessions-api/human-in-the-loop)、[steel-mcp-server](https://github.com/steel-dev/steel-mcp-server)、[Steel profiles](https://docs.steel.dev/overview/profiles-api/overview)、[noVNC](https://github.com/novnc/noVNC)、[Cloudflare live view](https://developers.cloudflare.com/browser-run/features/live-view/)、[Cloudflare human-in-the-loop](https://developers.cloudflare.com/browser-run/features/human-in-the-loop/) `[官方已寫]`
 - browserless 是 SSPL-1.0，閉源商用要買商業授權，不採用。
 - 風險：Cloudflare 官方寫 Browser Run 一律被標成 bot 流量，有些網站即使是人在登入也可能被擋；Cloudflare Live View 連結預設 5 分鐘內要開始連線（最長可設 1 小時），推播後使用者晚開就會失效。Browserbase 每個 session 最少算 1 分鐘，頻繁開短 session 比 AgentCore（實測每次約 5–6 秒計費）貴。
+- `[矛盾]` AgentCore Live View 能不能在手機上用：[DCV Web Client SDK release notes](https://docs.aws.amazon.com/dcv/latest/websdkguide/doc-history-release-notes.html) 1.10.1（2025-10-22）寫「Added mobile browser support (Chrome on Android, Chrome and Safari on iOS)」並加了 `setTrackpadMode`；較舊的支援瀏覽器表沒有手機。以 release notes 為準。WP2 #8 回填寫的「DCV 網頁客戶端官方不支援 iOS／Android」要更正。
 - `[矛盾]` Browserbase API 文件寫 `keepAlive` 是「Hobby Plan and above」，定價頁沒有 Hobby 方案；Steel 2025-10 部落格的方案名稱與現行文件對不上。
 
 **價格**（定價頁讀取日 2026-10-04）
@@ -398,7 +399,7 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 | 3 | 每人每月成本有官網價，標日期；閒置另列 | 成本 | 通過（B 半，估算） | 上方價格表、下方「實際費用」、`evidence/WP6/L4-*` | — |
 | 4 | 自架要自己維運的元件與估點 | `[推測]` | 通過（B 半） | 下方「維運元件」 | — |
 | 6 | OpenClaw 自架時，能否在框架外強制工具白名單 | `[推測]` | **可以，但不是預設**：`tools.deny` 關掉 exec、上網後，以使用者身分要求執行指令、讀網頁都被拒（實測）；預設設定兩者都會照做（實測） | [探測結果](../90-integrations/experiments/chatroom-concurrency/README.md#結果2026-10-04) | 不是阻斷項，但要另外補三件事，見下方 |
-| 7 | 有沒有候選能做到「使用者接手登入、交還後 agent 繼續」 | `[推測]` | Steel（steel-mcp-server handoff）、Cloudflare Browser Run（`Cloudflare.handoff`）有正式機制；**手機上能否操作，沒有一家官方寫支援**（noVNC 支援手機，但交還要自己做） | 上方第 4 層表 | 方案 B（AgentCore DCV 不支援手機）和方案 C 卡在同一個問題，要實機驗證 |
+| 7 | 有沒有候選能做到「使用者接手登入、交還後 agent 繼續」 | `[推測]` | Steel（steel-mcp-server handoff）、Cloudflare Browser Run（`Cloudflare.handoff`）有正式機制；**手機上能否操作，託管的沒有一家官方寫支援**（noVNC 支援手機，但交還要自己做） | 上方第 4 層表 | 方案 B 反而比較有把握：DCV Web Client SDK 1.10.1 起官方支援手機瀏覽器 `[官方已寫]`；hephclaw 的 iOS App 已在 Simulator 的真 WKWebView 收到 AgentCore Live View 串流（1280×720，`canvasHasContent: true`），實體 iPhone 的觸控與鍵盤未驗證（hephclaw `docs/agent-workspace/mobile-browser-research-20260930.md`）。方案 C 選託管瀏覽器時要自己實機驗證 |
 | 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | **無** | 下方「#8 門檻」 | 方案 C 不用為了省錢再投入 |
 
 **#6 鎖緊後還要補的三件事**
@@ -470,4 +471,5 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 | `00-overview/build-vs-buy.md:19` | Harness：框架都已經處理好了，低 | 框架本身低；但 OpenClaw 預設全開、一個租戶一個 gateway，每人一台機器；Strands 每個聊天室要一個 Agent 實例 |
 | `00-overview/build-vs-buy.md:24` | Gateway：自己架 MCP server，中 | 技能授權放自家 MCP server 手寫即可（WP2 實證），MCP gateway 類專案要多養服務、購買資料多一份，不值得 |
 | `00-overview/build-vs-buy.md:27` | Policy：在工具 proxy 前面放 OPA 或 Cedar，中 | 「買了才能用」這種規則，函式庫省不了程式碼（70 行→約 60 行），多得到的是型別檢查與形式驗證；規則變複雜再用 Cedar |
-| `00-overview/build-vs-buy.md:29` | Browser：自己維運一組 headless Chrome，中–高 | 託管（Cloudflare、Steel）有接手交還機制、價格與 AgentCore 相近；手機上操作 Live View 沒有一家官方支援；自架要做接手狀態機與手機觸控，約 27 點 |
+| `91-work-packages/WP2-capability-boundary.md:205` | #8：要另測手機能否開 Live View（DCV 網頁客戶端官方不支援 iOS／Android） | DCV Web Client SDK 1.10.1 起官方支援 iOS Safari／Chrome、Android Chrome `[官方已寫]`；hephclaw 已在 Simulator 真 WKWebView 收到串流，實機未驗證 |
+| `00-overview/build-vs-buy.md:29` | Browser：自己維運一組 headless Chrome，中–高 | 託管（Cloudflare、Steel）有接手交還機制、價格與 AgentCore 相近；手機上操作 Live View 託管的沒有一家官方支援（AgentCore 的 DCV 1.10.1 起支援）；自架要做接手狀態機與手機觸控，約 27 點 |
