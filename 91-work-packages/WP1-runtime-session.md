@@ -135,6 +135,8 @@
 |---|---|---|---|---|
 | Runtime（7 個 wp1_ runtime） | 約 470 個 session，每個活幾秒到約 4 分鐘；burst 的 280 個沒有主動停止，閒置 60 秒後回收 | 自己計數；這批 runtime 沒開 `USAGE_LOGS` | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 遠低於 1（未精算） |
 | Runtime `wp1_cost_v1_img_pub`（#10，20 個 session + 2 個乾跑） | 0.512418 vCPU-h、53.511837 GB-h | `USAGE_LOGS`，與 metric 對帳見 #10 | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 0.551548 |
+| Runtime（#11：`wp1_cs_v1_img_pub`、`_vpc`、`wp1_cs_v2_img_pub`、`_vpc`，140 個 session） | 0.177087 vCPU-h、2.911031 GB-h | `USAGE_LOGS`（2026-10-04 07:18 UTC，`usage_cost.py` 跑兩次結果相同） | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 0.043361 |
+| VPC endpoint、NAT（#11 借用 WP7 的 VPC） | — | — | — | 計入 [WP7](WP7-openclaw-on-agentcore.md#實際費用) |
 | ECR | 約 1.1 GB（`:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy`，小的幾乎不佔空間） | 自己計數 | — | 每月約 0.1 |
 
 ### 否定項目的替代方案
@@ -147,9 +149,9 @@
 ### 清理確認
 
 - [x] #10 的 runtime `wp1_cost_v1_img_pub`、delivery source `wp1_cost-usage-src` 與它的 delivery 已刪除（2026-10-02）；`wp0-usage-dst` 和 log group 是 WP0 的，保留
-- [ ] 其餘 Runtime 已刪除——**刻意保留**給 #11（VPC 組要跟 PUBLIC 比）：`wp1_cs_v1_img_pub`、`wp1_cs_v2_img_pub`、`wp1_cs_v1_bigimg_pub`、`wp1_cs_v2_bigimg_pub`、`wp1_cs_v1_img_pub_blk`、`wp1_cs_v1_img_pub_busy`、`wp1_ss_v1_img_pub`（含 endpoint `wp1_pinned`）。沒有 session 時不計運算費
-- [ ] ECR image `wp-agentcore-coldstart:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy` 待 WP1 全部跑完再刪
-- [ ] 隔天確認 Runtime 沒有仍在跑的 session
+- [x] 其餘 Runtime 已刪除（2026-10-04）：`wp1_cs_v1_bigimg_pub`、`wp1_cs_v2_bigimg_pub`、`wp1_cs_v1_img_pub_blk`、`wp1_cs_v1_img_pub_busy`、`wp1_ss_v1_img_pub`（含 endpoint `wp1_pinned`）06:30 UTC；#11 用的 `wp1_cs_v1_img_pub`、`wp1_cs_v2_img_pub`、`wp1_cs_v1_img_vpc`、`wp1_cs_v2_img_vpc` 與它們的 `USAGE_LOGS` 投遞 07:19 UTC
+- [x] ECR image `wp-agentcore-coldstart:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy` 已刪除（07:20 UTC）；repo 與 `:small` 屬於 WP0，保留
+- [ ] 隔天確認 Runtime 沒有仍在跑的 session；VPC 與服務連結角色的刪除見 [WP7 清理確認](WP7-openclaw-on-agentcore.md#清理確認)
 
 ### 要更正研究庫的段落
 
