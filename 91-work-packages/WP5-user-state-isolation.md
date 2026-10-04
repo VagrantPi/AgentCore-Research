@@ -257,3 +257,20 @@ python3 -c "import gzip, sys; from usage_cost import aggregate, write_csv; write
 | `91-work-packages/README.md:137` | 使用者 token（#10、#11）等 WP2 | #10、#11 都通過（2026-10-04，用重建的 HephAgora）。README 由 Kais 統一更新，本次不改 |
 | `05-built-in-tools/browser-reliability-security.md:45` | 生命週期從 `CreateBrowserProfile` 開始，沒說要不要先建 Browser | `CreateBrowserProfile` 只需要 name（可加 tag），不依附任何 Browser；profile 和 Browser 是兩個獨立資源 |
 | `08-policy/experiments/skill-gating/README.md:6` | HephAgora 分支「尚未推上 GitLab；推上後補連結」 | 原分支一直沒推，已由 Kais 重建同名分支；差異見本節開頭（README 已同步改） |
+
+### 模型 token 費（補，2026-10-05）
+
+上面 #8 的每人月費（約 $2.53–2.84）不含模型 token。補測方案 B agent 形狀（Strands＋經 HephAgora MCP 的工具）一天 10 輪的實際 token 數，細節與限制見 [`token-cost`](../90-integrations/experiments/token-cost/README.md)。
+
+| 組合 | 每人每月（10 輪／天） | 每輪輸入／輸出 token |
+|---|---|---|
+| Haiku 4.5 `jp.` | **約 $0.9–1.4** | 約 2,000–2,600／200 |
+| Sonnet 4.6 `global.`，不開 cache | **約 $2.9–3.4** | 約 2,500／190 |
+| Sonnet 4.6，開 cache、輪與輪連續送 | 約 $2.1–2.4 | — |
+| Sonnet 4.6，開 cache、輪與輪間隔超過 5 分鐘（最壞） | 約 $3.4–4.1（比不開還貴） | — |
+
+- **含模型的每人每月：Haiku 約 $3.4–4.2、Sonnet 約 $5.4–6.3**（基礎設施 $2.53–2.84 ＋ 模型費）。
+- Haiku 4.5 每個 cache 點至少 4,096 token，這次上下文不夠長，開了 cache 也沒作用；Sonnet 4.6 是 1,024。
+- 這次的工具結果與 system prompt 都很短。每次呼叫多 1,000 個固定 token，每人每月 Haiku +$0.43、Sonnet +$1.17（不快取）。
+- 單價：Price List 公開檔 `AmazonBedrockFoundationModels`／東京，publicationDate 2026-09-30。實驗模型費約 $0.54。
+

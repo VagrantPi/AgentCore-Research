@@ -134,11 +134,11 @@
 | 能力邊界能否在 agent 外強制 | [WP2](WP2-capability-boundary.md#回填) + [WP3](WP3-sandbox-egress.md#回填)：通過（自家 MCP server 授權 agent 繞不過；VPC 無 NAT 擋得住外網） | [WP7](WP7-openclaw-on-agentcore.md#回填)：預設會上網、執行程式；改 endpoint 設定後無 NAT 可用，只剩聊天與寫程式 | [WP6](WP6-oss-alternatives.md#b-半第-234-層)：OpenClaw `tools.deny` 鎖得住，但預設全開、HTTP 請求等同 owner、網路要另外擋 |
 | 接手登入 | [WP2 #8](WP2-capability-boundary.md#8-補做接手登入由-server-主導2026-10-05kais)＋[WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：server 主導流程在 iOS 模擬器通過，agent 拿不到 URL；要處理雲端 Chrome 存密碼、鍵盤開著時點擊偏移；實體手機未驗 | — | [WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：Steel、Cloudflare 有交還機制；手機操作沒有一家官方支援 |
 | 資料隔離 | [WP5](WP5-user-state-isolation.md#回填)：通過（Memory、臨時憑證、VM 裡的使用者 token、Browser profile） | 未測 | [WP6](WP6-oss-alternatives.md#第-5-層記憶)：只有 pgvector＋RLS 能在資料層強制，其他靠應用層帶 `user_id` |
-| 每位使用者每月實際成本 | [WP5](WP5-user-state-isolation.md#實際費用)：約 $2.53–2.84（估算，**不含模型 token**） | [WP7](WP7-openclaw-on-agentcore.md#實際費用)：約 $20.7（**含模型**，模型佔 94%）＋網路固定費約 $188／月 | [WP6](WP6-oss-alternatives.md#實際費用)：OpenClaw 每人一台 $35.4（24h）／$14.4（每天 8h），不含模型；沒有比方案 B 便宜的人數門檻 |
+| 每位使用者每月實際成本 | [WP5](WP5-user-state-isolation.md#模型-token-費補2026-10-05)：基礎設施約 $2.53–2.84；**含模型（每天 10 輪）Haiku 4.5 約 $3.4–4.2、Sonnet 4.6 約 $5.4–6.3**（[token-cost](../90-integrations/experiments/token-cost/README.md)） | [WP7](WP7-openclaw-on-agentcore.md#實際費用)：約 $20.7（**含模型**，模型佔 94%）＋網路固定費約 $188／月 | [WP6](WP6-oss-alternatives.md#實際費用)：OpenClaw 每人一台 $35.4（24h）／$14.4（每天 8h），不含模型；沒有比方案 B 便宜的人數門檻 |
 | 要自己維運的元件 | 少 | 中 | [WP6](WP6-oss-alternatives.md#回填)：挑最省的路線也約 60 點 |
 | 關鍵否定項（阻斷） | 無 | 無（#6 改設定可過） | 無；但成本沒有優勢 |
 
-- **每人月費三欄不能直接比**：方案 B 不含模型 token，方案 A 含（WP7 實測模型佔 94%）。最大的缺口是方案 B 的模型 token 費，要等正式 agent 上 Runtime 後用 `USAGE_LOGS` 與 Bedrock 用量重算；WP1、WP5 的 Runtime 用量也是用不呼叫模型的最小 agent 量的。
+- **每人月費的比較基礎**：方案 B 已補上模型 token 費（每天 10 輪、固定對話腳本實測），方案 A 的 WP7 也含模型。差距主要來自每輪的 token 數：方案 B 每輪約 2,000–2,600 個輸入 token，OpenClaw 約 2.6 萬（帶 35 個工具定義）。方案 B 的數字是用短 system prompt、stub 工具量的，正式 agent 上線後要用 `USAGE_LOGS` 與 Bedrock 用量重算；WP1、WP5 的 Runtime 用量也是用不呼叫模型的最小 agent 量的。
 
 ## 決策背景
 
