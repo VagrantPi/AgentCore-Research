@@ -372,7 +372,7 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 | 方案 | 月費 | 含時數 | 超量單價 | 計費單位 | 並發 |
 |---|---|---|---|---|---|
 | AgentCore Browser（對照） | — | — | 約 $0.101／browser-hour | 秒 | — |
-| Browserbase Developer | $20 | 100 h | $0.12／h | 分鐘，每 session 最少 1 分 | 25 |
+| Browserbase Developer | $20 | 100 h | $0.10／h | 分鐘，每 session 最少 1 分 | 25 |
 | Browserbase Startup | $99 | 500 h | $0.10／h | 同上 | 100 |
 | Steel Launch | $0 ＋ 用量 | 一次性 $30 額度 | $0.10／h | 分鐘，無條件進位 | 10；單 session 最長 15 分 |
 | Steel Scale | $250 ＋ 用量 | 每月 $100 額度 | $0.08／h | 同上 | 100；單 session 最長 1 小時 |
@@ -384,7 +384,7 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 | 100 人月費 | 每人 1 h（共 100 h） | 每人 5 h（共 500 h） |
 |---|---|---|
 | AgentCore Browser | $10.1 | $50.5 |
-| Browserbase | $20（Developer） | $68（Developer：20 + 400 × 0.12） |
+| Browserbase | $20（Developer） | $60（Developer：20 + 400 × 0.10） |
 | Steel | $10（Launch，但單 session 15 分、並發 10） | $250（Scale：250 + max(0, 40 − 100)） |
 | Cloudflare | $13.1（5 + 90 × 0.09） | $49.1（5 + 490 × 0.09） |
 
