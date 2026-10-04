@@ -201,6 +201,7 @@ suppressOutput (principal, action == …, resource) when guardrails {
 - [把業務規則從 prompt 搬到 Policy](prompt-to-policy.md)：規則盤點、為 policy 設計工具 schema、Cedar 改寫、本機驗證
 - [用 temporal policy 控管業務流程](temporal-workflows.md)：順序、核准、總額上限的寫法與陷阱；session 弱點的補強；409 的處理
 - [Guardrails in policy 的門檻校準與縱深防禦](guardrails-calibration.md)：用成本選門檻、`suppressOutput` 的實際行為、各層分工
+- [技能授權改由自家系統負責，不用 AgentCore Policy](skill-gating-hephagora.md)：backend、hephmind、HephAgora 現有的檢查鏈，剩下的缺口與補強
 
 ## 實驗
 
