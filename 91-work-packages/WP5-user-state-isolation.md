@@ -185,7 +185,7 @@ python3 -c "import gzip, sys; from usage_cost import aggregate, write_csv; write
 - [x] EC2 `i-06afed7f19deb7f4f` 跑完自行終止（2026-10-04 約 12:00 UTC）；S3 bucket `wp5-cost3d-6eaa8b19`、role 與 instance profile `/wp/wp5-cost-runner` 已刪除（2026-10-04 13:08 UTC，`/wp/` 只剩 WP0、WP3 保留的 role）
 - [x] Runtime：沿用 WP0 的 `wp0_min-HsBwOc6VWU`（**保留**給 WP1）；`wp0-runtime-exec` 沒有改動
 - [x] Browser、Gateway、Policy、VPC endpoint：未建立
-- [ ] 隔天確認沒有仍在跑的 Runtime session — WP1 結束時一起確認
+- [x] 隔天確認沒有仍在跑的 Runtime session — 2026-10-04 16:14 UTC 與 WP1 一起確認（見 [WP0 清理確認](WP0-cost-baseline.md#清理確認)）
 
 ### 要更正研究庫的段落
 

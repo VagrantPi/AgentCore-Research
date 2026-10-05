@@ -2,7 +2,7 @@
 
 說明見 [prompt-to-policy.md](../../prompt-to-policy.md#第四步在本機先驗證)。
 
-> 這裡只在本機驗證 Cedar 語法與授權邏輯。在 AgentCore Gateway 上的實測（陣列型 claim、`tools/list` 過濾）由 [WP2](../../../91-work-packages/WP2-capability-boundary.md) 進行。
+> 這裡只在本機驗證 Cedar 語法與授權邏輯。[WP2](../../../91-work-packages/WP2-capability-boundary.md#選配保留-gateway-時才做) 確認技能授權不需要 Gateway，Gateway 上的實測（G1–G6，含陣列型 claim）沒有做；`tools/list` 過濾改在自家 MCP server 實證（WP2 #1–#3）。
 
 ```bash
 pip install cedarpy   # 撰寫時使用 4.12.1（Cedar 4.x）

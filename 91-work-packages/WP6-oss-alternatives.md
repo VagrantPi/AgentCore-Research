@@ -67,24 +67,47 @@
 
 ## 回填
 
-### A 半：第 1、5、6 層（文件調研階段）
+### 執行資訊
 
-- 負責人：Kais
-- 執行日期：2026-10-02（文件與價格調研；實測未做）
-- 區域：ap-northeast-1（東京）
-- 資源 tag：`wp=WP6`、`owner=kais`、`project=hyfai`（本階段沒有建立 AWS 資源）
-- 使用的 AWS 帳號：無（沒有碰 AWS）
-- 價格截圖：[`evidence/WP6/`](evidence/WP6/)，檔名 `L{層}-<候選>-pricing-2026-10-02.png`
+| | A 半：第 1、5、6 層 | B 半：第 2、3、4 層 |
+|---|---|---|
+| 負責人 | Kais | Kais（2026-10-04 從 RomanChen 接手） |
+| 執行日期 | 2026-10-02（文件與價格調研；實測未做） | 2026-10-04 |
+| 區域 | ap-northeast-1（東京） | 本機實測；模型呼叫東京 Bedrock（`jp.anthropic.claude-haiku-4-5-20251001-v1:0`） |
+| 資源 tag | `wp=WP6`、`owner=kais`、`project=hyfai`（本階段沒有建立 AWS 資源） | 本階段沒有建立 AWS 資源 |
+| 使用的 AWS 帳號 | 無（沒有碰 AWS） | 050571774557（只呼叫 Bedrock） |
+| 價格截圖 | [`evidence/WP6/`](evidence/WP6/)，檔名 `L{層}-<候選>-pricing-2026-10-02.png` | [`evidence/WP6/`](evidence/WP6/)，檔名 `L4-<候選>-pricing-2026-10-04.png` |
+| 實測腳本 | 見第 5 層實測 | 第 2 層 [`90-integrations/experiments/chatroom-concurrency/`](../90-integrations/experiments/chatroom-concurrency/README.md)、第 3 層 [`08-policy/experiments/cedar-skill-gating/`](../08-policy/experiments/cedar-skill-gating/README.md) |
+
 - AWS 價格出處：EC2、EBS、RDS、ElastiCache、S3 的價格頁是動態載入，截圖看不到東京價。東京單價取自 AWS 官方 Price List 公開檔 `https://pricing.us-east-1.amazonaws.com/offers/v1.0/aws/<服務>/current/ap-northeast-1/index.json`（EC2 版本 20260925174521）。截圖只當頁面證據，不是價格出處。
 - 月時數用 730 h；「每天活躍 8 h」= 243.3 h/月，其餘 486.7 h 停機。
+- A 半的費用（第 1、5、6 層）全部是官網單價加假設用量的估算，本階段沒有花費。
+- B 半本階段花費：只有 Bedrock Haiku 4.5 呼叫，token 數沒量到（OpenClaw 的 log 不記用量，同時段 WP7 也在呼叫同一個模型）。本機 docker／程序不計費。
 
-#### 結論（三句內）
+### 結論
 
-1. 第 1 層「每人一台強隔離 VM」不一定要自己寫排程器：可以買 E2B 託管，或用 Kata on EKS（中）。純 Firecracker 自寫才是高難度。100 人 24h 常駐時，託管約 $12.2k/月，自架約 $9.0k/月。
-2. 第 5 層：Mem0、Zep 有現成的萃取與檢索，但跨使用者隔離大多靠應用程式帶 `user_id`。只有自管 pgvector 加 RLS 能在資料層強制。100 人規模的 AgentCore Memory 約 $45/月，比 Mem0（$249）、Zep（$150–300）便宜。
-3. 第 6 層：LLM 成本可以算到每位使用者（Langfuse、Phoenix 有內建價格表）。VM、瀏覽器、記憶這些非 LLM 成本沒有任何候選現成提供，要自己維護 session→user 對照再合併。
+1. 整體：方案 C 沒有比方案 B 便宜的人數門檻，見 [#8 門檻](#8-門檻方案-c-比方案-b-便宜的使用者規模)。
+2. 第 1 層「每人一台強隔離 VM」不一定要自己寫排程器：可以買 E2B 託管，或用 Kata on EKS（中）。純 Firecracker 自寫才是高難度。100 人 24h 常駐時，託管約 $12.2k/月，自架約 $9.0k/月。
+3. 第 2 層：OpenClaw 可以只靠設定檔在框架外鎖掉 exec、上網（實測），但預設全開、經 HTTP 進來的請求等同 owner、官方明說一個租戶一個 gateway；自架就是每人一台機器，100 人 24h 約 $3.5k／月，跟 AgentCore 保守估算（$3.4k）差不多、是實測值（$832）的 4 倍。Strands 本身不帶多餘工具，但每個聊天室要一個 Agent 實例。
+4. 第 3 層：授權函式庫（Cedar、OPA、Casbin）省不了程式碼，手寫 70 行換成 Cedar 還有約 60 行（查 DB、403／429、限流、計量都還在）；多得到的是型別檢查與日後的形式驗證。MCP gateway 類專案要多養一個服務、購買資料要多一份，不值得。**維持 WP2 的手寫做法。**
+5. 第 4 層：託管瀏覽器沒有一家在官方文件寫明支援「手機上操作 Live View」；反而 AgentCore 用的 DCV Web Client SDK 從 1.10.1（2025-10-22）起支援 iOS Safari／Chrome、Android Chrome 與觸控 `[官方已寫]`。Steel、Cloudflare Browser Run 有正式的接手、交還機制。價格上只有 Cloudflare 比 AgentCore Browser 便宜一點（每小時 $0.09 vs $0.101，100 人每月只差 $1.4），不實測；改在 iOS 模擬器 Safari 實測 AgentCore 的接手（[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md)）：點擊、英數、中文都能送進遠端，交還後自動化接得上，但 viewer 要自己加輸入框轉送按鍵。
+6. 第 5 層：Mem0、Zep 有現成的萃取與檢索，但跨使用者隔離大多靠應用程式帶 `user_id`。只有自管 pgvector 加 RLS 能在資料層強制。100 人規模的 AgentCore Memory 約 $45/月，比 Mem0（$249）、Zep（$150–300）便宜。
+7. 第 6 層：LLM 成本可以算到每位使用者（Langfuse、Phoenix 有內建價格表）。VM、瀏覽器、記憶這些非 LLM 成本沒有任何候選現成提供，要自己維護 session→user 對照再合併。
 
-#### 第 1 層：隔離執行環境
+### 檢核表
+
+| # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
+|---|---|---|---|---|---|
+| 1 | 六層都填完「有 / 沒有 / 要自己做」 | `[官方已寫]` / `[推測]` 逐格標 | 通過（A 半第 1、5、6 層；B 半第 2、3、4 層） | 各層的能力表 | — |
+| 2 | 每層至少一個候選有實測數字 | — | 第 5 層完成：寫入到搜得到 pgvector 365 ms、Mem0 1.85 s（AgentCore 對照 65.9 s）；第 1、6 層依「範圍調整」跳過（託管比 AgentCore 貴）；第 2 層：兩個聊天室並行 Strands 468–592 ms、OpenClaw 793–1,048 ms，10／10 沒串；第 3 層：Cedar 25 行、83 µs；第 4 層：候選以價格判定不實測；改測方案 B 的 AgentCore Live View，開頁到第一個畫面 1.7–1.9 秒（第一次 5.6 秒） | 下方「實測：第 5 層」、「範圍調整」；[chatroom-concurrency](../90-integrations/experiments/chatroom-concurrency/README.md)、[cedar-skill-gating](../08-policy/experiments/cedar-skill-gating/README.md)、[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md) | 第 5 層自架在即時性上勝出，但要自己寫萃取或接 Mem0；第 4 層方案 C 候選沒有實測數字，但價差小（每月 $1.4），不影響選型 |
+| 3 | 每人每月成本有官網價，標日期；閒置另列 | 成本 | 通過（A、B 兩半皆為估算） | 各層的費用段、`evidence/WP6/`（含 `L4-*`） | — |
+| 4 | 自架要自己維運的元件與估點 | `[推測]` | 通過 | 下方「維運元件與估點」 | — |
+| 5 | 第 1 層：100 人每人一台常駐 VM 的月費 | 成本 | 24h：自架約 $9.0k、託管約 $12.2k；8h：自架約 $3.3k、託管約 $4.2k | 第 1 層的費用段 | 自架 8h 情境的前提是全體同時段使用、host 能整台停機 |
+| 6 | OpenClaw 自架時，能否在框架外強制工具白名單 | `[推測]` | **可以，但不是預設**：`tools.deny` 關掉 exec、上網後，以使用者身分要求執行指令、讀網頁都被拒（實測）；預設設定兩者都會照做（實測） | [探測結果](../90-integrations/experiments/chatroom-concurrency/README.md#結果2026-10-04) | 不是阻斷項，但要另外補三件事，見第 2 層 |
+| 7 | 有沒有候選能做到「使用者接手登入、交還後 agent 繼續」 | `[推測]` | Steel（steel-mcp-server handoff）、Cloudflare Browser Run（`Cloudflare.handoff`）有正式機制；**手機上能否操作，託管的沒有一家官方寫支援**（noVNC 支援手機，但交還要自己做） | 第 4 層表 | 方案 B 反而比較有把握，見第 4 層「#7：方案 B 的手機接手」 |
+| 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | **無**（第 1 層：隨需價下，自架每 GB-h 的價格是 AgentCore 的 3.1 倍，跟人數無關） | 第 1 層判定、下方「#8 門檻」 | 方案 C 不用為了省錢再投入 |
+
+### 第 1 層：隔離執行環境
 
 | 能力 | Firecracker 直接用 | E2B 託管 | E2B 自架 | Daytona | Kata on EKS |
 |---|---|---|---|---|---|
@@ -114,51 +137,6 @@
 - Code Interpreter 對照（[WP3 回填](WP3-sandbox-egress.md#回填)）：約 1 vCPU / 1 GB 吃滿時每小時約 $0.10；E2B 同規格約 $0.067/h（$0.0504 + $0.0162）。
 - 冷啟動基準：WP0 從台灣呼叫，新 session 第一次約 0.85–0.95 秒，但 VM 在呼叫前已開好約 32 秒，不是真正的冷啟動；是否為預先開好的 VM 池由 WP1 確認。
 
-#### 第 5 層：記憶
-
-| 能力 | 自管 Postgres + pgvector | Mem0 雲端／自架 | Zep 雲端／Graphiti 自架 |
-|---|---|---|---|
-| 短期對話歷史 | 要自己做 | 沒有獨立功能，用 user_id／agent_id／run_id 分範圍 | Zep 有（thread）；Graphiti 要自己做 `[推測]` |
-| 長期記憶與語意檢索 | 要自己做（HNSW／IVFFlat） | 有 | 有（graph 檢索） |
-| LLM 萃取 | 要自己寫整條 pipeline | 內建，新版單次 LLM 呼叫、**只新增** | 內建；自訂萃取指令要 Flex Plus；Graphiti 每個 episode 觸發多次 LLM 呼叫 |
-| 合併去重與衝突 | 要自己做 | 不去重、不覆寫，衝突靠檢索排序 `[推測]` | 有：舊事實標記失效、不刪除 |
-| 跨使用者隔離 | `user_id` WHERE（應用層），或 **RLS（資料層強制）**；RLS 要加 `FORCE ROW LEVEL SECURITY`，否則表擁有者會繞過 | 應用層帶 `filters={"user_id": ...}`；Platform 的 API key 綁 project，角色只有 READER／OWNER，沒有 per-user key（官方文件沒寫此功能）。OSS 的 per-user key 綁 dashboard 使用者，不是記憶的 `user_id` | Zep：每位使用者獨立 user graph（服務內結構隔離）；Graphiti：`group_id`，靠應用層 `[推測]` |
-| 官方宣稱延遲 | 沒有 | p50 0.88–1.09 秒、每次約 7K token（README，沒說是寫入還是寫入加檢索）；雲端 add 是非同步 | Graphiti「通常次秒級」；Zep 託管「sub-200ms」 |
-
-- 來源：[PostgreSQL RLS](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)、[pgvector](https://github.com/pgvector/pgvector)、[mem0ai/mem0](https://github.com/mem0ai/mem0)、[Mem0 add](https://docs.mem0.ai/core-concepts/memory-operations/add)、[Zep concepts](https://help.getzep.com/concepts)、[getzep/graphiti](https://github.com/getzep/graphiti) `[官方已寫]`
-- pgvector 的近似索引是先掃索引再套 WHERE，依使用者過濾後結果可能變少。建議 partition、獨立表，或開 iterative scan `[官方已寫]`。
-- `[矛盾]` Mem0 舊論文（arXiv 2504.19413）描述萃取與整併，新版 README 寫只做 ADD。以新版 README 為準。
-
-#### 第 6 層：可觀測與成本分攤
-
-| 能力 | OTel + Tempo 自架／Grafana Cloud | Langfuse 雲端／自架 | Phoenix 自架／Arize AX |
-|---|---|---|---|
-| trace / span | 有 | 有，OTLP 只收 HTTP，**不收 gRPC** | 有（OpenInference） |
-| token 計量與成本換算 | 沒有原生；Tempo 不能單獨當分攤方案 `[推測]` | 有，內建價格表，可自訂 model definition | 有，內建價格表，可自訂 |
-| 依 user／session 彙總 | 要自己寫查詢 | UI 有；**Metrics API v2 不能用 userId／sessionId 當 group-by**，要自己 loop 或拉 Observations 彙總 | session 有；per user 沒查到 |
-| 非 LLM 成本掛到使用者 | 要自己做 | 要自己做（只有 generation／embedding 計成本） | 要自己做 |
-| 資料可查詢延遲 | 未查 | 官方寫 15–30 秒（Langfuse v4 宣稱 real-time，此數字可能過時） | 未查 |
-
-- 來源：[Langfuse token & cost](https://langfuse.com/docs/observability/features/token-and-cost-tracking)、[Langfuse Metrics API](https://langfuse.com/docs/metrics/features/metrics-api)、[Langfuse OTel](https://langfuse.com/integrations/native/opentelemetry)、[Langfuse scaling](https://langfuse.com/self-hosting/configuration/scaling)、[Phoenix cost tracking](https://arize.com/docs/phoenix/tracing/how-to-tracing/cost-tracking) `[官方已寫]`
-- Langfuse Cloud 的 JP 區在 AWS ap-northeast-1（東京），Hobby、Core 都能選，定價頁沒有區域加價 `[官方已寫]`。JP 區 Postgres 備份複製到大阪，ClickHouse（trace）與 S3 不跨區複製。來源：[Langfuse data regions](https://langfuse.com/security/data-regions)
-- Langfuse 舊版 metrics 端點（可依 user 彙總）在 Cloud 只服務到 2026-11-16 `[官方已寫]`。
-- AgentCore 的 `USAGE_LOGS` 只有 `session.id`，沒有使用者 ID（[WP0 回填](WP0-cost-baseline.md#回填)），所以 session→user 對照不論自架或 AgentCore 都要自己維護。
-- 自架相對 AgentCore 要自己補的維度：`user.id`（AgentCore 也沒有自動帶，待實測）、`session.id`（用 baggage 帶）、Runtime 資源用量（自架時沒有 `USAGE_LOGS`，要改看 CloudWatch Agent 或 cAdvisor）。
-- Langfuse 自架必須有 ClickHouse（沒有替代），共六個元件：Web、Worker、Postgres、Redis、ClickHouse、S3。Docker Compose 版官方定位是「單一 VM，無 HA、無擴展、無備份」`[官方已寫]`。
-
-#### 檢核表（A 半負責的部分）
-
-| # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
-|---|---|---|---|---|---|
-| 1 | 第 1、5、6 層填完「有 / 沒有 / 要自己做」 | `[官方已寫]` / `[推測]` 逐格標 | 通過（A 半） | 上方三張表 | 等 B 半合成六層表 |
-| 2 | 每層至少一個候選有實測數字 | — | 第 5 層完成：寫入到搜得到 pgvector 365 ms、Mem0 1.85 s（AgentCore 對照 65.9 s）；第 1、6 層依「範圍調整」跳過（託管比 AgentCore 貴） | 下方「實測：第 5 層」、「範圍調整」 | 第 5 層自架在即時性上勝出，但要自己寫萃取或接 Mem0 |
-| 3 | 每人每月成本有官網價，標日期；閒置另列 | 成本 | 通過（A 半，估算） | 下方「實際費用」、`evidence/WP6/` | — |
-| 4 | 自架要自己維運的元件與估點 | `[推測]` | 通過（A 半） | 下方「維運元件」 | — |
-| 5 | 第 1 層：100 人每人一台常駐 VM 的月費 | 成本 | 24h：自架約 $9.0k、託管約 $12.2k；8h：自架約 $3.3k、託管約 $4.2k | 下方算式 | 自架 8h 情境的前提是全體同時段使用、host 能整台停機 |
-| 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | 第 1 層：**無**（隨需價下，自架每 GB-h 的價格是 AgentCore 的 3.1 倍，跟人數無關）；全方案：**無**（見 B 半「#8 門檻」） | 下方「第 1 層判定」、B 半「#8 門檻」 | — |
-
-#### 實際費用（全部是官網單價加假設用量的估算，本階段沒有花費）
-
 **檢核點 5：第 1 層 100 人月費**
 
 | 候選 | 情境 A：24h 常駐 | 情境 B：每天活躍 8h |
@@ -170,86 +148,6 @@
 | AgentCore Runtime（對照，上限） | 0.2168 × 730 × 100 = **$15,826**（CPU 全時吃滿） | 0.2168 × 243.3 × 100 = **$5,275**（只算活躍時段且 CPU 吃滿；未計閒置記憶體） |
 
 不含維運人力、host 行程開銷（約 10–15% `[推測]`）。AgentCore 那列是上限：它只收實際用掉的 CPU，真實月費要用 WP1、WP5 的實際用量重算，不能直接拿來判定檢核點 8。
-
-**第 5 層：100 人月費**（假設 `[推測]`：每人每月 30 session × 10 輪 = 共 3 萬輪，每輪 1 次寫入加 1 次檢索，共 2 萬筆長期記憶、20 GB）
-
-| 候選 | 月費 | 算式 |
-|---|---|---|
-| AgentCore Memory（對照） | 約 $45 | 6 萬 event × $0.25/千 + 2 萬筆 × $0.75/千 + 3 萬次檢索 × $0.50/千（單價見 [`read-write-cost.md`](../02-memory/read-write-cost.md)） |
-| Mem0 雲端 | $249 | 3 萬次檢索超過 Starter 的 5 千次，要 Pro |
-| Zep 雲端 | $150–300 | 每則訊息 1–2 credit，6–12 萬 credits，Flex $125 加超量 |
-| 自管 pgvector（RDS 東京） | 單 AZ 約 $76.5；Multi-AZ 約 $153 | `db.t4g.medium` $0.101/h × 730 + 20 GB × $0.138；不含萃取 LLM 費。運行中閒置照收；停止時不收實例時數，仍收儲存、備份、public IPv4，連續停滿 7 天自動啟動 `[官方已寫]`（[RDS 停止實例](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html)） |
-| Mem0 自架 | 約 $110（單 AZ）；Multi-AZ 約 $186；compose 內建 Postgres 單機約 $33.5 | server 主機 `t4g.medium` $0.0432/h × 730 + 20 GB gp3 = $33.46（官方沒寫建議規格，`[推測]`）+ RDS 單 AZ $76.49；單機版無 HA、無備份。不含萃取 LLM 費 |
-| Graphiti 自架（Neo4j） | 約 $16.7–33.5 | Neo4j 5.26 官方最低 2 vCPU／2 GB／10 GB → `t4g.small` $0.0216/h × 730 + 10 GB gp3 = $16.73；實務 `t4g.medium` $33.46 `[推測]`。Graphiti 是函式庫，跑在應用程式裡；不含 LLM 費 |
-
-**萃取用 LLM 月費**（自建三個候選都要加；AgentCore 內建策略已含在上表）
-
-假設 `[推測]`：每月 3 萬次寫入，每次 6.5K 輸入 + 0.5K 輸出 token；embedding 寫入與檢索各 1 次、每次 200 token（共 12M token）。7K token 取自 Mem0 README 的基準表，那是 managed 平台、top_200 檢索預算下的數字，不是單次寫入 `[矛盾]`，所以下表可能高估，要實測。
-
-| 模型（東京） | 每百萬 token 輸入／輸出 | 月費 |
-|---|---|---|
-| Claude Haiku 4.5（`jp.` Geo profile） | $1.10／$5.50 | 214.5 + 82.5 + Titan V2 0.35 ≈ **$297**（Global profile 約 $270） |
-| Amazon Nova Lite | $0.072／$0.288 | 14.04 + 4.32 + 0.35 ≈ **$18.7** |
-| Amazon Nova Micro | $0.042／$0.168 | 8.19 + 2.52 + 0.35 ≈ **$11.1** |
-| gpt-5-mini（Mem0 自架預設） | $0.25／$2.00 | 48.75 + 30 + text-embedding-3-small 0.24 ≈ **$79**（推理 token 算進輸出，可能偏低） |
-
-- 東京單價取自 Bedrock Price List 東京檔（2026-09-30）`[官方已寫]`；OpenAI 取自[各模型頁](https://developers.openai.com/api/docs/models/gpt-5-mini) `[官方已寫]`。Titan Text Embeddings V2 東京 $0.029、Cohere Embed 4 $0.12 每百萬 token。
-- 東京沒有 In-Region 的 Haiku 4.5、Nova Micro，只能走 cross-region profile；Haiku 4.5 的 Geo 價比 Global 貴 10%。Nova Lite、Titan V2、Cohere Embed 4 東京可直接 on-demand `[官方已寫]`（各模型的 [model card](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-haiku-4-5.html)）。
-- `[矛盾]` Nova Micro 的 Price List 有東京 SKU，文件卻寫東京沒有 In-Region。單價以 Price List 為準。
-- 汰換風險：Haiku 4.5 的 model card 寫「EOL no sooner than Oct 16, 2026」；gpt-5-mini 在 OpenAI 已標 Deprecated。
-- 實測更正（2026-10-02，[`latency-compare`](../02-memory/experiments/latency-compare/README.md)）：Mem0 2.2.1 每次 `add` 呼叫 LLM 1 次，平均 8.6K 輸入、80 輸出 token（使用者還沒有既有記憶時）。照這個數字重算，Haiku 4.5 是 283.8 + 13.2 + 0.35 ≈ **$297**：輸入多估少了、輸出多估了，合計剛好跟原估算相同。另外 mem0ai 2.2.1 搭 Nova 會在 Converse 參數驗證失敗，要用 Nova 就得修 mem0 或自己包 LLM client。
-
-**第 6 層：100 人月費**（假設 `[推測]`：每人每天 10 則對話，每則 35 units、135 KB）
-
-| 候選 | 月費 | 算式 |
-|---|---|---|
-| AgentCore 內建觀測（對照） | 約 $1.55 | span 攝入 4.05 GB × $0.35 + 儲存 4.05 × $0.033（東京 CloudWatch Price List，2026-09-22）；只算 span，不含 `APPLICATION_LOGS`（vended logs 東京 $0.76/GB 起，量要實測） |
-| Langfuse Cloud Core | 約 $105 | 105 萬 units：$29 + 90 萬 × $8/10 萬 + 5 萬 × $7/10 萬 |
-| Grafana Cloud Traces | $19 | 4.05 GB 低於含的 50 GB；沒有成本換算 |
-| Langfuse 自架（拆開部署） | 約 $340 | `t4g.xlarge` + RDS + Valkey + ClickHouse（`r7g.large`）+ EBS + S3；不含 ALB、備份、Multi-AZ |
-| Langfuse 自架（單 VM Compose） | 約 $137 | 只適合實驗；撐不撐得住待實測 |
-| Phoenix 自架（Postgres） | 約 $113 | `t4g.medium` + RDS `db.t4g.medium` |
-
-觀測後端要 24h 收資料，沒有閒置折扣。
-
-#### 自架要自己維運的元件與估點（`[推測]`，費氏數列）
-
-| 層 | 路線 | 主要元件 | 估點合計 |
-|---|---|---|---|
-| 1 | 純 Firecracker | VM 排程與生命週期 API（21）、host fleet、映像、網路、記憶體清除、pause/resume、計量 | 約 68 |
-| 1 | Kata on EKS | 節點群組與 Karpenter、映像、狀態保存（只有 PVC） | 約 36 |
-| 1 | E2B 自架 | 移植到 AWS（13）、host fleet、映像 | 約 50 |
-| 5 | 自管 pgvector | 萃取 pipeline（8）、去重與衝突（8）、索引、RLS、對話表 | 約 28 |
-| 5 | Mem0 自架 | 去重策略、server 部署、RLS | 約 19 |
-| 5 | Graphiti 自架 | 圖資料庫維運（5）、限流 | 約 23 |
-| 6 | Langfuse 自架 | 六元件部署（8）、升級、擴展、session→user 合併報表（5）、隱私 | 約 34；改用 Cloud 省約 18–21 |
-
-#### 實測：第 5 層寫入加檢索延遲（2026-10-02）
-
-- 腳本與原始數據：[`02-memory/experiments/latency-compare/`](../02-memory/experiments/latency-compare/README.md)。資源 tag：`wp=WP6`、`owner=kais`、`project=hyfai`。
-- 從台灣筆電呼叫東京（STS RTT 中位數 43–68 ms）。pgvector 和 Mem0 的 DB 是本機 docker，embedding 用 Titan V2、Mem0 萃取用 Haiku 4.5（`jp.`），都在東京 Bedrock。
-- 每次試驗用新的使用者、同一則訊息。`visible_ms` 是從開始寫入到搜尋第一次找回這筆資料。
-
-| 候選 | 次數 | 寫入 p50 | 搜尋 p50 | 寫入到搜得到 p50／p90 |
-|---|---|---|---|---|
-| pgvector（存原句，不萃取） | 10 | 192 ms | 170 ms | **365／463 ms** |
-| Mem0 OSS 2.2.1（同步萃取） | 10 | 1,683 ms | 170 ms | **1.85／2.07 s** |
-| AgentCore Memory（對照組，非同步萃取） | 5 | 243 ms | 337 ms | **65.9／68.1 s**（4 次命中；第一次 5 分鐘內沒萃取出來，原因沒查） |
-
-- **自架比 AgentCore 快很多的是「剛寫入就要搜得到」：** AgentCore 的長期記憶要等約 66 秒的背景萃取，Mem0 同步萃取約 1.9 秒。搜尋本身三者都在 0.2–0.35 秒。
-- 同一個 session 內的前文本來就靠短期記憶，66 秒只影響「剛說完的事實，下一個 session 馬上要用」的情境，對選型影響小。
-- 費用約 $0.36（Haiku $0.22、`RetrieveMemoryRecords` 輪詢 270 次 $0.135），算式見腳本 README。
-- 清理：docker 容器已移除；兩個 `wp6_latency_*` memory 都已刪除（見腳本 README 的清理確認）。
-
-#### 範圍調整（2026-10-02）
-
-接下來 WP6 只實測**估算月費比 AgentCore 便宜的託管方案**。託管方案的估算月費如果已經比 AgentCore 高，就不實測，直接以價格判定。自架方案也不再追加實測，已經做完的 pgvector、Mem0 OSS 保留。
-
-| 層 | 託管候選 | 100 人估算月費 | AgentCore 對照 | 判定 |
-|---|---|---|---|---|
-| 1 | E2B、Daytona | 24h $12.2k–12.4k；8h $4.2k–4.3k。E2B 縮到 1 vCPU／1 GB 也要 $5.0k／$1.8k | 實測 $832／$277；保守估 $3.4k／$1.1k（見下方「第 1 層判定」） | **跳過**：任何一種算法都比 AgentCore 貴 |
-| 5 | Mem0 Platform、Zep Cloud | $249；$150–300 | 約 $45 | **跳過**：比 AgentCore 貴 3–7 倍 |
-| 6 | Langfuse Cloud Core | 約 $105 | 約 $1.55（只算 span） | **跳過**：比 AgentCore 貴約 68 倍 |
 
 #### 第 1 層判定（2026-10-02，用 [WP1 #10](WP1-runtime-session.md#10-成本情境) 的實測）
 
@@ -269,42 +167,7 @@
 - 自架也沒有比較便宜的人數門檻：nested virtualization 要用 Intel 機型，`c8i.large` 每 GB-h 是 0.11797 ÷ 4 = $0.0295，AgentCore 是 $0.00945，貴 3.1 倍；多人共用一台 host 也只是把每人的 GB 攤平，不會改變這個比例。Savings Plans、Spot 沒算：要折到原價的 32% 以下（0.00945 ÷ 0.0295）才會比 AgentCore 便宜。3 年期 Savings Plans 或 Spot 有可能做到，但那時還要再加 host 開銷與維運人力 `[推測]`。
 - 但書：WP1 的情境是每 5 分鐘 ping 一次、不呼叫模型。真實 agent 的記憶體與 CPU 用量要等正式 agent 上 Runtime 後，再用 `USAGE_LOGS` 重算。
 
-#### 待實測（下一階段，要碰 AWS 或部署）
-
-1. ~~第 1 層冷啟動~~：依上表跳過。Firecracker、Kata 自架不測。
-2. ~~第 5 層一次寫入加檢索延遲~~：pgvector、Mem0 OSS 已完成（見上方）。Mem0 Platform、Zep Cloud 依上表跳過。
-3. ~~第 6 層 Langfuse 實測~~：依上表跳過。
-4. ~~寫信問 E2B、Daytona~~（暫停期間的儲存費、40 GB 磁碟、VM sandbox 啟動秒數）：第 1 層跳過，不用問。
-
-A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
-
-#### 要更正研究庫的段落（已套用，2026-10-02）
-
-| 檔案:行號 | 原本寫的 | 調研結果 |
-|---|---|---|
-| `00-overview/build-vs-buy.md:21` | session 強隔離要自己寫一整套排程器，難度高 | 拆三級：買 E2B 託管＝低；Kata on EKS＝中；純 Firecracker＝高。AWS 上要 Intel nested virtualization。Daytona 預設是 container；VM sandbox 雖已不標 beta，但磁碟上限 10 GiB、只能從 VM snapshot 建立 |
-| `00-overview/build-vs-buy.md:22` | 短期記憶用 Redis／Postgres，低 | 自建低成立；Mem0 沒有獨立對話歷史，Zep thread 才是對應物 |
-| `00-overview/build-vs-buy.md:23` | 合併、去重、衝突、隔離全部要自己設計 | Mem0 只新增不去重；Zep／Graphiti 有失效機制；只有 pgvector 加 RLS 能在資料層強制隔離 |
-| `06-observability/README.md:104` | log 大約每 GB $0.50 | $0.50 是美東價；東京標準 Logs 攝入 $0.76/GB。span 的 $0.35/GB 東京相同 |
-| `00-overview/build-vs-buy.md:30` | 觀測低–中，標準成熟 | 改成中：trace 與 LLM 成本換算成熟，每位使用者全成本分攤不成熟；Langfuse 自架六元件；只收 HTTP OTLP |
-
-### B 半：第 2、3、4 層
-
-- 負責人：Kais（2026-10-04 從 RomanChen 接手）
-- 執行日期：2026-10-04
-- 區域：本機實測；模型呼叫東京 Bedrock（`jp.anthropic.claude-haiku-4-5-20251001-v1:0`）
-- 資源 tag：本階段沒有建立 AWS 資源
-- 使用的 AWS 帳號：050571774557（只呼叫 Bedrock）
-- 價格截圖：[`evidence/WP6/`](evidence/WP6/)，檔名 `L4-<候選>-pricing-2026-10-04.png`
-- 實測腳本：第 2 層 [`90-integrations/experiments/chatroom-concurrency/`](../90-integrations/experiments/chatroom-concurrency/README.md)、第 3 層 [`08-policy/experiments/cedar-skill-gating/`](../08-policy/experiments/cedar-skill-gating/README.md)
-
-#### 結論（三句內）
-
-1. 第 2 層：OpenClaw 可以只靠設定檔在框架外鎖掉 exec、上網（實測），但預設全開、經 HTTP 進來的請求等同 owner、官方明說一個租戶一個 gateway；自架就是每人一台機器，100 人 24h 約 $3.5k／月，跟 AgentCore 保守估算（$3.4k）差不多、是實測值（$832）的 4 倍。Strands 本身不帶多餘工具，但每個聊天室要一個 Agent 實例。
-2. 第 3 層：授權函式庫（Cedar、OPA、Casbin）省不了程式碼，手寫 70 行換成 Cedar 還有約 60 行（查 DB、403／429、限流、計量都還在）；多得到的是型別檢查與日後的形式驗證。MCP gateway 類專案要多養一個服務、購買資料要多一份，不值得。**維持 WP2 的手寫做法。**
-3. 第 4 層：託管瀏覽器沒有一家在官方文件寫明支援「手機上操作 Live View」；反而 AgentCore 用的 DCV Web Client SDK 從 1.10.1（2025-10-22）起支援 iOS Safari／Chrome、Android Chrome 與觸控 `[官方已寫]`。Steel、Cloudflare Browser Run 有正式的接手、交還機制。價格上只有 Cloudflare 比 AgentCore Browser 便宜一點（每小時 $0.09 vs $0.101，100 人每月只差 $1.4），不實測；改在 iOS 模擬器 Safari 實測 AgentCore 的接手（[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md)）：點擊、英數、中文都能送進遠端，交還後自動化接得上，但 viewer 要自己加輸入框轉送按鍵。
-
-#### 第 2 層：Agent 框架與技能
+### 第 2 層：Agent 框架與技能
 
 | 能力 | OpenClaw 自架 | Strands | LangGraph | Claude Agent SDK |
 |---|---|---|---|---|
@@ -329,7 +192,27 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 - 同一個 Strands `Agent` 實例同時收兩個請求：第二個直接丟 `ConcurrencyException`。
 - 同一個 OpenClaw session 同時兩個請求：session 已存在時排隊（約 0.9 秒、1.6–1.8 秒完成）；新 session 的第一則訊息就並行時，一個回 500 `SessionWorkStartChangedError ... Retry.`，呼叫端要重試。
 
-#### 第 3 層：工具閘道與授權
+**#6 鎖緊後還要補的三件事**
+
+1. **經 HTTP 進來的請求等同 owner**（[官方已寫]）：後端轉送使用者原文時，`/` 指令會以 owner 身分處理。`commands.config`、`commands.bash`、`commands.mcp`、`commands.debug` 預設就關；`/elevated` 要用 `tools.elevated.enabled: false` 關，最好再加 `commands.text: false`。
+2. **內建 plugin 的工具不在 deny 的群組裡**：鎖緊後模型還看得到 `file_fetch`、`file_write`、`dir_list` 等（`group:plugins`），這次因為沒有配對節點用不了。嚴格白名單要連 `group:plugins` 一起 deny 再只放行 MCP，寫法官方沒寫、未測。OpenClaw 一天出好幾版、工具群組一直加，deny 清單要隨版本重審。
+3. **網路要另外擋**：OpenClaw 本身不限制對外連線 `[官方已寫]`，要靠 Security Group 或 egress proxy 只放行 Bedrock 與自家 MCP server（跟方案 B 的 [WP3](WP3-sandbox-egress.md) 同一套做法）。授權判定仍然在自家 MCP server。
+
+- 探測的教訓：第一版用 `echo WP6_EXEC_$((6*7))` 當標記，鎖緊後模型沒有呼叫 exec 卻回出 `WP6_EXEC_42`（自己算的），從 session 資料庫確認後改用隨機 nonce 重跑。拿模型回覆判定「有沒有執行」時，標記一定要是模型猜不到的值。
+
+**第 2 層：OpenClaw 自架，每人一台**（官方建議 2 vCPU／4 GB／40 GB；東京 `t4g.medium` $0.0432／h、gp3 $0.096／GB-月，與 [WP2](WP2-capability-boundary.md#實際費用-1) 同一組單價）
+
+| | 24h 常駐 | 每天 8h（其餘停機） |
+|---|---|---|
+| 每人 | 0.0432 × 730 + 40 × 0.096 = **$35.38** | 0.0432 × 243.3 + 3.84 = **$14.35** |
+| 100 人 | **$3,538** | **$1,435** |
+| AgentCore Runtime 對照（100 人，A 半「第 1 層判定」） | 實測 $832、保守 $3,409 | 實測 $277、保守 $1,136 |
+
+- 不含公網 IPv4（每台 $3.65／月）、模型 token、維運人力。每人一台 EC2 本身就是 VM 隔離，所以這個數字同時涵蓋第 1、2 層。
+- 停機再開機要等 EC2 開機加 OpenClaw 啟動，首句延遲會遠大於 AgentCore 的預喚醒（WP1 實測 p50 170–196 ms），沒實測。
+- Strands、LangGraph、Claude Agent SDK 是函式庫，費用落在第 1 層的執行環境上，不另計。
+
+### 第 3 層：工具閘道與授權
 
 | 能力 | OPA（opa-wasm） | Cedar（cedar-wasm） | Casbin（node-casbin） | agentgateway | IBM ContextForge |
 |---|---|---|---|---|---|
@@ -349,7 +232,9 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 - 跟函式庫無關、但該修的：WP2 的限流是「先數再放行」，不是原子操作。改成 `UPDATE … WHERE count < limit RETURNING`，或用 Redis `INCR`。
 - 什麼時候改用 Cedar：規則超過「買了沒」一種（方案分級、組織共享、試用期），或要對外證明權限邊界時。
 
-#### 第 4 層：雲端瀏覽器與接手
+**第 3 層**：函式庫都是開源、內嵌在自家 server，不另收費；gateway 類要多一台主機（agentgateway 約 `t4g.small` $15.8／月起；ContextForge 再加 Postgres）`[推測]`。方案 B 的授權也是在自家 server 手寫，這一層兩案成本相同。
+
+### 第 4 層：雲端瀏覽器與接手
 
 | 能力 | Browserbase | Steel 託管 | Steel 自架（steel-browser） | 自架 Chromium＋noVNC | Cloudflare Browser Run |
 |---|---|---|---|---|---|
@@ -408,59 +293,101 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 - 實作上要注意：每個瀏覽器操作都要設逾時，卡住就重連 CDP 或重開 session；改手機尺寸是為了看得清楚，不是省錢。這組工作負載的實測單價（$0.086–0.092／h）比上方用 WP2 回推的 $0.101 低，費用隨網頁與操作而變。
 - 限制：模擬器的 HID 事件不等於實體手機的觸控與螢幕鍵盤；真正的注音輸入（`compositionend`）沒測，中文那一項用按鈕模擬選完字的字串。費用：接手測試約 $0.013（479 秒 × $0.101／h，系統 browser 沒有投遞）；尺寸費用實驗 19 個 session `USAGE_LOGS` 實測 $0.136。
 
-#### 檢核表（B 半負責的部分）
+**#7：方案 B 的手機接手**
 
-| # | 檢核點 | 來源等級 | 結果 | 證據 | 對選型的影響 |
-|---|---|---|---|---|---|
-| 1 | 第 2、3、4 層填完「有 / 沒有 / 要自己做」 | `[官方已寫]` / `[推測]` 逐格標 | 通過（B 半） | 上方三張表 | 和 A 半合起來六層都填完 |
-| 2 | 每層至少一個候選有實測數字 | — | 第 2 層：兩個聊天室並行 Strands 468–592 ms、OpenClaw 793–1,048 ms，10／10 沒串；第 3 層：Cedar 25 行、83 µs；第 4 層：候選以價格判定不實測；改測方案 B 的 AgentCore Live View，開頁到第一個畫面 1.7–1.9 秒（第一次 5.6 秒） | [chatroom-concurrency](../90-integrations/experiments/chatroom-concurrency/README.md)、[cedar-skill-gating](../08-policy/experiments/cedar-skill-gating/README.md)、[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md) | 第 4 層方案 C 候選沒有實測數字，但價差小（每月 $1.4），不影響選型 |
-| 3 | 每人每月成本有官網價，標日期；閒置另列 | 成本 | 通過（B 半，估算） | 上方價格表、下方「實際費用」、`evidence/WP6/L4-*` | — |
-| 4 | 自架要自己維運的元件與估點 | `[推測]` | 通過（B 半） | 下方「維運元件」 | — |
-| 6 | OpenClaw 自架時，能否在框架外強制工具白名單 | `[推測]` | **可以，但不是預設**：`tools.deny` 關掉 exec、上網後，以使用者身分要求執行指令、讀網頁都被拒（實測）；預設設定兩者都會照做（實測） | [探測結果](../90-integrations/experiments/chatroom-concurrency/README.md#結果2026-10-04) | 不是阻斷項，但要另外補三件事，見下方 |
-| 7 | 有沒有候選能做到「使用者接手登入、交還後 agent 繼續」 | `[推測]` | Steel（steel-mcp-server handoff）、Cloudflare Browser Run（`Cloudflare.handoff`）有正式機制；**手機上能否操作，託管的沒有一家官方寫支援**（noVNC 支援手機，但交還要自己做） | 上方第 4 層表 | 方案 B 反而比較有把握：DCV Web Client SDK 1.10.1 起官方支援手機瀏覽器 `[官方已寫]`；hephclaw 的 iOS App 已在 Simulator 的真 WKWebView 收到 AgentCore Live View 串流（1280×720，`canvasHasContent: true`），實體 iPhone 的觸控與鍵盤未驗證（hephclaw `docs/agent-workspace/mobile-browser-research-20260930.md`）。方案 C 選託管瀏覽器時要自己實機驗證。AgentCore 已在 iOS 模擬器 Safari 實測接手、英數與中文輸入、交還後繼續都可行（[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md)），條件是 viewer 自己加輸入框轉送按鍵；實體手機的螢幕鍵盤與注音輸入仍未驗證 |
-| 8 | 方案 C 比方案 B 便宜的使用者規模門檻 | 成本 | **無** | 下方「#8 門檻」 | 方案 C 不用為了省錢再投入 |
+- 方案 B 反而比較有把握：DCV Web Client SDK 1.10.1 起官方支援手機瀏覽器 `[官方已寫]`；hephclaw 的 iOS App 已在 Simulator 的真 WKWebView 收到 AgentCore Live View 串流（1280×720，`canvasHasContent: true`），實體 iPhone 的觸控與鍵盤未驗證（hephclaw `docs/agent-workspace/mobile-browser-research-20260930.md`）。方案 C 選託管瀏覽器時要自己實機驗證。AgentCore 已在 iOS 模擬器 Safari 實測接手、英數與中文輸入、交還後繼續都可行（[mobile-takeover](../05-built-in-tools/experiments/mobile-takeover/README.md)），條件是 viewer 自己加輸入框轉送按鍵；實體手機的螢幕鍵盤與注音輸入仍未驗證
 
-**#6 鎖緊後還要補的三件事**
+### 第 5 層：記憶
 
-1. **經 HTTP 進來的請求等同 owner**（[官方已寫]）：後端轉送使用者原文時，`/` 指令會以 owner 身分處理。`commands.config`、`commands.bash`、`commands.mcp`、`commands.debug` 預設就關；`/elevated` 要用 `tools.elevated.enabled: false` 關，最好再加 `commands.text: false`。
-2. **內建 plugin 的工具不在 deny 的群組裡**：鎖緊後模型還看得到 `file_fetch`、`file_write`、`dir_list` 等（`group:plugins`），這次因為沒有配對節點用不了。嚴格白名單要連 `group:plugins` 一起 deny 再只放行 MCP，寫法官方沒寫、未測。OpenClaw 一天出好幾版、工具群組一直加，deny 清單要隨版本重審。
-3. **網路要另外擋**：OpenClaw 本身不限制對外連線 `[官方已寫]`，要靠 Security Group 或 egress proxy 只放行 Bedrock 與自家 MCP server（跟方案 B 的 [WP3](WP3-sandbox-egress.md) 同一套做法）。授權判定仍然在自家 MCP server。
-
-- 探測的教訓：第一版用 `echo WP6_EXEC_$((6*7))` 當標記，鎖緊後模型沒有呼叫 exec 卻回出 `WP6_EXEC_42`（自己算的），從 session 資料庫確認後改用隨機 nonce 重跑。拿模型回覆判定「有沒有執行」時，標記一定要是模型猜不到的值。
-
-#### 實際費用
-
-**本階段花費**：只有 Bedrock Haiku 4.5 呼叫，token 數沒量到（OpenClaw 的 log 不記用量，同時段 WP7 也在呼叫同一個模型）。本機 docker／程序不計費。
-
-**第 2 層：OpenClaw 自架，每人一台**（官方建議 2 vCPU／4 GB／40 GB；東京 `t4g.medium` $0.0432／h、gp3 $0.096／GB-月，與 [WP2](WP2-capability-boundary.md#實際費用-1) 同一組單價）
-
-| | 24h 常駐 | 每天 8h（其餘停機） |
-|---|---|---|
-| 每人 | 0.0432 × 730 + 40 × 0.096 = **$35.38** | 0.0432 × 243.3 + 3.84 = **$14.35** |
-| 100 人 | **$3,538** | **$1,435** |
-| AgentCore Runtime 對照（100 人，A 半「第 1 層判定」） | 實測 $832、保守 $3,409 | 實測 $277、保守 $1,136 |
-
-- 不含公網 IPv4（每台 $3.65／月）、模型 token、維運人力。每人一台 EC2 本身就是 VM 隔離，所以這個數字同時涵蓋第 1、2 層。
-- 停機再開機要等 EC2 開機加 OpenClaw 啟動，首句延遲會遠大於 AgentCore 的預喚醒（WP1 實測 p50 170–196 ms），沒實測。
-- Strands、LangGraph、Claude Agent SDK 是函式庫，費用落在第 1 層的執行環境上，不另計。
-
-**第 3 層**：函式庫都是開源、內嵌在自家 server，不另收費；gateway 類要多一台主機（agentgateway 約 `t4g.small` $15.8／月起；ContextForge 再加 Postgres）`[推測]`。方案 B 的授權也是在自家 server 手寫，這一層兩案成本相同。
-
-**第 4 層**：見上方價格表。
-
-#### 自架要自己維運的元件與估點（`[推測]`，費氏數列）
-
-| 層 | 路線 | 主要元件 | 估點合計 |
+| 能力 | 自管 Postgres + pgvector | Mem0 雲端／自架 | Zep 雲端／Graphiti 自架 |
 |---|---|---|---|
-| 2 | OpenClaw 每人一台 | 每人一台機器的開通、啟停與回收（8）、版本升級與 deny 清單隨版重審（5）、對外網路控管（3）、使用者 token 輪換（MCP headers 是靜態的，要改 ENV 加重啟，3） | 約 19 |
-| 2 | Strands／LangGraph 自寫 | 框架本身不用維運；聊天室對應實例、session 路由（3），執行環境算在第 1 層 | 約 3 |
-| 3 | 手寫（同方案 B） | 無額外；限流改原子操作（1） | 約 1 |
-| 3 | 改用 Cedar | 規則與 schema、DB → entities 轉換（2） | 約 2 |
-| 3 | agentgateway／ContextForge | 部署與升級（3）、購買資料同步進 JWT 或它的 DB（5）、限流計量接回自家帳本（3） | 約 11 |
-| 4 | 託管（Cloudflare、Steel） | 接手交還接進 App（3）、手機實機驗證與鍵盤補強（3） | 約 6 |
-| 4 | 自架 Chromium＋noVNC | 一人一容器的隔離與擴展（8）、瀏覽器更新（3）、接手交還狀態機與逾時（5）、手機觸控與鍵盤（5）、profile 加密保存（3）、網域白名單代理（3） | 約 27 |
+| 短期對話歷史 | 要自己做 | 沒有獨立功能，用 user_id／agent_id／run_id 分範圍 | Zep 有（thread）；Graphiti 要自己做 `[推測]` |
+| 長期記憶與語意檢索 | 要自己做（HNSW／IVFFlat） | 有 | 有（graph 檢索） |
+| LLM 萃取 | 要自己寫整條 pipeline | 內建，新版單次 LLM 呼叫、**只新增** | 內建；自訂萃取指令要 Flex Plus；Graphiti 每個 episode 觸發多次 LLM 呼叫 |
+| 合併去重與衝突 | 要自己做 | 不去重、不覆寫，衝突靠檢索排序 `[推測]` | 有：舊事實標記失效、不刪除 |
+| 跨使用者隔離 | `user_id` WHERE（應用層），或 **RLS（資料層強制）**；RLS 要加 `FORCE ROW LEVEL SECURITY`，否則表擁有者會繞過 | 應用層帶 `filters={"user_id": ...}`；Platform 的 API key 綁 project，角色只有 READER／OWNER，沒有 per-user key（官方文件沒寫此功能）。OSS 的 per-user key 綁 dashboard 使用者，不是記憶的 `user_id` | Zep：每位使用者獨立 user graph（服務內結構隔離）；Graphiti：`group_id`，靠應用層 `[推測]` |
+| 官方宣稱延遲 | 沒有 | p50 0.88–1.09 秒、每次約 7K token（README，沒說是寫入還是寫入加檢索）；雲端 add 是非同步 | Graphiti「通常次秒級」；Zep 託管「sub-200ms」 |
 
-#### #8 門檻：方案 C 比方案 B 便宜的使用者規模
+- 來源：[PostgreSQL RLS](https://www.postgresql.org/docs/current/ddl-rowsecurity.html)、[pgvector](https://github.com/pgvector/pgvector)、[mem0ai/mem0](https://github.com/mem0ai/mem0)、[Mem0 add](https://docs.mem0.ai/core-concepts/memory-operations/add)、[Zep concepts](https://help.getzep.com/concepts)、[getzep/graphiti](https://github.com/getzep/graphiti) `[官方已寫]`
+- pgvector 的近似索引是先掃索引再套 WHERE，依使用者過濾後結果可能變少。建議 partition、獨立表，或開 iterative scan `[官方已寫]`。
+- `[矛盾]` Mem0 舊論文（arXiv 2504.19413）描述萃取與整併，新版 README 寫只做 ADD。以新版 README 為準。
+
+#### 實測：第 5 層寫入加檢索延遲（2026-10-02）
+
+- 腳本與原始數據：[`02-memory/experiments/latency-compare/`](../02-memory/experiments/latency-compare/README.md)。資源 tag：`wp=WP6`、`owner=kais`、`project=hyfai`。
+- 從台灣筆電呼叫東京（STS RTT 中位數 43–68 ms）。pgvector 和 Mem0 的 DB 是本機 docker，embedding 用 Titan V2、Mem0 萃取用 Haiku 4.5（`jp.`），都在東京 Bedrock。
+- 每次試驗用新的使用者、同一則訊息。`visible_ms` 是從開始寫入到搜尋第一次找回這筆資料。
+
+| 候選 | 次數 | 寫入 p50 | 搜尋 p50 | 寫入到搜得到 p50／p90 |
+|---|---|---|---|---|
+| pgvector（存原句，不萃取） | 10 | 192 ms | 170 ms | **365／463 ms** |
+| Mem0 OSS 2.2.1（同步萃取） | 10 | 1,683 ms | 170 ms | **1.85／2.07 s** |
+| AgentCore Memory（對照組，非同步萃取） | 5 | 243 ms | 337 ms | **65.9／68.1 s**（4 次命中；第一次 5 分鐘內沒萃取出來，原因沒查） |
+
+- **自架比 AgentCore 快很多的是「剛寫入就要搜得到」：** AgentCore 的長期記憶要等約 66 秒的背景萃取，Mem0 同步萃取約 1.9 秒。搜尋本身三者都在 0.2–0.35 秒。
+- 同一個 session 內的前文本來就靠短期記憶，66 秒只影響「剛說完的事實，下一個 session 馬上要用」的情境，對選型影響小。
+- 費用約 $0.36（Haiku $0.22、`RetrieveMemoryRecords` 輪詢 270 次 $0.135），算式見腳本 README。
+- 清理：docker 容器已移除；兩個 `wp6_latency_*` memory 都已刪除（見腳本 README 的清理確認）。
+
+**第 5 層：100 人月費**（假設 `[推測]`：每人每月 30 session × 10 輪 = 共 3 萬輪，每輪 1 次寫入加 1 次檢索，共 2 萬筆長期記憶、20 GB）
+
+| 候選 | 月費 | 算式 |
+|---|---|---|
+| AgentCore Memory（對照） | 約 $45 | 6 萬 event × $0.25/千 + 2 萬筆 × $0.75/千 + 3 萬次檢索 × $0.50/千（單價見 [`read-write-cost.md`](../02-memory/read-write-cost.md)） |
+| Mem0 雲端 | $249 | 3 萬次檢索超過 Starter 的 5 千次，要 Pro |
+| Zep 雲端 | $150–300 | 每則訊息 1–2 credit，6–12 萬 credits，Flex $125 加超量 |
+| 自管 pgvector（RDS 東京） | 單 AZ 約 $76.5；Multi-AZ 約 $153 | `db.t4g.medium` $0.101/h × 730 + 20 GB × $0.138；不含萃取 LLM 費。運行中閒置照收；停止時不收實例時數，仍收儲存、備份、public IPv4，連續停滿 7 天自動啟動 `[官方已寫]`（[RDS 停止實例](https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/USER_StopInstance.html)） |
+| Mem0 自架 | 約 $110（單 AZ）；Multi-AZ 約 $186；compose 內建 Postgres 單機約 $33.5 | server 主機 `t4g.medium` $0.0432/h × 730 + 20 GB gp3 = $33.46（官方沒寫建議規格，`[推測]`）+ RDS 單 AZ $76.49；單機版無 HA、無備份。不含萃取 LLM 費 |
+| Graphiti 自架（Neo4j） | 約 $16.7–33.5 | Neo4j 5.26 官方最低 2 vCPU／2 GB／10 GB → `t4g.small` $0.0216/h × 730 + 10 GB gp3 = $16.73；實務 `t4g.medium` $33.46 `[推測]`。Graphiti 是函式庫，跑在應用程式裡；不含 LLM 費 |
+
+**萃取用 LLM 月費**（自建三個候選都要加；AgentCore 內建策略已含在上表）
+
+假設 `[推測]`：每月 3 萬次寫入，每次 6.5K 輸入 + 0.5K 輸出 token；embedding 寫入與檢索各 1 次、每次 200 token（共 12M token）。7K token 取自 Mem0 README 的基準表，那是 managed 平台、top_200 檢索預算下的數字，不是單次寫入 `[矛盾]`，所以下表可能高估，要實測。
+
+| 模型（東京） | 每百萬 token 輸入／輸出 | 月費 |
+|---|---|---|
+| Claude Haiku 4.5（`jp.` Geo profile） | $1.10／$5.50 | 214.5 + 82.5 + Titan V2 0.35 ≈ **$297**（Global profile 約 $270） |
+| Amazon Nova Lite | $0.072／$0.288 | 14.04 + 4.32 + 0.35 ≈ **$18.7** |
+| Amazon Nova Micro | $0.042／$0.168 | 8.19 + 2.52 + 0.35 ≈ **$11.1** |
+| gpt-5-mini（Mem0 自架預設） | $0.25／$2.00 | 48.75 + 30 + text-embedding-3-small 0.24 ≈ **$79**（推理 token 算進輸出，可能偏低） |
+
+- 東京單價取自 Bedrock Price List 東京檔（2026-09-30）`[官方已寫]`；OpenAI 取自[各模型頁](https://developers.openai.com/api/docs/models/gpt-5-mini) `[官方已寫]`。Titan Text Embeddings V2 東京 $0.029、Cohere Embed 4 $0.12 每百萬 token。
+- 東京沒有 In-Region 的 Haiku 4.5、Nova Micro，只能走 cross-region profile；Haiku 4.5 的 Geo 價比 Global 貴 10%。Nova Lite、Titan V2、Cohere Embed 4 東京可直接 on-demand `[官方已寫]`（各模型的 [model card](https://docs.aws.amazon.com/bedrock/latest/userguide/model-card-anthropic-claude-haiku-4-5.html)）。
+- `[矛盾]` Nova Micro 的 Price List 有東京 SKU，文件卻寫東京沒有 In-Region。單價以 Price List 為準。
+- 汰換風險：Haiku 4.5 的 model card 寫「EOL no sooner than Oct 16, 2026」；gpt-5-mini 在 OpenAI 已標 Deprecated。
+- 實測更正（2026-10-02，[`latency-compare`](../02-memory/experiments/latency-compare/README.md)）：Mem0 2.2.1 每次 `add` 呼叫 LLM 1 次，平均 8.6K 輸入、80 輸出 token（使用者還沒有既有記憶時）。照這個數字重算，Haiku 4.5 是 283.8 + 13.2 + 0.35 ≈ **$297**：輸入多估少了、輸出多估了，合計剛好跟原估算相同。另外 mem0ai 2.2.1 搭 Nova 會在 Converse 參數驗證失敗，要用 Nova 就得修 mem0 或自己包 LLM client。
+
+### 第 6 層：可觀測與成本分攤
+
+| 能力 | OTel + Tempo 自架／Grafana Cloud | Langfuse 雲端／自架 | Phoenix 自架／Arize AX |
+|---|---|---|---|
+| trace / span | 有 | 有，OTLP 只收 HTTP，**不收 gRPC** | 有（OpenInference） |
+| token 計量與成本換算 | 沒有原生；Tempo 不能單獨當分攤方案 `[推測]` | 有，內建價格表，可自訂 model definition | 有，內建價格表，可自訂 |
+| 依 user／session 彙總 | 要自己寫查詢 | UI 有；**Metrics API v2 不能用 userId／sessionId 當 group-by**，要自己 loop 或拉 Observations 彙總 | session 有；per user 沒查到 |
+| 非 LLM 成本掛到使用者 | 要自己做 | 要自己做（只有 generation／embedding 計成本） | 要自己做 |
+| 資料可查詢延遲 | 未查 | 官方寫 15–30 秒（Langfuse v4 宣稱 real-time，此數字可能過時） | 未查 |
+
+- 來源：[Langfuse token & cost](https://langfuse.com/docs/observability/features/token-and-cost-tracking)、[Langfuse Metrics API](https://langfuse.com/docs/metrics/features/metrics-api)、[Langfuse OTel](https://langfuse.com/integrations/native/opentelemetry)、[Langfuse scaling](https://langfuse.com/self-hosting/configuration/scaling)、[Phoenix cost tracking](https://arize.com/docs/phoenix/tracing/how-to-tracing/cost-tracking) `[官方已寫]`
+- Langfuse Cloud 的 JP 區在 AWS ap-northeast-1（東京），Hobby、Core 都能選，定價頁沒有區域加價 `[官方已寫]`。JP 區 Postgres 備份複製到大阪，ClickHouse（trace）與 S3 不跨區複製。來源：[Langfuse data regions](https://langfuse.com/security/data-regions)
+- Langfuse 舊版 metrics 端點（可依 user 彙總）在 Cloud 只服務到 2026-11-16 `[官方已寫]`。
+- AgentCore 的 `USAGE_LOGS` 只有 `session.id`，沒有使用者 ID（[WP0 回填](WP0-cost-baseline.md#回填)），所以 session→user 對照不論自架或 AgentCore 都要自己維護。
+- 自架相對 AgentCore 要自己補的維度：`user.id`（AgentCore 也沒有自動帶，待實測）、`session.id`（用 baggage 帶）、Runtime 資源用量（自架時沒有 `USAGE_LOGS`，要改看 CloudWatch Agent 或 cAdvisor）。
+- Langfuse 自架必須有 ClickHouse（沒有替代），共六個元件：Web、Worker、Postgres、Redis、ClickHouse、S3。Docker Compose 版官方定位是「單一 VM，無 HA、無擴展、無備份」`[官方已寫]`。
+
+**第 6 層：100 人月費**（假設 `[推測]`：每人每天 10 則對話，每則 35 units、135 KB）
+
+| 候選 | 月費 | 算式 |
+|---|---|---|
+| AgentCore 內建觀測（對照） | 約 $1.55 | span 攝入 4.05 GB × $0.35 + 儲存 4.05 × $0.033（東京 CloudWatch Price List，2026-09-22）；只算 span，不含 `APPLICATION_LOGS`（vended logs 東京 $0.76/GB 起，量要實測） |
+| Langfuse Cloud Core | 約 $105 | 105 萬 units：$29 + 90 萬 × $8/10 萬 + 5 萬 × $7/10 萬 |
+| Grafana Cloud Traces | $19 | 4.05 GB 低於含的 50 GB；沒有成本換算 |
+| Langfuse 自架（拆開部署） | 約 $340 | `t4g.xlarge` + RDS + Valkey + ClickHouse（`r7g.large`）+ EBS + S3；不含 ALB、備份、Multi-AZ |
+| Langfuse 自架（單 VM Compose） | 約 $137 | 只適合實驗；撐不撐得住待實測 |
+| Phoenix 自架（Postgres） | 約 $113 | `t4g.medium` + RDS `db.t4g.medium` |
+
+觀測後端要 24h 收資料，沒有閒置折扣。
+
+### #8 門檻：方案 C 比方案 B 便宜的使用者規模
 
 合併 A、B 兩半，逐層看「自架或託管」相對 AgentCore 的成本結構：
 
@@ -475,18 +402,57 @@ A 半的實測到此結束，只剩檢核點 8 要等 B 半一起算。
 - **結論：無門檻。** 金額最大的是第 1、2 層的執行環境，自架每人每月都比較貴，而且隨人數線性增加，沒有規模效益。第 4、5 層雖然在 75、226 人以上有門檻，每月省下的是幾十美元等級，抵不過第 1、2 層每人多出的 $3–27，也抵不過維運估點（上表加 A 半，挑最省的路線也有約 60 點：OpenClaw 每人一台 19、授權 1、託管瀏覽器 6、Mem0 自架 19、Langfuse Cloud 約 13）。
 - 但書：AgentCore 的實測值來自不呼叫模型的最小 agent（WP1 #10）。真實 agent 的記憶體若接近保守估算（4 GB），第 1、2 層的差距會縮到每人 $1–3，那時要用正式 agent 的 `USAGE_LOGS` 重算。
 
-#### 清理確認
+### 自架要自己維運的元件與估點（`[推測]`，費氏數列）
+
+| 層 | 路線 | 主要元件 | 估點合計 |
+|---|---|---|---|
+| 1 | 純 Firecracker | VM 排程與生命週期 API（21）、host fleet、映像、網路、記憶體清除、pause/resume、計量 | 約 68 |
+| 1 | Kata on EKS | 節點群組與 Karpenter、映像、狀態保存（只有 PVC） | 約 36 |
+| 1 | E2B 自架 | 移植到 AWS（13）、host fleet、映像 | 約 50 |
+| 2 | OpenClaw 每人一台 | 每人一台機器的開通、啟停與回收（8）、版本升級與 deny 清單隨版重審（5）、對外網路控管（3）、使用者 token 輪換（MCP headers 是靜態的，要改 ENV 加重啟，3） | 約 19 |
+| 2 | Strands／LangGraph 自寫 | 框架本身不用維運；聊天室對應實例、session 路由（3），執行環境算在第 1 層 | 約 3 |
+| 3 | 手寫（同方案 B） | 無額外；限流改原子操作（1） | 約 1 |
+| 3 | 改用 Cedar | 規則與 schema、DB → entities 轉換（2） | 約 2 |
+| 3 | agentgateway／ContextForge | 部署與升級（3）、購買資料同步進 JWT 或它的 DB（5）、限流計量接回自家帳本（3） | 約 11 |
+| 4 | 託管（Cloudflare、Steel） | 接手交還接進 App（3）、手機實機驗證與鍵盤補強（3） | 約 6 |
+| 4 | 自架 Chromium＋noVNC | 一人一容器的隔離與擴展（8）、瀏覽器更新（3）、接手交還狀態機與逾時（5）、手機觸控與鍵盤（5）、profile 加密保存（3）、網域白名單代理（3） | 約 27 |
+| 5 | 自管 pgvector | 萃取 pipeline（8）、去重與衝突（8）、索引、RLS、對話表 | 約 28 |
+| 5 | Mem0 自架 | 去重策略、server 部署、RLS | 約 19 |
+| 5 | Graphiti 自架 | 圖資料庫維運（5）、限流 | 約 23 |
+| 6 | Langfuse 自架 | 六元件部署（8）、升級、擴展、session→user 合併報表（5）、隱私 | 約 34；改用 Cloud 省約 18–21 |
+
+### 範圍調整（2026-10-02）
+
+接下來 WP6 只實測**估算月費比 AgentCore 便宜的託管方案**。託管方案的估算月費如果已經比 AgentCore 高，就不實測，直接以價格判定。自架方案也不再追加實測，已經做完的 pgvector、Mem0 OSS 保留。
+
+| 層 | 託管候選 | 100 人估算月費 | AgentCore 對照 | 判定 |
+|---|---|---|---|---|
+| 1 | E2B、Daytona | 24h $12.2k–12.4k；8h $4.2k–4.3k。E2B 縮到 1 vCPU／1 GB 也要 $5.0k／$1.8k | 實測 $832／$277；保守估 $3.4k／$1.1k（見下方「第 1 層判定」） | **跳過**：任何一種算法都比 AgentCore 貴 |
+| 5 | Mem0 Platform、Zep Cloud | $249；$150–300 | 約 $45 | **跳過**：比 AgentCore 貴 3–7 倍 |
+| 6 | Langfuse Cloud Core | 約 $105 | 約 $1.55（只算 span） | **跳過**：比 AgentCore 貴約 68 倍 |
+
+原列的「待實測」項目都已完成或依上表跳過：第 1 層冷啟動（Firecracker、Kata 自架不測）；第 5 層一次寫入加檢索延遲（pgvector、Mem0 OSS 已完成；Mem0 Platform、Zep Cloud 跳過）；第 6 層 Langfuse 實測；寫信問 E2B、Daytona（暫停期間的儲存費、40 GB 磁碟、VM sandbox 啟動秒數），第 1 層跳過，不用問。
+
+### 清理確認
 
 - [x] 沒有建立 AWS 資源
 - [x] OpenClaw gateway 已停止；裝在暫存目錄，`~/.openclaw` 不存在、沒有裝 launchd 服務；`/tmp/openclaw/` log 已刪除
 - [x] 子 agent 的暫存測試檔在 session scratchpad，不在 repo
 - [x] 第 4 層實測的兩個 AgentCore Browser session 已關閉，`list-browser-sessions --status READY` 為空；沒有註冊 Cloudflare
 - [x] 尺寸費用實驗的自訂 Browser `wp6_viewport`、USAGE_LOGS delivery source／delivery 已刪
+- [x] 第 5 層實測的 docker 容器與 `wp6_latency_*` memory 已刪除（見第 5 層實測）
 
-#### 要更正研究庫的段落
+### 要更正研究庫的段落
+
+前五列是 A 半，2026-10-02 已套用；後五列是 B 半。
 
 | 檔案:行號 | 原本寫的 | 調研結果 |
 |---|---|---|
+| `00-overview/build-vs-buy.md:21` | session 強隔離要自己寫一整套排程器，難度高 | 拆三級：買 E2B 託管＝低；Kata on EKS＝中；純 Firecracker＝高。AWS 上要 Intel nested virtualization。Daytona 預設是 container；VM sandbox 雖已不標 beta，但磁碟上限 10 GiB、只能從 VM snapshot 建立 |
+| `00-overview/build-vs-buy.md:22` | 短期記憶用 Redis／Postgres，低 | 自建低成立；Mem0 沒有獨立對話歷史，Zep thread 才是對應物 |
+| `00-overview/build-vs-buy.md:23` | 合併、去重、衝突、隔離全部要自己設計 | Mem0 只新增不去重；Zep／Graphiti 有失效機制；只有 pgvector 加 RLS 能在資料層強制隔離 |
+| `06-observability/README.md:104` | log 大約每 GB $0.50 | $0.50 是美東價；東京標準 Logs 攝入 $0.76/GB。span 的 $0.35/GB 東京相同 |
+| `00-overview/build-vs-buy.md:30` | 觀測低–中，標準成熟 | 改成中：trace 與 LLM 成本換算成熟，每位使用者全成本分攤不成熟；Langfuse 自架六元件；只收 HTTP OTLP |
 | `00-overview/build-vs-buy.md:19` | Harness：框架都已經處理好了，低 | 框架本身低；但 OpenClaw 預設全開、一個租戶一個 gateway，每人一台機器；Strands 每個聊天室要一個 Agent 實例 |
 | `00-overview/build-vs-buy.md:24` | Gateway：自己架 MCP server，中 | 技能授權放自家 MCP server 手寫即可（WP2 實證），MCP gateway 類專案要多養服務、購買資料多一份，不值得 |
 | `00-overview/build-vs-buy.md:27` | Policy：在工具 proxy 前面放 OPA 或 Cedar，中 | 「買了才能用」這種規則，函式庫省不了程式碼（70 行→約 60 行），多得到的是型別檢查與形式驗證；規則變複雜再用 Cedar |

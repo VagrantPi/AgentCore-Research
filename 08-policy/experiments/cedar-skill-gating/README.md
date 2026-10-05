@@ -1,6 +1,6 @@
 # 技能授權用 Cedar 寫：和手寫版比較
 
-WP6 第 3 層的實測（[WP6 回填](../../../91-work-packages/WP6-oss-alternatives.md#b-半第-234-層)）。WP2 在自家 MCP server（HephAgora）手寫的「買了才能用」約 70 行（[`skill-gating`](../skill-gating/README.md)）。這裡用開源 Cedar（`@cedar-policy/cedar-wasm` 4.13.0）寫同一條規則，看能省多少、多了什麼。
+WP6 第 3 層的實測（[WP6 回填](../../../91-work-packages/WP6-oss-alternatives.md#第-3-層工具閘道與授權)）。WP2 在自家 MCP server（HephAgora）手寫的「買了才能用」約 70 行（[`skill-gating`](../skill-gating/README.md)）。這裡用開源 Cedar（`@cedar-policy/cedar-wasm` 4.13.0）寫同一條規則，看能省多少、多了什麼。
 
 ## 怎麼跑
 

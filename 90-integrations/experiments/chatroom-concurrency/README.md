@@ -1,6 +1,6 @@
 # 一個程序同時服務兩個聊天室
 
-WP6 第 2 層的實測（[WP6 回填](../../../91-work-packages/WP6-oss-alternatives.md#b-半第-234-層)）：同一位使用者有兩個聊天室，一個 agent 程序能不能同時處理、對話狀態會不會串在一起。另外用 OpenClaw 測「框架外強制工具白名單」（WP6 #6）。
+WP6 第 2 層的實測（[WP6 回填](../../../91-work-packages/WP6-oss-alternatives.md#第-2-層agent-框架與技能)）：同一位使用者有兩個聊天室，一個 agent 程序能不能同時處理、對話狀態會不會串在一起。另外用 OpenClaw 測「框架外強制工具白名單」（WP6 #6）。
 
 模型都是東京 Bedrock 的 Claude Haiku 4.5（`jp.anthropic.claude-haiku-4-5-20251001-v1:0`），從台灣筆電呼叫。
 

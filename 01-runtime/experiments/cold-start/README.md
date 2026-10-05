@@ -61,11 +61,11 @@ python bench.py cleanup
 ```
 
 - 每個試驗做完都會呼叫 `StopRuntimeSession`；lifecycle 也壓低到閒置 60 秒、最長 600 秒，避免 session 閒置時繼續計費。
-- **MMDSv2：** `CreateAgentRuntime` 的 API 沒有 `metadataConfiguration` 參數（boto3 1.43.105 的 service model 只有 Update 才有）。所以如果第一次呼叫因為 MMDS 相關錯誤被擋下，腳本會自動補一次 `UpdateAgentRuntime`，設定 `requireMMDSV2=true`，然後重試。新建立的 runtime 是否預設就是 MMDSv2，也是這次實驗順便要確認的事。
+- **MMDSv2：** `CreateAgentRuntime` 的 API 沒有 `metadataConfiguration` 參數（boto3 1.43.105 的 service model 只有 Update 才有）。所以如果第一次呼叫因為 MMDS 相關錯誤被擋下，腳本會自動補一次 `UpdateAgentRuntime`，設定 `requireMMDSV2=true`，然後重試。實測新建的 runtime 預設就是 `requireMMDSV2: true`，這個分支沒有被觸發（見[結果](#結果)的 MMDSv2 一段）。
 
 ## 成本估算
 
-以下是自行估算，未經實測：
+以下是事前的自行估算。實測費用見 [WP1 實際費用](../../../91-work-packages/WP1-runtime-session.md#實際費用)：#10 成本情境 $0.551548、#11 VPC 組 $0.043361（`USAGE_LOGS`）；其餘 wp1_ runtime 沒開 `USAGE_LOGS`，未精算。
 
 - 每個試驗的 session 只活幾秒鐘，而且 agent 不呼叫任何模型，所以運算費用用 v1 價格粗估**遠低於 1 美元**。
 - 另外會有 ECR 儲存費（約 1.2 GB）、CloudWatch Logs，以及 VPC 變體的 NAT 或 endpoint 費用。

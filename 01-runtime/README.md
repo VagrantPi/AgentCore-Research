@@ -9,10 +9,10 @@
 - **資源模型：** Runtime → 不可變的 Version → 有名稱的 Endpoint → Session，**每個 Session 是一台獨立的 microVM**。這層層關係跟 Lambda 的 function → version → alias 幾乎一樣，差別在最後多了「session」這一層狀態。
 - **兩個正交的選擇：**
   - **運算型態**：microVM（serverless，session 最長 8 小時）或 Instances（在自己帳號的 EC2 上跑，最長 14 天，可用 GPU）。
-  - **平台版本**：V1，或 V2（從 snapshot 還原，冷啟動時間穩定，但程式碼要配合改寫）。
+  - **平台版本**：V1，或 V2（從 snapshot 還原，冷啟動穩定在約 2 s，但程式碼要配合改寫）。實測 V1 有約 15 台的預熱池，池子裡冷啟動只要 0.56 s；V2 只在池子用光後才比較快（V1 small 3.6 s、1 GB 17.8 s）（[WP1](../91-work-packages/WP1-runtime-session.md#回填) #1、#2）。
 - **對開發者的要求其實很薄：** 一個在 `0.0.0.0:8080` 上實作 `POST /invocations` 和 `GET /ping` 的 ARM64 container 就行。其他協定只是換 port 和路徑。
 - **AgentCore 不管「哪個 session 屬於哪個使用者」**，這件事要你的後端自己負責。這是最容易被忽略的安全責任。
-- **2026 年的兩個強制變更：** MMDSv2 從 2026-06-30 起強制啟用，沒開的 runtime 無法被呼叫；direct code deploy 的 Python 3.10 / 3.11 從 2026-08-31 起**無法再更新**。
+- **2026 年的兩個強制變更：** MMDSv2 從 2026-06-30 起強制啟用，沒開的 runtime 無法被呼叫（`CreateAgentRuntime` 新建的 runtime 預設就是 `requireMMDSV2: true`，[WP1](experiments/cold-start/README.md#結果)）；direct code deploy 的 Python 3.10 / 3.11 從 2026-08-31 起**無法再更新**。
 
 ## 核心概念
 
@@ -55,7 +55,7 @@ V2 的原理跟 **Lambda SnapStart** 相同：先把環境初始化好，拍一�
 
 |  | V1（預設） | V2 |
 |--|-----------|-----|
-| 冷啟動 | 隨 image 大小和並發量變動 | **不論 image 大小或並發量都很穩定** |
+| 冷啟動 | 從約 15 台的預熱池分配時 0.56 s，image 大小沒影響；池子用光後 small 3.6 s、1 GB 17.8 s（[WP1](../91-work-packages/WP1-runtime-session.md#回填) #1） | **不論 image 大小或並發量都穩定在約 2 s**；池子裡比 V1 慢，池子用光後才比較快（WP1 #2） |
 | 建立或更新需要的時間 | 幾秒 | **幾分鐘**（要製作快照） |
 | 啟動期限 | — | 啟動後 120 秒內 `/ping` 必須回報健康，否則建立失敗 |
 | 環境變數大小上限 | 4 KB | 1.5 KB（direct code）/ 2.5 KB（container） |
@@ -101,7 +101,7 @@ V2 的原理跟 **Lambda SnapStart** 相同：先把環境初始化好，拍一�
 | 更新速度 | 較慢 | 第二次之後的部署明顯較快 |
 | 新 session 建立速率 | 見下方 ⚠️ | 25 個／秒 |
 
-⚠️ **官方文件在 session 建立速率上前後矛盾：** Direct code 的頁面寫「container 部署每秒只能建立 1.6 個新 session」，但 Quotas 頁寫的是「25 TPS，container 和 direct code 共用」。如果你預期會有流量尖峰，**這個數字要先實測確認**。
+⚠️ **官方文件在 session 建立速率上前後矛盾：** Direct code 的頁面寫「container 部署每秒只能建立 1.6 個新 session」，但 Quotas 頁寫的是「25 TPS，container 和 direct code 共用」。實測 container 100 個新 session 在約 1 秒內送出，0 次 throttle：1.6/s 不成立；25/s 是持續速率還是上限，這個規模分辨不出來（[WP1](../91-work-packages/WP1-runtime-session.md#檢核表) #9）。
 
 ⚠️ **Direct code 的語言版本淘汰時程：** Python 3.10 和 3.11 已經在 2026-06-30 標示為淘汰，並在 **2026-08-31 起禁止更新**。已經在跑的 runtime 如果還用這兩個版本，下次部署前必須先升級。
 
@@ -147,7 +147,7 @@ stateDiagram-v2
 | 存放位置 | 存活範圍 | 適合放什麼 |
 |---------|---------|-----------|
 | microVM 的記憶體與本機磁碟 | 到 microVM 停止為止 | 暫存資料 |
-| **Session storage**（預覽中） | 跨越停止與恢復；**14 天沒被呼叫就清空**；**更新 runtime 版本時也會清空**；上限 1 GB | coding agent 的專案目錄、已安裝的套件 |
+| **Session storage**（預覽中） | 跨越停止與恢復；**14 天沒被呼叫就清空**；**恢復時用的版本變了才會清空**（例如透過 DEFAULT），固定版本的 endpoint 不會（[WP1](../91-work-packages/WP1-runtime-session.md#檢核表) #6a、#6b）；上限 1 GB | coding agent 的專案目錄、已安裝的套件 |
 | EFS / S3 Files（需要 VPC） | 永久，由你自己管理；可以跨 session、跨 agent 共享 | 共用的工具庫、資料集、模型權重 |
 | Capacity provider 的 EBS（僅 Instances） | 跨越停止與恢復，直到 session 被刪除 | 長時間任務的 checkpoint |
 | AgentCore Memory | 永久，結構化 | 對話歷史、使用者偏好 |
@@ -180,7 +180,7 @@ app.complete_async_task(task_id)         # 所有任務完成後，/ping 會回�
 
 - **最長 8 小時**（microVM 的 `maxLifetime`）。更長的任務要改用 Instances（14 天）。
 - **官方沒有提供「任務完成」的通知機制：** 文件描述的模式是「使用者晚點再回來查」，也就是用同一個 session ID 再呼叫一次。需要主動通知的話，要自己在任務結束時送到 SNS、EventBridge 或 webhook（這是我的設計判斷）。
-- **最常見的坑：** 如果 handler 裡有阻塞的操作，而程式是單執行緒，`/ping` 就會一起被卡住，**15 分鐘後 session 會被當成閒置而砍掉**。阻塞的工作一定要放到其他執行緒，或改用 async。
+- **最常見的坑：** 如果 handler 裡有阻塞的操作，而程式是單執行緒，`/ping` 就會一起被卡住，**15 分鐘後 session 會被當成閒置而砍掉**。阻塞的工作一定要放到其他執行緒，或改用 async。實測範圍更大：多執行緒、`/ping` 照常回 `Healthy` 的 handler，請求超過閒置逾時也一樣被砍，只有處理中回 `HealthyBusy` 能保住；handler 也必須 async 或多執行緒，同一 session 的並行請求才不會排隊（[WP1](../91-work-packages/WP1-runtime-session.md#檢核表) #8、#8′）。
 - **另一個坑：** 自己實作 `/ping` 時，如果每次都把 `time_of_last_update` 設成現在時間，平台會以為狀態一直在變，session **永遠不會進入閒置**，會一直跑到 8 小時上限，最後把 session 配額耗光。
 
 ## 網路
@@ -191,6 +191,7 @@ app.complete_async_task(task_id)         # 所有任務完成後，/ping 會回�
   - **只支援特定的 AZ。** 以東京為例，只支援 `apne1-az1`、`az2`、`az4`，**不支援 `az3`**。放錯 AZ，建立時就會失敗。
   - 建議加上 ECR、S3 gateway、CloudWatch Logs 的 VPC endpoint。Container 型的 agent 會定期從 ECR 重新拉取 image，沒有 S3 gateway endpoint 的話，這些流量都會算進 NAT 的處理費。
     - 不開 NAT 時，ECR `api`、`dkr` interface endpoint 是**必要的**：缺了 Runtime 建得起來（READY）但呼叫回 502（[WP3](../91-work-packages/WP3-sandbox-egress.md) #5）。
+    - 跑 OpenClaw 這類會自己換 scoped 憑證的 agent，還要加 STS interface endpoint；缺了建憑證會卡 2–7 分鐘才逾時（[WP7](../91-work-packages/WP7-openclaw-on-agentcore.md#回填) #6）。
     - `[矛盾]` S3 gateway endpoint 政策照官方文件只放行 `prod-<region>-starport-layer-bucket` 時，Runtime 拉不到映像；「全允許＋拒絕匿名請求」可行（WP3 B 半）。
   - Runtime 刪除後，ENI 最多會在 VPC 裡**殘留 8 小時**才自動清掉。
 - **呼叫端也可以走私有網路：** 用 PrivateLink 建立 `bedrock-agentcore`（資料面）與 `bedrock-agentcore-control`（控制面）的 interface endpoint。
@@ -201,7 +202,7 @@ app.complete_async_task(task_id)         # 所有任務完成後，/ping 會回�
 
 1. **自己管理「session ↔ 使用者」的對應：** AgentCore 不會檢查呼叫者是不是這個 session 的主人。如果後端直接把前端傳來的 session ID 往下送，**A 使用者只要猜到或拿到 B 的 session ID，就能進入 B 的 microVM**。你的後端必須自己維護對應關係，並限制每個使用者能開的 session 數量。
 2. **VM 裡的任何程式都拿得到 execution role 的憑證：** 取得方式跟 EC2 的 IMDS 一樣，走 microVM 的 metadata 服務（MMDS）。而 agent 可能會執行它自己產生的程式碼，所以 **execution role 必須最小權限**，而且權限不能大於「能呼叫這個 agent 的人」的權限，否則就會出現權限提升的漏洞。
-3. **MMDSv2 從 2026-06-30 起強制啟用：** 沒有設定 `metadataConfiguration.requireMMDSV2 = true` 的 runtime，呼叫時會收到 `ValidationException`。
+3. **MMDSv2 從 2026-06-30 起強制啟用：** 沒有設定 `metadataConfiguration.requireMMDSV2 = true` 的 runtime，呼叫時會收到 `ValidationException`。不過 `CreateAgentRuntime` 新建的 runtime 預設就是 `requireMMDSV2: true`（[WP1](experiments/cold-start/README.md#結果)）。
 4. **一定要驗證 `prompt` 的型別：** payload 是任意 JSON。如果呼叫端把 `prompt` 塞成一個 `toolUse` 結構，某些框架會**直接執行那個工具，完全跳過模型判斷和 guardrail**。務必檢查它是字串，最好用 Pydantic 或 Zod 定義 schema。
 5. **把 Gateway 放在 Runtime 前面，並鎖定只接受 Gateway 的請求：** 這樣 Policy、Guardrails、interceptor 等控制才不會被繞過。IAM 型的 runtime 用 resource policy 限制；JWT 型的用 `allowedWorkloadConfiguration` 限制。
 6. **限制 agent 存取 localhost：** 每台 microVM 裡都有一個跑在 localhost 的平台服務，負責 session 生命週期、儲存與 shell。如果 agent 的 HTTP 工具可以任意打 localhost，就會變成 SSRF 的入口。影響範圍雖然只限於這個 session，但仍然可以破壞 session，或取得 shell。
@@ -211,33 +212,33 @@ app.complete_async_task(task_id)         # 所有任務完成後，/ping 會回�
 
 ## 冷啟動與效能
 
-**官方沒有公布冷啟動的具體數字。** 以下是從文件整理出的影響因素：
+**官方沒有公布冷啟動的具體數字。** WP1 在東京實測（呼叫端在台灣）：V1 從池子 p50 561 ms、池子用光後 small 3617 ms；V2 p50 1898 ms（[實驗結果](experiments/cold-start/README.md#結果)、[WP1](../91-work-packages/WP1-runtime-session.md#檢核表)）。以下是影響因素：
 
 | 因素 | 影響 |
 |------|------|
-| 平台版本 | V1 隨 image 大小和並發量變動；V2 從快照還原，比較穩定 |
-| Image 大小 | 對 V1 影響明顯，對 V2 影響較小 |
-| VPC 模式 | 官方提到可能增加 session 的啟動時間 |
+| 平台版本 | V1 有約 15 台的預熱池，池子裡 0.56 s，池子用光才會真的冷啟動；V2 從快照還原，穩定在約 2 s |
+| Image 大小 | V1 池子裡沒影響（small 561 ms、1 GB 559 ms）；池子用光後 small 3.6 s、1 GB 17.8 s。V2 沒影響 |
+| VPC 模式 | 官方提到可能增加 session 的啟動時間；實測池子內外都約 0 ms，只有 V2 建立 runtime 時等 READY 從 183 秒變 527 秒（[WP1](../91-work-packages/WP1-runtime-session.md#檢核表) #11） |
 | 掛載 EFS / S3 Files | 每個掛載的逾時是 30 秒，而且是平行掛載，**任何一個失敗就整個請求失敗**（HTTP 424） |
 | 有沒有帶 session header | 沒帶的話，每個請求都可能是一次冷啟動 |
 | 閒置逾時 | 越短越容易觸發冷啟動 |
 | Instances | 第一次呼叫要先配置 EC2，所以明顯比較慢 |
 
-→ 冷啟動數據需要自己實測，已列為實驗題目。
+→ 冷啟動已由 [WP1](../91-work-packages/WP1-runtime-session.md#回填) 實測，完整數據見[實驗 README](experiments/cold-start/README.md#結果)。
 
 ## 踩雷清單
 
 1. **Session 與使用者的對應要自己管。** 詳見[安全要點](#安全要點)第 1 點。
-2. **Handler 阻塞會卡住 `/ping`：** 長時間任務會在 15 分鐘時被砍掉。
+2. **Handler 阻塞會卡住 `/ping`：** 長時間任務會在 15 分鐘時被砍掉。不只阻塞：`/ping` 照常回 `Healthy` 的請求超過閒置逾時也會被砍，只有 `HealthyBusy` 能保住（[WP1](../91-work-packages/WP1-runtime-session.md#檢核表) #8′）。
 3. **自己寫 `/ping` 時亂設 `time_of_last_update`：** session 永遠不會被回收，最後耗光配額。
 4. **V2 在啟動階段產生的隨機值、時間、憑證，所有實例都一樣。**
-5. **更新版本會清空 session storage：** 如果 coding agent 的專案目錄放在這裡，每次部署新版本，使用者的工作區就會被重置。
+5. **透過 DEFAULT 恢復時，更新版本會清空 session storage：** 清空與否看恢復 session 時用的版本有沒有變；用固定版本的 endpoint 部署，使用者的工作區就不會被重置（[WP1](../91-work-packages/WP1-runtime-session.md#檢核表) #6a、#6b）。
 6. **`UpdateAgentRuntime` 是完整覆寫（full PUT）：** 就算只想改一個設定，也要把 `roleArn`、`agentRuntimeArtifact`、`networkConfiguration` 等必填欄位全部帶上。
 7. **VPC 放在 public subnet 還是出不了網，而且 AZ 有白名單限制。**
-8. **MMDSv2 沒開就無法呼叫**（2026-06-30 起）。
+8. **MMDSv2 沒開就無法呼叫**（2026-06-30 起）；`CreateAgentRuntime` 新建的 runtime 預設已開。
 9. **Direct code 使用 Python 3.10 / 3.11 的話，已經無法更新**（2026-08-31 起）。
 10. **V2 無法透過 CloudFormation 或 CDK 設定。** 用 IaC 管理的團隊目前得額外用 API 處理。
-11. **Container 的 session 建立速率，官方文件寫法不一致**，要實測。
+11. **Container 的 session 建立速率，官方文件寫法不一致**：實測 100 個在約 1 秒內送出都沒被 throttle，1.6/s 不成立（[WP1](../91-work-packages/WP1-runtime-session.md#檢核表) #9）。
 
 ## 與其他元件的關係
 
@@ -254,7 +255,7 @@ app.complete_async_task(task_id)         # 所有任務完成後，/ping 會回�
 - [x] Session 隔離與生命週期（microVM、逾時）
 - [x] 支援的協定（HTTP、MCP、A2A、AG-UI）與 streaming
 - [x] 長時間執行 / 非同步任務的處理方式
-- [x] 冷啟動與效能（官方沒有數字，待實驗）
+- [x] 冷啟動與效能（官方沒有數字；WP1 已實測，PUBLIC 2026-10-02、VPC 2026-10-04）
 
 ## 延伸調研
 
@@ -263,7 +264,7 @@ app.complete_async_task(task_id)         # 所有任務完成後，/ping 會回�
 
 ## 實驗
 
-- [冷啟動與 session 建立速率](experiments/cold-start/README.md)：實驗工具已完成、本機驗證通過，**尚未在 AWS 上實跑**（撰寫時沒有 AWS 憑證）。矩陣為 V1/V2 × container/zip × PUBLIC/VPC，外加大 image，並用來驗證 V2 snapshot 的狀態重複問題，以及 1.6/s 與 25/s 的文件矛盾。**將由 [WP1](../91-work-packages/WP1-runtime-session.md) 在 AWS 實跑**，結果回填到實驗的 README
+- [冷啟動與 session 建立速率](experiments/cold-start/README.md)：[WP1](../91-work-packages/WP1-runtime-session.md#回填) 已在東京實跑：PUBLIC 組 2026-10-02、VPC 組 2026-10-04，結果在實驗的 README。矩陣為 V1/V2 × container × PUBLIC/VPC，外加大 image（只跑 PUBLIC），並驗證了 V2 snapshot 的狀態重複問題與 1.6/s、25/s 的文件矛盾。zip 變體沒有跑
 
 ## 參考資料
 
