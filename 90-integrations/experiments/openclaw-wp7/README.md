@@ -28,8 +28,9 @@
 | `metrics.py` | 用 CloudWatch metric 對帳 token 與 guardrail text unit |
 | `first.csv`、`burst.csv`、`restore.csv`、`load.csv`、`boundary.jsonl` | 原始結果 |
 | `logs_excerpt.txt`、`logs_excerpt_round2.txt` | Runtime log 的關鍵行（log group 已隨清理刪除） |
-
-`infra.json`（每個資源的 ID 與建立／刪除時間）不進版控。
+| `wp7-cost.csv` | 每個 session 的 vCPU-h、GB-h、金額（`usage_cost.py` 於 2026-10-04 算出）；原始 `USAGE_LOGS` 在 [`91-work-packages/evidence/usage-logs/wp0-usage.jsonl.gz`](../../../91-work-packages/evidence/usage-logs/wp0-usage.jsonl.gz) |
+| `bedrock_metrics.json`、`export.py` | Sonnet 4.6 token 與 guardrail text unit 的每分鐘指標，以及匯出它的腳本 |
+| `infra.json` | 每個資源的 ID 與建立／刪除時間（UTC），endpoint、NAT 的費用就是用它算的；第 1 輪的紀錄在 `round1` 底下 |
 
 ## 執行順序
 

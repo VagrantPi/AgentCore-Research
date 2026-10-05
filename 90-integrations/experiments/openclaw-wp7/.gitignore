@@ -1,4 +1,3 @@
-infra.json
 *.log
 state.json
 *.out

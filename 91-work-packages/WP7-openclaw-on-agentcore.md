@@ -134,6 +134,10 @@
 | **合計** | | | | **約 12.00** |
 
 - 本帳號拿不到帳單，全部是估算，算法見 [WP0](WP0-cost-baseline.md)。
+- **原始資料**：
+  - 每個 session 的加總存在 [`wp7-cost.csv`](../90-integrations/experiments/openclaw-wp7/wp7-cost.csv)（52 個 session，兩輪合計 $0.189975）。
+  - 每分鐘的 token 與 guardrail 指標存在 `bedrock_metrics.json`，資源建立／刪除時間存在 `infra.json`。
+  - 每秒一筆的原始 `USAGE_LOGS` 在 [`evidence/usage-logs/wp0-usage.jsonl.gz`](evidence/usage-logs/wp0-usage.jsonl.gz)（WP0 刪 log group 前整組匯出，`wp7_openclaw-wvyu0583ah` 10,059 筆、`wp7_openclaw-2E7NKd5QWE` 383 筆）。用它重算，結果與 `wp7-cost.csv` 只差四捨五入。
 - 不含：NAT 與 endpoint 的資料處理費（$0.062／GB、$0.01／GB；資料量沒量，主要是 1.45 GB 映像經 ECR endpoint 拉了幾次）、ECR 儲存（1.45 GB 存放約 4.5 小時，不到 $0.01）、S3 請求費（約 2,000 次 PUT／GET，不到 $0.02）。
 
 ### 沒有補做的項目（成本高、對選型沒有影響）
@@ -209,9 +213,9 @@
 - [x] 補測重建的資源（Runtime `wp7_openclaw-2E7NKd5QWE`、投遞、ECR、role、guardrail、secret、bucket、runtime log group、`/openclaw/container` 的 3 個 `test_*` stream）已刪除（10:33 UTC）；收緊版 interface endpoint × 6、S3 gateway endpoint、endpoint 安全群組已刪除（09:27 UTC）
 - [x] 補測的匿名讀取對照 bucket `wp7-anon-probe-050571774557`（只有 `probe.txt` 可匿名讀取）：09:25:22 建立，09:26:37 刪除，刪除後回 404
 - [x] Browser、Gateway、Policy、Memory：沒有建立
-- [ ] VPC `wp7-vpc`（private subnet × 2、路由表、`wp7-runtime-sg`）：等 AgentCore 網卡自動清掉，隔天刪；也給 WP1 #11 用
-- [ ] 服務連結角色 `AWSServiceRoleForBedrockAgentCoreNetwork`：確認東京沒有 VPC 模式的 AgentCore 資源後刪
-- [ ] 隔天確認 Runtime 沒有仍在跑的資源（`list-agent-runtimes`）
+- [x] VPC `wp7-vpc`（private subnet × 2、路由表、`wp7-runtime-sg`，也給 WP1 #11 用）：網卡在 2026-10-04 14:44 UTC 還剩 2 個，2026-10-05 01:04 UTC 確認已清空，01:07 UTC 刪除
+- [x] 服務連結角色 `AWSServiceRoleForBedrockAgentCoreNetwork`：確認東京沒有 VPC 模式的 AgentCore 資源、沒有 `agentic_ai` 網卡後刪除（2026-10-05，deletion task `SUCCEEDED`）
+- [x] 隔天確認（2026-10-05）：東京只剩不是本次建立的 Runtime `openclaw_agent`、Browser `hephclaw_workspace_20260928`，兩者都是 PUBLIC
 - 帳號裡另一套 openclaw 部署（Runtime `openclaw_agent`、`openclaw/*` secret，2026-09-13 建立、沒有 tag）不是本次建立的，沒有動。
 
 ### 要更正研究庫的段落
