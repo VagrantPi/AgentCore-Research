@@ -237,7 +237,7 @@ AWS 部分沒有否定項目。
 - [x] `USAGE_LOGS` 投遞（WP2 的 3 個 source／delivery）已刪除
 - [x] IAM 角色 `/wp/wp2-hephagora-ec2`（含 instance profile）、`/wp/wp2-harness-exec` 已刪除
 - [x] ECR `wp2-hephagora`、`wp2-agent`、角色 `/wp/wp2-agent-exec`、S3 `wp2-roman-browser-policy-…`、log group `wp2-usage`：與 WP3 一起刪除（11:00 UTC）
-- [ ] IAM user `RomanChen` 的 `wp-roman-agentcore`：B 群全部做完後移除
+- [x] IAM user `RomanChen` 的 `wp-roman-agentcore`：已不存在（2026-10-05 `list-user-policies` 確認）
 
 #### 要更正研究庫的段落
 

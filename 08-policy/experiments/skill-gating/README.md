@@ -4,7 +4,7 @@
 
 - 自家 MCP server＝**HephAgora**（`hephai/HephAgora`）。
 - HephAgora 的改動在它的分支 `wp2/skill-gating`。原分支（RomanChen，2026-10-02）一直沒有推上 GitLab，2026-10-04 由 Kais 依本文件重建同名分支，用來做 WP5 #10、#11：[hephai/HephAgora `wp2/skill-gating`](https://gitlab.hephaistudio.dscloud.biz:49156/hephai/HephAgora/-/tree/wp2/skill-gating)（`de3df3d6`）。重建版和原版的差異：
-  - 沒有 Browser MCP server（`wp2-browser-server.ts`），所以 #6、#7、#8 不能用重建版重現。
+  - 沒有 Browser MCP server（`wp2-browser-server.ts`），所以 #6、#7 不能用重建版重現。#8 於 2026-10-05 在重建版上另寫 Browser skill server 補做，見 [`takeover/`](takeover/README.md)。
   - migration 合成 `036_wp2_skill_entitlements.sql`。
   - `com.wp2.todo` 改成每人一份資料（`src/wp2/todo.ts`）。
   - 本機驗收改成 `scripts/wp2/check.sh`，compose 檔用 `docker-compose.wp2-local.yml`，project 名 `hephagora-wp2`、port 13100。

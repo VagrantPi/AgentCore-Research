@@ -72,7 +72,7 @@ Session（session.id，透過 header 或 OTel baggage 傳遞）
 | 類型 | 內容 | 注意事項 |
 |------|------|---------|
 | `APPLICATION_LOGS` | 每次呼叫的 trace/span ID，**加上 `request_payload` 和 `response_payload`** | **包含使用者的完整對話內容** |
-| `USAGE_LOGS` | 每個 session 每秒的 vCPU-hours 和 GB-hours | 可以用來把成本分攤到個別 session：[WP0](../91-work-packages/WP0-cost-baseline.md#回填) 已實測，每個 session 每秒一筆、有 `session.id`，加總與 metric 一致。**沒有使用者 ID**，要分攤到使用者得自己維護 session → 使用者的對照（由 [WP5](../91-work-packages/WP5-user-state-isolation.md) 驗證） |
+| `USAGE_LOGS` | 每個 session 每秒的 vCPU-hours 和 GB-hours | 可以用來把成本分攤到個別 session：[WP0](../91-work-packages/WP0-cost-baseline.md#回填) 已實測，每個 session 每秒一筆、有 `session.id`，加總與 metric 一致。**沒有使用者 ID**，要分攤到使用者得自己維護 session → 使用者的對照。[WP5 #5](../91-work-packages/WP5-user-state-isolation.md#回填) 已驗證：依 session 加總即得每位使用者的用量，與 metric 差 0%；session ID 要能對回使用者（以使用者 ID 開頭，或後端保留對照表）；同一個 log group 會混到其他 runtime，要依 `agent.name` 過濾 |
 
 ## 在 agent 程式裡加上 instrumentation
 
@@ -132,8 +132,8 @@ Session（session.id，透過 header 或 OTel baggage 傳遞）
 2. **Agent 內部的 span 需要 ADOT**，只有 Runtime 服務本身自動產生的 span 不夠用。Harness 例外，預設全開。
 3. **ADOT 版本要 ≥ 0.18.0**，才能把 span 送到 agent 自己的 log group。
 4. **`APPLICATION_LOGS` 會記錄完整的 payload。**
-5. **`AWS_GENAI_CONTENT_EXTRACTION_OPT_OUT` 的名稱和實際行為看起來相反**，要實測確認（列在 [WP5](../91-work-packages/WP5-user-state-isolation.md) 的檢核點）。
-6. **資源用量的 metric 最多延遲 60 分鐘，而且不等於帳單。**
+5. **`AWS_GENAI_CONTENT_EXTRACTION_OPT_OUT` 的名稱和實際行為看起來相反**。[WP5 #6](../91-work-packages/WP5-user-state-isolation.md#回填) 決定不驗（公司帳號不開 Transaction Search），正式環境開 tracing 時再確認；在那之前一律假設 span 含對話內容。
+6. **資源用量的 metric 最多延遲 60 分鐘**；加總與 `USAGE_LOGS` 完全一致，和實際帳單差多少無法驗證（帳號拿不到帳單，見 [WP0 #2](../91-work-packages/WP0-cost-baseline.md#回填)）。
 7. **不支援 ADOT Collector。**
 8. **跨帳號監控只能在同一個區域內使用。**
 9. **Memory、Gateway、內建工具的 log delivery 要自己設定**，預設不會送出。

@@ -180,7 +180,7 @@ sequenceDiagram
 | Payments | 錢包供應商計費 | Coinbase CDP：每次操作 $0.005 | AWS 本身不另外收費 |
 | Registry / Optimization | — | 有免費額度；Optimization 預覽期間免費 | |
 
-**成本直覺：** 以一個 session 為例，1 vCPU 實際運算 60 秒、2 GB 記憶體維持 5 分鐘，用 v1 價格自行試算：CPU 約 $0.0015 + 記憶體約 $0.0016 ≈ **每個 session $0.003**。實務上，**模型的 token 費用通常才是大宗**（不含在 AgentCore 帳單裡）。所以在考慮 AgentCore 的成本時，重點通常不是運算費，而是 Web Search、Evaluations 這類按次或按 token 計費的項目，以及 CloudWatch 的日誌量。
+**成本直覺：** 以一個 session 為例，1 vCPU 實際運算 60 秒、2 GB 記憶體維持 5 分鐘，用 v1 價格自行試算：CPU 約 $0.0015 + 記憶體約 $0.0016 ≈ **每個 session $0.003**。但 session 呼叫完後會**閒置到逾時（預設 15 分鐘）才結束，這段期間記憶體照算**：最小 agent 含 15 分鐘閒置實測約 $0.003 / 個（[WP0 #3](../91-work-packages/WP0-cost-baseline.md#回填)），金額 92% 來自記憶體（[WP1 #10](../91-work-packages/WP1-runtime-session.md#10-成本情境)）。方案 B（AgentCore Runtime 跑自寫 agent）實測每位使用者每月基礎設施約 $2.53–2.84（[WP5 #8](../91-work-packages/WP5-user-state-isolation.md#回填)），模型 token 費 Haiku 4.5 約 $0.9–1.4、Sonnet 4.6 約 $2.9–3.4（[WP5](../91-work-packages/WP5-user-state-isolation.md#模型-token-費補2026-10-05)，不含在 AgentCore 帳單裡），**兩者同一個量級，模型費不一定是大宗**；只有方案 A（OpenClaw 跑在 AgentCore）因為每輪送約 2.6 萬個輸入 token，模型費佔 94%（[WP7 #4](../91-work-packages/WP7-openclaw-on-agentcore.md#回填)）。所以考慮 AgentCore 的成本時，要壓低 session 閒置的時間（縮短閒置逾時或用完主動 `StopRuntimeSession`），也要注意 Web Search、Evaluations 這類按次或按 token 計費的項目，以及 CloudWatch 的日誌量。
 
 ## 區域可用性
 
@@ -244,7 +244,7 @@ sequenceDiagram
 ## 延伸調研
 
 - [Harness 與 Runtime 的選擇細節](harness-vs-runtime.md)：能力邊界、逃生口、踩雷清單、export 路徑
-- [自建 vs 用 AgentCore](build-vs-buy.md)：各元件自建難度、綁定程度分析、混合策略。其中的難度與成本是判斷，將由 [WP6](../91-work-packages/WP6-oss-alternatives.md) 用實測與官網價格更正
+- [自建 vs 用 AgentCore](build-vs-buy.md)：各元件自建難度、綁定程度分析、混合策略。其中的難度與成本已依 [WP6](../91-work-packages/WP6-oss-alternatives.md#回填) 的實測與官網價格更正（見 WP6 A 半、B 半的「要更正研究庫的段落」）
 
 ## 研究問題
 

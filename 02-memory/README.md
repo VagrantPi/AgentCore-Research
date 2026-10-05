@@ -132,7 +132,7 @@ sequenceDiagram
 
 | 層 | 做法 | 能擋住什麼 | 擋不住什麼 |
 |----|------|-----------|-----------|
-| **IAM：讀取** | 用 `bedrock-agentcore:namespace`（完全相等）或 `bedrock-agentcore:namespacePath`（`StringLike`）限制 `RetrieveMemoryRecords` 等 API；短期記憶的 event API 另有 `actorId`、`sessionId` 兩個 key（⚠️ `namespacePath` 與 `namespaceVariable` 只出現在開發指南，IAM 官方參考沒有列出，見[延伸](multi-tenant-isolation.md#第-2-層iam-條件)） | 不同 IAM principal 之間讀取彼此的資料 | **多個使用者共用同一個 principal 的情況**（最常見：後端用同一個 role 服務所有使用者） |
+| **IAM：讀取** | 用 `bedrock-agentcore:namespace` 或 `bedrock-agentcore:namespacePath` 限制 `RetrieveMemoryRecords` 等 API，兩個 key 都能用 `StringLike`（實測 `/strategy/*/actor/<id>/*`）；短期記憶的 event API 另有 `actorId`、`sessionId` 兩個 key（⚠️ 兩個 key **各自只認同名的請求參數**，用另一種參數呼叫一律被拒（fail-closed），兩種都要用就各寫一條 Allow；`namespaceVariable` 未測。見 [WP5 #1](../91-work-packages/WP5-user-state-isolation.md#回填)、[延伸](multi-tenant-isolation.md#第-2-層iam-條件)） | 不同 IAM principal 之間讀取彼此的資料 | **多個使用者共用同一個 principal 的情況**（最常見：後端用同一個 role 服務所有使用者） |
 | **IAM：寫入** | 用 `bedrock-agentcore:namespaceVariable/<key>` 限制 `CreateEvent` 能帶入哪些值，例如 `orgname` 只能是 `acme` | 某個租戶的 principal 把資料寫進別的租戶 | 同上 |
 | **Gateway + Cedar（FGAC）** | 讓 Memory 經由 Gateway 對外，用 Cedar policy 規定 `context.input.actorId == principal.getTag("sub")` | **以 JWT 身分區分個別使用者**，可以做到 per-user 隔離 | **批次 API**（`BatchCreate` / `Update` / `DeleteMemoryRecords`）與 `IngestData` 不經過 Cedar，只能用 IAM 整個允許或整個拒絕 |
 
@@ -219,7 +219,7 @@ sequenceDiagram
 
 ## 實驗
 
-- [多租戶隔離的後端參考實作](experiments/tenant-guard/)：9 個案例本機測試通過；**將由 [WP5](../91-work-packages/WP5-user-state-isolation.md) 改成真的 AWS client 實測**
+- [多租戶隔離的後端參考實作](experiments/tenant-guard/)：9 個案例本機測試通過；[WP5](../91-work-packages/WP5-user-state-isolation.md#回填) 已用真的 AWS client 實測（2026-10-02，[`experiments/tenant-guard/aws/`](experiments/tenant-guard/aws/)）
 - [萃取品質比較](experiments/extraction-compare/)：比較工具本機實跑過（只用示範資料）；AWS 實驗程式**沒有實跑過**
 - [月費與檢索速率估算](experiments/cost-model/)：已實跑，結果整理在延伸文件中
 

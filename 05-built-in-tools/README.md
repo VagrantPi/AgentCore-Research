@@ -42,7 +42,7 @@ Code Interpreter（資源：aws.codeinterpreter.v1，或自建並設定網路與
 |------|------|
 | 語言 | Python、JavaScript、TypeScript；預裝的 Node 套件很少（axios、lodash、zod 等） |
 | 預裝的 Python 套件 | 資料分析（pandas、polars、numpy、duckdb、pyarrow）、畫圖（matplotlib、plotly）、ML（scikit-learn、torch、xgboost、spacy）、最佳化（ortools、cvxpy、z3）、文件處理（openpyxl、python-docx、pdfplumber、python-pptx、markitdown）、影音處理（opencv、moviepy、ffmpeg），以及 boto3、SQLAlchemy、psycopg2 等 |
-| 網路模式 | **Sandbox**（官方描述是「有限的對外連線」，**明確可以存取 S3**）、**Public**（可以上網）、**VPC**（連到你 VPC 裡的資源；要上網得走 NAT；可以掛載 S3 Files / EFS，見[延伸](code-interpreter-data-agent.md#資料怎麼進出沙箱)） |
+| 網路模式 | **Sandbox**（官方描述是「有限的對外連線」，**明確可以存取 S3**；[WP3 #1](../91-work-packages/WP3-sandbox-egress.md#回填) 實測：DNS 只解析得到 `*.amazonaws.com`，任意 HTTPS、PyPI、STS 都不通，S3 同區域任何 bucket 都通、其他區域不通）、**Public**（可以上網）、**VPC**（連到你 VPC 裡的資源；要上網得走 NAT；可以掛載 S3 Files / EFS，見[延伸](code-interpreter-data-agent.md#資料怎麼進出沙箱)） |
 | Execution role | 程式在沙箱裡用這個 role 存取 AWS，例如用 `aws s3 cp` 讀取大檔案。憑證經由 MMDS 提供，**沙箱裡的任何程式都讀得到**；所以這個 role 的權限，等於模型寫出來的任何程式都能使用的權限 |
 | 硬體與配額 | 每個 session 2 vCPU / 8 GB、10 GB 磁碟；同步請求 15 分鐘、非同步（`startCommandExecution` + `getTask`）最長 8 小時；每個帳號同時 1,000 個 session |
 | 計費 | 依實際用量計費（與 Runtime v1 同價），等待 I/O 的時間不收 CPU 費用 |
@@ -162,8 +162,8 @@ Code Interpreter（資源：aws.codeinterpreter.v1，或自建並設定網路與
 ## 實驗
 
 - [導覽白名單檢查](experiments/url-guard/)：12 個案例本機實跑通過
-- [Code Interpreter 網路模式實測腳本](experiments/sandbox-probe/)：本機確認可執行，**還沒在 Code Interpreter 裡跑過**；將由 [WP3](../91-work-packages/WP3-sandbox-egress.md) 實跑
-- Browser 接手登入 demo（`experiments/takeover-demo/`，尚未建立）：將由 [WP4](../91-work-packages/WP4-browser-takeover.md) 建立，實測 Live View、`take_control`、profile 隔離
+- [Code Interpreter 網路模式實測腳本](experiments/sandbox-probe/)：[WP3](../91-work-packages/WP3-sandbox-egress.md#回填) 已在 Code Interpreter 實跑（2026-10-02，Sandbox／Public 見 A 半 #1、VPC 見 B 半 #3），結果整理在該目錄的 README
+- [手機上接手 AgentCore Browser](experiments/mobile-takeover/)：iOS 模擬器 Mobile Safari 實測 Live View、`take_control`、交還後繼續（[WP6 #7](../91-work-packages/WP6-oss-alternatives.md#回填)）。原本規劃由 [WP4](../91-work-packages/WP4-browser-takeover.md) 建立的 `experiments/takeover-demo/` 沒有建立；server 主導的接手登入另見 [`../08-policy/experiments/skill-gating/takeover/`](../08-policy/experiments/skill-gating/takeover/)（[WP2 #8 補做](../91-work-packages/WP2-capability-boundary.md#回填)，2026-10-05）
 - [Web Search 月費估算與引用檢查](experiments/web-search/)：本機實跑通過，**沒有實際呼叫過 Web Search**
 
 ## 參考資料
@@ -178,5 +178,5 @@ Code Interpreter（資源：aws.codeinterpreter.v1，或自建並設定網路與
 範圍在 00–05 之內，以 05 為主：
 
 1. **Browser 自動化的可靠性與安全設計：** 在 CDP、`InvokeBrowser`、Nova Act / browser-use 之間怎麼選；登入狀態的管理方式（依使用者分開的 profile 或 Identity 的 3LO）；Live View 的真人接手流程；如何防範網頁內容裡的 prompt injection。
-2. **Code Interpreter 的資料分析 agent 設計：** 大檔案經由 S3 的資料流、execution role 的最小權限、Sandbox / Public / VPC 三種網路模式的實際差異（需要實測），以及跟 Runtime 的 Command API 怎麼分工。
+2. **Code Interpreter 的資料分析 agent 設計：** 大檔案經由 S3 的資料流、execution role 的最小權限、Sandbox / Public / VPC 三種網路模式的實際差異（已由 [WP3 #1、#3](../91-work-packages/WP3-sandbox-egress.md#回填) 實測），以及跟 Runtime 的 Command API 怎麼分工。
 3. **Web Search 的 grounding 品質與成本控制：** 用網域和日期過濾提高回答的可信度；每千次 $7 之下的查詢策略（快取、`maxResults`、什麼時候不查）；引用來源的呈現如何符合使用條款。

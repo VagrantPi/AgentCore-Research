@@ -207,7 +207,9 @@ suppressOutput (principal, action == …, resource) when guardrails {
 
 - [Prompt 規則改寫成 Cedar](experiments/prompt-to-policy/)：用開源 Cedar 在本機驗證 schema 與 10 個授權案例，**已實跑、全部通過**
 - [Guardrail 門檻校準工具](experiments/guardrail-threshold/)：輸入分數與標註，算出各門檻的混淆矩陣與成本；**目前只用合成資料驗證過**
-- 依已購買能力過濾工具（`experiments/skill-gating/`，尚未建立）：將由 [WP2](../91-work-packages/WP2-capability-boundary.md) 以上面的 Cedar 案例為起點，在 AWS 上實測陣列型 claim 與 `tools/list` 過濾
+- [依已購買能力過濾工具](experiments/skill-gating/)：[WP2](../91-work-packages/WP2-capability-boundary.md#回填) 的交付物，2026-10-05 完成。技能授權做在自家 MCP server（HephAgora），不需要 Gateway，所以 Gateway 選配項 G1–G6（含 G3 陣列型 claim）沒有做
+  - [接手登入由 server 主導](experiments/skill-gating/takeover/)：WP2 #8，server 停下自動操作、把 Live View 連結直接推給 App，agent 拿不到 URL
+- [技能授權用 Cedar 寫](experiments/cedar-skill-gating/)：WP6 第 3 層，用開源 Cedar 寫和 WP2 手寫版同一條「買了才能用」規則，比較兩者
 
 ## 參考資料
 

@@ -138,13 +138,13 @@ wp0_min,wp0-session-3-12E26BF9616640039AEDAE9AD13D7A52,910,0.003726,0.292650,0.0
 ### 清理確認
 
 - [x] Runtime / Harness 已刪除 — WP5、WP1 用完後於 2026-10-04 16:10 UTC 刪除：`wp0_min-HsBwOc6VWU`、role `/wp/wp0-runtime-exec`、`USAGE_LOGS` 投遞（delivery、source `wp0-usage-src`、destination `wp0-usage-dst`）、log group `/aws/vendedlogs/bedrock-agentcore/wp0-usage`。刪 log group 前整個存成 [`evidence/usage-logs/wp0-usage.jsonl.gz`](evidence/usage-logs/)（236,056 筆，2026-10-02 03:40 – 10-04 14:21 UTC，含 WP0、WP1、WP5、WP6、WP7 投遞到這裡的全部紀錄；[`scripts/dump_log_group.py`](scripts/dump_log_group.py)）
-- [ ] ECR repo `wp-agentcore-coldstart`（`:small` 與幾個沒有 tag 的 image，其中一個約 1.1 GB）— 自動模式擋下 `delete-repository --force`，由 Kais 手動執行：`aws ecr delete-repository --region ap-northeast-1 --repository-name wp-agentcore-coldstart --force`
+- [x] ECR repo `wp-agentcore-coldstart`（`:small` 與幾個沒有 tag 的 image，其中一個約 1.1 GB）— 自動模式擋下 `delete-repository --force`，由 Kais 手動刪除（2026-10-05；`describe-repositories` 回 `RepositoryNotFoundException`）
 - [x] Browser session 已停止、profile 已刪除（未使用）
 - [x] Gateway、Policy 已刪除（未使用）
 - [x] Memory 已刪除（未使用）
 - [x] VPC endpoint、NAT 已刪除（未使用）
 - [x] 隔天確認沒有仍在跑的資源 — 2026-10-04 16:14 UTC：東京的 Runtime 只剩 `wp0_min`（刪除中）與不屬於我們的 `openclaw_agent`；Code Interpreter、自訂 Browser 都沒有 WP 的；`/wp/` 底下沒有 role
-- [ ] `KaisLinCli` 的 inline policy `wp0-account-owner` 移除 — **Kais 決定先保留**（2026-10-05）：等 WP7 的 VPC 清完、最後用 `list-agent-runtimes` 等確認 AgentCore 沒有殘留後再移除。拿掉後只失去 AgentCore 操作權限（`logs:*`、`ec2:*`、`iam:*` 等由群組 `HephAI_Digital_Human` 提供，不受影響）。移除：`aws iam delete-user-policy --user-name KaisLinCli --policy-name wp0-account-owner`；之後要用正式 agent 重算成本時，可用 `iam/wp0-owner-policy.json` 加回
+- [x] `KaisLinCli` 的 inline policy `wp0-account-owner` 已移除（2026-10-05）：WP7 的 VPC 清完後，`list-agent-runtimes` 確認東京只剩不是本次建立的 `openclaw_agent`，由 Kais 手動移除。拿掉後只失去 AgentCore 操作權限（`logs:*`、`ec2:*`、`iam:*` 等由群組 `HephAI_Digital_Human` 提供，不受影響）。之後要用正式 agent 重算成本時，可用 `iam/wp0-owner-policy.json` 加回
 
 ### 要更正研究庫的段落（已套用，2026-10-02）
 
