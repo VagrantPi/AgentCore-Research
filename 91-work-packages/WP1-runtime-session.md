@@ -135,7 +135,7 @@
 |---|---|---|---|---|
 | Runtime（7 個 wp1_ runtime） | 約 470 個 session，每個活幾秒到約 4 分鐘；burst 的 280 個沒有主動停止，閒置 60 秒後回收 | 自己計數；這批 runtime 沒開 `USAGE_LOGS` | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 遠低於 1（未精算） |
 | Runtime `wp1_cost_v1_img_pub`（#10，20 個 session + 2 個乾跑） | 0.512418 vCPU-h、53.511837 GB-h | `USAGE_LOGS`，與 metric 對帳見 #10 | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 0.551548 |
-| Runtime（#11：`wp1_cs_v1_img_pub`、`_vpc`、`wp1_cs_v2_img_pub`、`_vpc`，140 個 session） | 0.177087 vCPU-h、2.911031 GB-h | `USAGE_LOGS`（2026-10-04 07:18 UTC，`usage_cost.py` 跑兩次結果相同） | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 0.043361 |
+| Runtime（#11：`wp1_cs_v1_img_pub`、`_vpc`、`wp1_cs_v2_img_pub`、`_vpc`，140 個 session） | 0.177087 vCPU-h、2.911031 GB-h | `USAGE_LOGS`（2026-10-04 07:18 UTC，`usage_cost.py` 跑兩次結果相同）；每個 session 的加總存在 [`wp1-vpc-cost.csv`](../01-runtime/experiments/cold-start/wp1-vpc-cost.csv)；原始 log 在 [`evidence/usage-logs/wp0-usage.jsonl.gz`](evidence/usage-logs/wp0-usage.jsonl.gz)，重算結果相同 | $0.0895 / vCPU-hour、$0.00945 / GB-hour | 0.043361 |
 | VPC endpoint、NAT（#11 借用 WP7 的 VPC） | — | — | — | 計入 [WP7](WP7-openclaw-on-agentcore.md#實際費用) |
 | ECR | 約 1.1 GB（`:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy`，小的幾乎不佔空間） | 自己計數 | — | 每月約 0.1 |
 
@@ -159,7 +159,7 @@
 - [x] 其餘 Runtime 已刪除（2026-10-04）：`wp1_cs_v1_bigimg_pub`、`wp1_cs_v2_bigimg_pub`、`wp1_cs_v1_img_pub_blk`、`wp1_cs_v1_img_pub_busy`、`wp1_ss_v1_img_pub`（含 endpoint `wp1_pinned`）06:30 UTC；#11 用的 `wp1_cs_v1_img_pub`、`wp1_cs_v2_img_pub`、`wp1_cs_v1_img_vpc`、`wp1_cs_v2_img_vpc` 與它們的 `USAGE_LOGS` 投遞 07:19 UTC
 - [x] ECR image `wp-agentcore-coldstart:wp1`、`:wp1-big`、`:wp1-ss`、`:wp1-busy` 已刪除（07:20 UTC）；repo 與 `:small` 屬於 WP0，保留
 - [x] 隔天確認 Runtime 沒有仍在跑的 session — 2026-10-04 16:14 UTC：`wp1_*` Runtime 都已不存在；共用的 `wp0_min` 已刪除（見 [WP0 清理確認](WP0-cost-baseline.md#清理確認)）
-- [ ] VPC `wp7-vpc` 與服務連結角色 — 屬於 [WP7 清理確認](WP7-openclaw-on-agentcore.md#清理確認)。2026-10-04 16:14 UTC 查：VPC endpoint 都已刪，但 VPC 裡還有 2 張 `agentic_ai` 類型的網卡是 `in-use`，VPC 還刪不掉
+- [x] VPC `wp7-vpc` 與服務連結角色 — 屬於 [WP7 清理確認](WP7-openclaw-on-agentcore.md#清理確認)。2026-10-04 16:14 UTC 查時 VPC 裡還有 2 張 `agentic_ai` 網卡是 `in-use`；2026-10-05 01:04 UTC 確認網卡已清空，01:07 UTC 刪除 VPC，之後刪除服務連結角色（deletion task `SUCCEEDED`）
 
 ### 要更正研究庫的段落
 

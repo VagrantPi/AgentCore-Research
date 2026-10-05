@@ -1,0 +1,256 @@
+{
+  "vpc": {
+    "id": "vpc-0c1ce2f73c790081c",
+    "created": "2026-10-04T02:39:17+00:00",
+    "deleted": "2026-10-05T01:07:04+00:00"
+  },
+  "private_subnet_0": {
+    "id": "subnet-01e0b801ee6e9d3b4",
+    "created": "2026-10-04T02:39:17+00:00",
+    "az": "apne1-az4",
+    "deleted": "2026-10-05T01:07:01+00:00"
+  },
+  "private_subnet_1": {
+    "id": "subnet-0f5dc8d87ceee0d92",
+    "created": "2026-10-04T02:39:17+00:00",
+    "az": "apne1-az1",
+    "deleted": "2026-10-05T01:07:03+00:00"
+  },
+  "private_rt": {
+    "id": "rtb-0eed7c7dc5a41783c",
+    "created": "2026-10-04T02:39:18+00:00",
+    "deleted": "2026-10-05T01:07:03+00:00"
+  },
+  "public_subnet": {
+    "id": "subnet-0bfd02e3b3d532457",
+    "created": "2026-10-04T02:39:19+00:00",
+    "deleted": "2026-10-04T03:29:24+00:00"
+  },
+  "igw": {
+    "id": "igw-0245c75c3a38919ac",
+    "created": "2026-10-04T02:39:19+00:00",
+    "deleted": "2026-10-04T03:29:23+00:00"
+  },
+  "public_rt": {
+    "id": "rtb-07b706e9c2eb9523f",
+    "created": "2026-10-04T02:39:20+00:00",
+    "assoc": "rtbassoc-094926e0d50290dff",
+    "deleted": "2026-10-04T03:29:23+00:00"
+  },
+  "eip": {
+    "id": "eipalloc-0afcee407f8c0d702",
+    "created": "2026-10-04T02:39:21+00:00",
+    "deleted": "2026-10-04T03:29:22+00:00"
+  },
+  "nat": {
+    "id": "nat-09ed9dfdebfb7e36e",
+    "created": "2026-10-04T02:39:21+00:00",
+    "deleted": "2026-10-04T03:29:21+00:00"
+  },
+  "runtime_sg": {
+    "id": "sg-052e07c7a108816cc",
+    "created": "2026-10-04T02:41:10+00:00",
+    "deleted": "2026-10-05T01:07:03+00:00"
+  },
+  "bedrock_dns_changes": [
+    {
+      "on": true,
+      "at": "2026-10-04T03:48:51+00:00"
+    }
+  ],
+  "round1": {
+    "endpoint_sg": {
+      "id": "sg-06200dba6323489ae",
+      "created": "2026-10-04T02:41:08+00:00",
+      "deleted": "2026-10-04T04:07:58+00:00"
+    },
+    "ep_s3": {
+      "id": "vpce-0cc7d2a062e917aa1",
+      "created": "2026-10-04T02:41:11+00:00",
+      "deleted": "2026-10-04T04:04:23+00:00"
+    },
+    "ep_bedrock-runtime": {
+      "id": "vpce-0fd718dfe98593805",
+      "created": "2026-10-04T02:41:12+00:00",
+      "azs": 2,
+      "deleted": "2026-10-04T04:04:23+00:00"
+    },
+    "ep_ssm": {
+      "id": "vpce-029ef710a30d639f5",
+      "created": "2026-10-04T02:41:15+00:00",
+      "azs": 2,
+      "deleted": "2026-10-04T04:04:23+00:00"
+    },
+    "ep_ecr.api": {
+      "id": "vpce-0cca5251e593cc05d",
+      "created": "2026-10-04T02:41:17+00:00",
+      "azs": 2,
+      "deleted": "2026-10-04T04:04:23+00:00"
+    },
+    "ep_ecr.dkr": {
+      "id": "vpce-0b3de1d0b77d1e6ea",
+      "created": "2026-10-04T02:41:19+00:00",
+      "azs": 2,
+      "deleted": "2026-10-04T04:04:23+00:00"
+    },
+    "ep_secretsmanager": {
+      "id": "vpce-03f2845a0a1e75a4b",
+      "created": "2026-10-04T02:41:22+00:00",
+      "azs": 2,
+      "deleted": "2026-10-04T04:04:23+00:00"
+    },
+    "ep_logs": {
+      "id": "vpce-07d37901155a06092",
+      "created": "2026-10-04T02:41:23+00:00",
+      "azs": 2,
+      "deleted": "2026-10-04T04:04:23+00:00"
+    },
+    "ep_monitoring": {
+      "id": "vpce-0f19db552f02b519f",
+      "created": "2026-10-04T02:41:26+00:00",
+      "azs": 2,
+      "deleted": "2026-10-04T04:04:23+00:00"
+    },
+    "ep_bedrock-agentcore": {
+      "id": "vpce-09b966dd0f6e9ddf2",
+      "created": "2026-10-04T02:41:28+00:00",
+      "azs": 2,
+      "deleted": "2026-10-04T04:04:23+00:00"
+    },
+    "bucket": {
+      "id": "wp7-openclaw-050571774557",
+      "created": "2026-10-04T02:43:20+00:00",
+      "deleted": "2026-10-04T06:33:55+00:00"
+    },
+    "secret": {
+      "id": "arn:aws:secretsmanager:ap-northeast-1:050571774557:secret:wp7/openclaw/gateway-token-quHytC",
+      "created": "2026-10-04T02:43:20+00:00",
+      "deleted": "2026-10-04T06:33:49+00:00"
+    },
+    "guardrail": {
+      "id": "0a51rvubryg3",
+      "version": "1",
+      "created": "2026-10-04T02:43:28+00:00",
+      "deleted": "2026-10-04T06:33:49+00:00"
+    },
+    "role": {
+      "id": "arn:aws:iam::050571774557:role/wp/wp7-openclaw-exec",
+      "created": "2026-10-04T02:43:29+00:00",
+      "deleted": "2026-10-04T07:19:23+00:00"
+    },
+    "ecr": {
+      "id": "050571774557.dkr.ecr.ap-northeast-1.amazonaws.com/wp7-openclaw",
+      "created": "2026-10-04T02:47:31+00:00",
+      "deleted": "2026-10-04T07:19:22+00:00"
+    },
+    "runtime": {
+      "id": "wp7_openclaw-wvyu0583ah",
+      "arn": "arn:aws:bedrock-agentcore:ap-northeast-1:050571774557:runtime/wp7_openclaw-wvyu0583ah",
+      "created": "2026-10-04T02:48:07+00:00",
+      "deleted": "2026-10-04T07:19:21+00:00"
+    },
+    "usage_delivery": {
+      "id": "6uIi9RK5vdJadU1u",
+      "source": "wp7_openclaw-usage-src",
+      "created": "2026-10-04T02:52:43+00:00",
+      "deleted": "2026-10-04T07:19:21+00:00"
+    },
+    "ep_sts": {
+      "id": "vpce-0289b42f9109ad88f",
+      "created": "2026-10-04T03:57:46+00:00",
+      "azs": 2,
+      "note": "WP7 #6b \u8ffd\u52a0\uff0c\u7bc4\u4f8b\u6c92\u6709",
+      "deleted": "2026-10-04T04:04:23+00:00"
+    }
+  },
+  "endpoint_sg": {
+    "id": "sg-0c690a04fbacb2799",
+    "created": "2026-10-04T09:19:37+00:00",
+    "deleted": "2026-10-04T09:29:18+00:00"
+  },
+  "ep_s3": {
+    "id": "vpce-05a99260550b41979",
+    "created": "2026-10-04T09:19:38+00:00",
+    "deleted": "2026-10-04T09:26:45+00:00"
+  },
+  "ep_bedrock-runtime": {
+    "id": "vpce-0e2b8fc84db487fdd",
+    "created": "2026-10-04T09:19:40+00:00",
+    "azs": 2,
+    "deleted": "2026-10-04T09:26:45+00:00"
+  },
+  "ep_sts": {
+    "id": "vpce-00ce81aa5711f8857",
+    "created": "2026-10-04T09:19:42+00:00",
+    "azs": 2,
+    "deleted": "2026-10-04T09:26:45+00:00"
+  },
+  "ep_secretsmanager": {
+    "id": "vpce-0f9b381cff98da2b8",
+    "created": "2026-10-04T09:19:43+00:00",
+    "azs": 2,
+    "deleted": "2026-10-04T09:26:45+00:00"
+  },
+  "ep_ecr.api": {
+    "id": "vpce-04daf6aa1a920325e",
+    "created": "2026-10-04T09:19:44+00:00",
+    "azs": 2,
+    "deleted": "2026-10-04T09:26:45+00:00"
+  },
+  "ep_ecr.dkr": {
+    "id": "vpce-000f40f4d1138905b",
+    "created": "2026-10-04T09:19:46+00:00",
+    "azs": 2,
+    "deleted": "2026-10-04T09:26:45+00:00"
+  },
+  "ep_logs": {
+    "id": "vpce-05a7184b8795e3304",
+    "created": "2026-10-04T09:19:52+00:00",
+    "azs": 2,
+    "deleted": "2026-10-04T09:26:45+00:00"
+  },
+  "secret": {
+    "id": "arn:aws:secretsmanager:ap-northeast-1:050571774557:secret:wp7/openclaw/gateway-token-4CquLJ",
+    "created": "2026-10-04T17:19:41+08:00",
+    "deleted": "2026-10-04T10:33:03+00:00"
+  },
+  "guardrail": {
+    "id": "jg2r9cmjkloy",
+    "version": "1",
+    "created": "2026-10-04T09:19:42+00:00",
+    "deleted": "2026-10-04T10:33:03+00:00"
+  },
+  "role": {
+    "id": "arn:aws:iam::050571774557:role/wp/wp7-openclaw-exec",
+    "created": "2026-10-04T09:19:42+00:00",
+    "deleted": "2026-10-04T10:33:04+00:00"
+  },
+  "ecr": {
+    "id": "050571774557.dkr.ecr.ap-northeast-1.amazonaws.com/wp7-openclaw",
+    "created": "2026-10-04T17:19:43+08:00",
+    "deleted": "2026-10-04T10:33:03+00:00"
+  },
+  "bucket": {
+    "id": "wp7-openclaw-050571774557",
+    "created": "2026-10-04T17:19:41+08:00",
+    "note": "\u5efa\u7acb\u6642\u9593\u4ee5 secret \u8fd1\u4f3c\uff08\u540c\u4e00\u6b21 support\uff09",
+    "deleted": "2026-10-04T10:33:07+00:00"
+  },
+  "runtime": {
+    "id": "wp7_openclaw-2E7NKd5QWE",
+    "arn": "arn:aws:bedrock-agentcore:ap-northeast-1:050571774557:runtime/wp7_openclaw-2E7NKd5QWE",
+    "created": "2026-10-04T09:21:14+00:00",
+    "deleted": "2026-10-04T10:33:03+00:00"
+  },
+  "usage_delivery": {
+    "id": "WQhhygysvUwmXRur",
+    "source": "wp7_openclaw-usage-src",
+    "created": "2026-10-04T09:21:35+00:00",
+    "deleted": "2026-10-04T10:33:02+00:00"
+  },
+  "anon_probe_bucket": {
+    "id": "wp7-anon-probe-050571774557",
+    "created": "2026-10-04T09:25:22+00:00",
+    "deleted": "2026-10-04T09:26:37+00:00"
+  }
+}
