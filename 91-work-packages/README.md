@@ -134,7 +134,7 @@
 | 能力邊界能否在 agent 外強制 | [WP2](WP2-capability-boundary.md#回填) + [WP3](WP3-sandbox-egress.md#回填)：通過（自家 MCP server 授權 agent 繞不過；VPC 無 NAT 擋得住外網） | [WP7](WP7-openclaw-on-agentcore.md#回填)：預設會上網、執行程式；改 endpoint 設定後無 NAT 可用，只剩聊天與寫程式 | [WP6](WP6-oss-alternatives.md#b-半第-234-層)：OpenClaw `tools.deny` 鎖得住，但預設全開、HTTP 請求等同 owner、網路要另外擋 |
 | 接手登入 | [WP2 #8](WP2-capability-boundary.md#8-補做接手登入由-server-主導2026-10-05kais)＋[WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：server 主導流程在 iOS 模擬器通過，agent 拿不到 URL；要處理雲端 Chrome 存密碼、鍵盤開著時點擊偏移；實體手機未驗 | — | [WP6](WP6-oss-alternatives.md#第-4-層雲端瀏覽器與接手)：Steel、Cloudflare 有交還機制；手機操作沒有一家官方支援 |
 | 資料隔離 | [WP5](WP5-user-state-isolation.md#回填)：通過（Memory、臨時憑證、VM 裡的使用者 token、Browser profile） | 未測 | [WP6](WP6-oss-alternatives.md#第-5-層記憶)：只有 pgvector＋RLS 能在資料層強制，其他靠應用層帶 `user_id` |
-| 每位使用者每月實際成本 | [WP5](WP5-user-state-isolation.md#模型-token-費補2026-10-05)：基礎設施約 $2.53–2.84；**含模型（每天 10 輪）Haiku 4.5 約 $3.4–4.2、Sonnet 4.6 約 $5.4–6.3**（[token-cost](../90-integrations/experiments/token-cost/README.md)） | [WP7](WP7-openclaw-on-agentcore.md#實際費用)：約 $20.7（**含模型**，模型佔 94%）＋網路固定費約 $188／月 | [WP6](WP6-oss-alternatives.md#實際費用)：OpenClaw 每人一台 $35.4（24h）／$14.4（每天 8h），不含模型；沒有比方案 B 便宜的人數門檻 |
+| 每位使用者每月實際成本 | [WP5](WP5-user-state-isolation.md#模型-token-費補2026-10-05)：基礎設施約 $2.53–2.84；**含模型（每天 10 輪）Haiku 4.5 約 $3.4–4.2、Sonnet 4.6 約 $5.4–6.3**（[token-cost](../90-integrations/experiments/token-cost/README.md)） | [WP7](WP7-openclaw-on-agentcore.md#實際費用)：約 $20.7（**含模型**，模型佔 94%）＋網路固定費約 $188／月（雙 AZ；[收緊版](WP7-openclaw-on-agentcore.md#方案-a-收緊能力邊界的代價供選型) 無 NAT 約 $123／月） | [WP6](WP6-oss-alternatives.md#實際費用)：OpenClaw 每人一台 $35.4（24h）／$14.4（每天 8h），不含模型；沒有比方案 B 便宜的人數門檻 |
 | 要自己維運的元件 | 少 | 中 | [WP6](WP6-oss-alternatives.md#回填)：挑最省的路線也約 60 點 |
 | 關鍵否定項（阻斷） | 無 | 無（#6 改設定可過） | 無；但成本沒有優勢 |
 
@@ -167,7 +167,7 @@ VM 要存取使用者資料時，由後端 AssumeRole 加 session policy 發範�
 
 | 假設 | 來源等級 | 驗證 |
 |---|---|---|
-| microVM 冷啟動可以用預喚醒藏起來，使用者感受不到 | `[推測]`；WP1 已實證（PUBLIC）：預喚醒後首句 p50 170–196 ms | WP1 |
+| microVM 冷啟動可以用預喚醒藏起來，使用者感受不到 | `[推測]`；WP1 已實證（PUBLIC）：預喚醒後首句 p50 170–196 ms；VPC 模式冷啟動與 PUBLIC 相同（#11） | WP1 |
 | 同一個 session ID 可以讓一位使用者的多個聊天室共用一台 microVM，並行請求不會卡住 `/ping` | `[推測]`；WP1 已實證（PUBLIC），條件是 handler 為 async 或多執行緒 | WP1 |
 | 自家 MCP server 能依使用者身分過濾 `tools/list`、拒絕未購買工具的呼叫 | `[推測]`；WP2 已實證（HephAgora，本機與 `/mcp` 標準入口；需加購買表與開關） | WP2 |
 | Runtime 的 agent 能把每位使用者的 token 帶到自家 MCP server；Harness 的 `remote_mcp` 能不能做到未知 | `[推測]`；WP2 已實證：Runtime 可以；Harness 每次 `InvokeHarness` 覆寫 `tools` 也可以 | WP2 |
