@@ -62,3 +62,170 @@ ts,run,event,values
 2026-10-04T07:22:19.830+00:00,152136-390x844,viewer_connected,"{""sincePageStartMs"": 829}"
 2026-10-04T07:22:20.651+00:00,152136-390x844,viewer_first_frame,"{""sincePageStartMs"": 1654}"
 2026-10-04T07:23:03.635+00:00,152136-390x844,session_stopped,{}
+2026-11-05T08:03:51.715+00:00,160339-mobile-handoff,baseline,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:03:56.906+00:00,160339-mobile-handoff,emulated,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 "", ""touch"": 5}"
+2026-11-05T08:03:58.136+00:00,160339-mobile-handoff,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:03:58.187+00:00,160339-mobile-handoff,viewer_page_loaded,{}
+2026-11-05T08:03:58.608+00:00,160339-mobile-handoff,viewer_authenticated,{}
+2026-11-05T08:03:58.654+00:00,160339-mobile-handoff,viewer_auth_error,{}
+2026-11-05T08:03:58.960+00:00,160339-mobile-handoff,viewer_connected,{}
+2026-11-05T08:03:59.997+00:00,160339-mobile-handoff,viewer_first_frame,{}
+2026-11-05T08:04:02.640+00:00,160339-mobile-handoff,viewer_shot,"{""tag"": ""A-keep-automation"", ""first_frame"": true}"
+2026-11-05T08:04:02.692+00:00,160339-mobile-handoff,A_tap_target,"{""x"": 250.9296875, ""y"": 305.109375, ""href"": ""https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%B0%8F%E6%99%82%E5%88%B6""}"
+2026-11-05T08:04:06.835+00:00,160339-mobile-handoff,A_after_tap,"{""expected"": ""https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%B0%8F%E6%99%82%E5%88%B6"", ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 "", ""touch"": 5}"
+2026-11-05T08:04:08.721+00:00,160339-mobile-handoff,B_take_control,"{""target"": ""https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%B0%8F%E6%99%82%E5%88%B6""}"
+2026-11-05T08:04:08.724+00:00,160339-mobile-handoff,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:04:08.728+00:00,160339-mobile-handoff,viewer_disconnect,{}
+2026-11-05T08:04:08.728+00:00,160339-mobile-handoff,viewer_disconnect,{}
+2026-11-05T08:04:08.752+00:00,160339-mobile-handoff,viewer_page_loaded,{}
+2026-11-05T08:04:09.276+00:00,160339-mobile-handoff,viewer_authenticated,{}
+2026-11-05T08:04:09.398+00:00,160339-mobile-handoff,viewer_auth_error,{}
+2026-11-05T08:04:09.663+00:00,160339-mobile-handoff,viewer_connected,{}
+2026-11-05T08:04:10.569+00:00,160339-mobile-handoff,viewer_first_frame,{}
+2026-11-05T08:04:13.421+00:00,160339-mobile-handoff,viewer_shot,"{""tag"": ""B-take-control"", ""first_frame"": true}"
+2026-11-05T08:04:18.601+00:00,160339-mobile-handoff,B_after_release,"{""expected"": ""https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%B0%8F%E6%99%82%E5%88%B6"", ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:04:28.584+00:00,160339-mobile-handoff,cleared,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:04:29.100+00:00,160339-mobile-handoff,session_stopped,{}
+2026-11-05T08:05:28.174+00:00,160517-mobile-handoff,baseline,"{""toolbar"": 88, ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:05:39.784+00:00,160517-mobile-handoff,emulated,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 "", ""touch"": 5}"
+2026-11-05T08:05:40.021+00:00,160517-mobile-handoff,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:05:40.081+00:00,160517-mobile-handoff,viewer_page_loaded,{}
+2026-11-05T08:05:40.707+00:00,160517-mobile-handoff,viewer_authenticated,{}
+2026-11-05T08:05:40.771+00:00,160517-mobile-handoff,viewer_auth_error,{}
+2026-11-05T08:05:41.231+00:00,160517-mobile-handoff,viewer_connected,{}
+2026-11-05T08:05:45.294+00:00,160517-mobile-handoff,viewer_first_frame,{}
+2026-11-05T08:05:47.996+00:00,160517-mobile-handoff,viewer_shot,"{""tag"": ""A-keep-automation"", ""first_frame"": true}"
+2026-11-05T08:05:48.064+00:00,160517-mobile-handoff,A_tap_target,"{""x"": 250.9296875, ""y"": 305.109375, ""href"": ""https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%B0%8F%E6%99%82%E5%88%B6""}"
+2026-11-05T08:05:52.235+00:00,160517-mobile-handoff,A_after_tap,"{""expected"": ""https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%B0%8F%E6%99%82%E5%88%B6"", ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 "", ""touch"": 5}"
+2026-11-05T08:05:58.337+00:00,160517-mobile-handoff,A_cleared,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:06:02.873+00:00,160517-mobile-handoff,B_take_control,"{""target"": ""https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%B0%8F%E6%99%82%E5%88%B6""}"
+2026-11-05T08:06:02.877+00:00,160517-mobile-handoff,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:06:02.883+00:00,160517-mobile-handoff,viewer_disconnect,{}
+2026-11-05T08:06:02.885+00:00,160517-mobile-handoff,viewer_disconnect,{}
+2026-11-05T08:06:02.912+00:00,160517-mobile-handoff,viewer_page_loaded,{}
+2026-11-05T08:06:03.801+00:00,160517-mobile-handoff,viewer_authenticated,{}
+2026-11-05T08:06:03.865+00:00,160517-mobile-handoff,viewer_auth_error,{}
+2026-11-05T08:06:04.757+00:00,160517-mobile-handoff,viewer_connected,{}
+2026-11-05T08:06:06.958+00:00,160517-mobile-handoff,viewer_first_frame,{}
+2026-11-05T08:06:09.750+00:00,160517-mobile-handoff,viewer_shot,"{""tag"": ""B-take-control"", ""first_frame"": true}"
+2026-11-05T08:06:15.231+00:00,160517-mobile-handoff,B_after_release,"{""expected"": ""https://zh.wikipedia.org/wiki/%E4%BA%8C%E5%8D%81%E5%9B%9B%E5%B0%8F%E6%99%82%E5%88%B6"", ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E7%81%A3%E6%91%A9%E5%A4%A9%E5%A4%A7%E6%A8%93%E5%88%97%E8%A1%A8"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:06:18.047+00:00,160517-mobile-handoff,B_clear_only,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E7%81%A3%E6%91%A9%E5%A4%A9%E5%A4%A7%E6%A8%93%E5%88%97%E8%A1%A8"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:06:20.530+00:00,160517-mobile-handoff,B_override_zero,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E7%81%A3%E6%91%A9%E5%A4%A9%E5%A4%A7%E6%A8%93%E5%88%97%E8%A1%A8"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:06:25.234+00:00,160517-mobile-handoff,B_override_then_clear,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E7%81%A3%E6%91%A9%E5%A4%A9%E5%A4%A7%E6%A8%93%E5%88%97%E8%A1%A8"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:06:27.485+00:00,160517-mobile-handoff,B_after_detach,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E7%81%A3%E6%91%A9%E5%A4%A9%E5%A4%A7%E6%A8%93%E5%88%97%E8%A1%A8"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:06:28.011+00:00,160517-mobile-handoff,session_stopped,{}
+2026-11-05T08:07:01.372+00:00,160651-mobile-handoff,baseline,"{""toolbar"": 88, ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:07:06.106+00:00,160651-mobile-handoff,emulated,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 "", ""touch"": 5}"
+2026-11-05T08:07:06.684+00:00,160651-mobile-handoff,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:07:06.753+00:00,160651-mobile-handoff,viewer_page_loaded,{}
+2026-11-05T08:07:09.280+00:00,160651-mobile-handoff,viewer_authenticated,{}
+2026-11-05T08:07:09.331+00:00,160651-mobile-handoff,viewer_auth_error,{}
+2026-11-05T08:07:09.826+00:00,160651-mobile-handoff,viewer_connected,{}
+2026-11-05T08:07:11.003+00:00,160651-mobile-handoff,viewer_first_frame,{}
+2026-11-05T08:07:13.836+00:00,160651-mobile-handoff,viewer_shot,"{""tag"": ""A-keep-automation"", ""first_frame"": true}"
+2026-11-05T08:07:17.917+00:00,160651-mobile-handoff,A_tap,"{""target"": {""x"": 300, ""y"": 600}, ""taps"": [[300, 601, ""touch""]], ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101""}"
+2026-11-05T08:07:20.871+00:00,160651-mobile-handoff,A_cleared,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:07:26.705+00:00,160651-mobile-handoff,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:07:26.713+00:00,160651-mobile-handoff,viewer_disconnect,{}
+2026-11-05T08:07:26.713+00:00,160651-mobile-handoff,viewer_disconnect,{}
+2026-11-05T08:07:26.749+00:00,160651-mobile-handoff,viewer_page_loaded,{}
+2026-11-05T08:07:27.208+00:00,160651-mobile-handoff,viewer_authenticated,{}
+2026-11-05T08:07:27.253+00:00,160651-mobile-handoff,viewer_auth_error,{}
+2026-11-05T08:07:27.581+00:00,160651-mobile-handoff,viewer_connected,{}
+2026-11-05T08:07:28.521+00:00,160651-mobile-handoff,viewer_first_frame,{}
+2026-11-05T08:07:31.214+00:00,160651-mobile-handoff,viewer_shot,"{""tag"": ""B-take-control"", ""first_frame"": true}"
+2026-11-05T08:07:36.716+00:00,160651-mobile-handoff,B_tap,"{""target"": {""x"": 300, ""y"": 600}, ""taps"": [[300, 601, ""touch""]], ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:07:39.309+00:00,160651-mobile-handoff,B_clear_only,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:07:41.734+00:00,160651-mobile-handoff,B_override_zero,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:07:45.126+00:00,160651-mobile-handoff,B_override_then_clear,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:07:49.408+00:00,160651-mobile-handoff,B_after_detach,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:07:50.064+00:00,160651-mobile-handoff,session_stopped,{}
+2026-11-05T08:11:21.525+00:00,161113-mobile-handoff,baseline,"{""toolbar"": 88, ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:11:30.148+00:00,161113-mobile-handoff,emulated,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 "", ""touch"": 5}"
+2026-11-05T08:11:30.511+00:00,161113-mobile-handoff,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:11:30.580+00:00,161113-mobile-handoff,viewer_page_loaded,{}
+2026-11-05T08:11:31.024+00:00,161113-mobile-handoff,viewer_authenticated,{}
+2026-11-05T08:11:31.074+00:00,161113-mobile-handoff,viewer_auth_error,{}
+2026-11-05T08:11:31.445+00:00,161113-mobile-handoff,viewer_connected,{}
+2026-11-05T08:11:32.637+00:00,161113-mobile-handoff,viewer_first_frame,{}
+2026-11-05T08:11:35.450+00:00,161113-mobile-handoff,viewer_shot,"{""tag"": ""A-keep-automation"", ""first_frame"": true}"
+2026-11-05T08:11:39.521+00:00,161113-mobile-handoff,A_tap,"{""target"": {""x"": 300, ""y"": 600}, ""taps"": [[300, 601, ""touch""]], ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101""}"
+2026-11-05T08:11:47.879+00:00,161113-mobile-handoff,A_cleared,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:11:51.001+00:00,161113-mobile-handoff,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:11:51.005+00:00,161113-mobile-handoff,viewer_disconnect,{}
+2026-11-05T08:11:51.066+00:00,161113-mobile-handoff,viewer_page_loaded,{}
+2026-11-05T08:11:51.458+00:00,161113-mobile-handoff,viewer_authenticated,{}
+2026-11-05T08:11:51.504+00:00,161113-mobile-handoff,viewer_auth_error,{}
+2026-11-05T08:11:51.894+00:00,161113-mobile-handoff,viewer_connected,{}
+2026-11-05T08:11:52.781+00:00,161113-mobile-handoff,viewer_first_frame,{}
+2026-11-05T08:11:55.524+00:00,161113-mobile-handoff,viewer_shot,"{""tag"": ""B-take-control"", ""first_frame"": true}"
+2026-11-05T08:12:00.762+00:00,161113-mobile-handoff,B_tap,"{""target"": {""x"": 300, ""y"": 600}, ""taps"": [[300, 601, ""touch""]], ""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:12:05.809+00:00,161113-mobile-handoff,B_clear_only,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:12:07.711+00:00,161113-mobile-handoff,B_override_zero,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 412, ""innerHeight"": 915, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:12:10.909+00:00,161113-mobile-handoff,B_override_then_clear,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:12:12.858+00:00,161113-mobile-handoff,B_after_detach,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""touch"": 0}"
+2026-11-05T08:12:14.754+00:00,161113-mobile-handoff,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:12:14.757+00:00,161113-mobile-handoff,viewer_disconnect,{}
+2026-11-05T08:12:14.757+00:00,161113-mobile-handoff,viewer_disconnect,{}
+2026-11-05T08:12:14.788+00:00,161113-mobile-handoff,viewer_page_loaded,{}
+2026-11-05T08:12:15.350+00:00,161113-mobile-handoff,viewer_authenticated,{}
+2026-11-05T08:12:15.489+00:00,161113-mobile-handoff,viewer_auth_error,{}
+2026-11-05T08:12:15.843+00:00,161113-mobile-handoff,viewer_connected,{}
+2026-11-05T08:12:16.859+00:00,161113-mobile-handoff,viewer_first_frame,{}
+2026-11-05T08:12:19.607+00:00,161113-mobile-handoff,viewer_shot,"{""tag"": ""C-take-control"", ""first_frame"": true}"
+2026-11-05T08:12:27.541+00:00,161113-mobile-handoff,C_server_saw_during_takeover,"{""url"": ""https://httpbin.org/headers"", ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, l"", ""ch_mobile"": ""?0"", ""ch_platform"": ""\""Linux\""""}"
+2026-11-05T08:12:27.881+00:00,161113-mobile-handoff,session_stopped,{}
+2026-11-05T08:38:35.800+00:00,163819-window-bounds,window_before,"{""windowId"": 1178926263, ""bounds"": {""left"": 0, ""top"": 0, ""width"": 1599, ""height"": 999, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""outerWidth"": 1599, ""outerHeight"": 999, ""screenX"": 0, ""screenY"": 0}}"
+2026-11-05T08:38:37.368+00:00,163819-window-bounds,window_resized,"{""error"": null, ""bounds"": {""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 500, ""innerHeight"": 916, ""outerWidth"": 500, ""outerHeight"": 1003, ""screenX"": 0, ""screenY"": 0}}"
+2026-11-05T08:38:37.373+00:00,163819-window-bounds,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:38:42.132+00:00,163819-window-bounds,viewer_shot,"{""tag"": ""1-resized"", ""first_frame"": true}"
+2026-11-05T08:38:54.774+00:00,163819-window-bounds,tabs_opened,"{""tabs"": [{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal"", ""windowId"": 1178926263}, {""url"": ""https://zh.wikipedia.org/wiki/1"", ""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal"", ""windowId"": 1178926263}, {""url"": ""https://zh.wikipedia.org/wiki/2"", ""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal"", ""windowId"": 1178926263}, {""url"": ""https://zh.wikipedia.org/wiki/3"", ""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal"", ""windowId"": 1178926263}, {""url"": ""https://zh.wikipedia.org/wiki/4"", ""left"": 0, ""top"": 0, ""width"": 1456, ""height"": 853, ""windowState"": ""normal"", ""windowId"": 1178926269}]}"
+2026-11-05T08:38:54.778+00:00,163819-window-bounds,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:38:59.667+00:00,163819-window-bounds,viewer_shot,"{""tag"": ""2-tabs-crop"", ""first_frame"": true}"
+2026-11-05T08:38:59.668+00:00,163819-window-bounds,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:39:04.483+00:00,163819-window-bounds,viewer_shot,"{""tag"": ""3-tabs-full"", ""first_frame"": true}"
+2026-11-05T08:39:07.612+00:00,163819-window-bounds,window_restored,"{""error"": null, ""bounds"": {""left"": 0, ""top"": 0, ""width"": 1599, ""height"": 999, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""outerWidth"": 1599, ""outerHeight"": 999, ""screenX"": 0, ""screenY"": 0}}"
+2026-11-05T08:39:07.617+00:00,163819-window-bounds,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:39:12.688+00:00,163819-window-bounds,viewer_shot,"{""tag"": ""4-restored"", ""first_frame"": true}"
+2026-11-05T08:39:12.929+00:00,163819-window-bounds,session_stopped,{}
+2026-11-05T08:39:44.203+00:00,163936-window-bounds,window_before,"{""windowId"": 1222947446, ""bounds"": {""left"": 0, ""top"": 0, ""width"": 1599, ""height"": 999, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""outerWidth"": 1599, ""outerHeight"": 999, ""screenX"": 0, ""screenY"": 0}}"
+2026-11-05T08:39:45.717+00:00,163936-window-bounds,window_resized,"{""error"": null, ""bounds"": {""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 500, ""innerHeight"": 916, ""outerWidth"": 500, ""outerHeight"": 1003, ""screenX"": 0, ""screenY"": 0}}"
+2026-11-05T08:39:45.729+00:00,163936-window-bounds,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:39:50.446+00:00,163936-window-bounds,viewer_shot,"{""tag"": ""1-resized"", ""first_frame"": true}"
+2026-11-05T08:39:56.812+00:00,163936-window-bounds,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:40:01.294+00:00,163936-window-bounds,viewer_shot,"{""tag"": ""2-tabs-crop"", ""first_frame"": true}"
+2026-11-05T08:40:06.160+00:00,163936-window-bounds,popup_resized,"{""bounds"": {""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/4"", ""innerWidth"": 500, ""innerHeight"": 968, ""outerWidth"": 500, ""outerHeight"": 1003, ""screenX"": 0, ""screenY"": 0}}"
+2026-11-05T08:40:07.746+00:00,163936-window-bounds,tabs_opened,"{""tabs"": [{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal"", ""windowId"": 1222947446}, {""url"": ""https://zh.wikipedia.org/wiki/1"", ""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal"", ""windowId"": 1222947446}, {""url"": ""https://zh.wikipedia.org/wiki/2"", ""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal"", ""windowId"": 1222947446}, {""url"": ""https://zh.wikipedia.org/wiki/3"", ""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal"", ""windowId"": 1222947446}, {""url"": ""https://zh.wikipedia.org/wiki/4"", ""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal"", ""windowId"": 1222947452}]}"
+2026-11-05T08:40:07.749+00:00,163936-window-bounds,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:40:12.226+00:00,163936-window-bounds,viewer_shot,"{""tag"": ""3-popup-crop"", ""first_frame"": true}"
+2026-11-05T08:40:13.334+00:00,163936-window-bounds,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:40:17.814+00:00,163936-window-bounds,viewer_shot,"{""tag"": ""4-popup-closed-crop"", ""first_frame"": true}"
+2026-11-05T08:40:19.859+00:00,163936-window-bounds,window_restored,"{""error"": null, ""bounds"": {""left"": 0, ""top"": 0, ""width"": 1599, ""height"": 999, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912, ""outerWidth"": 1599, ""outerHeight"": 999, ""screenX"": 0, ""screenY"": 0}}"
+2026-11-05T08:40:19.861+00:00,163936-window-bounds,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:40:24.916+00:00,163936-window-bounds,viewer_shot,"{""tag"": ""5-restored"", ""first_frame"": true}"
+2026-11-05T08:40:25.130+00:00,163936-window-bounds,session_stopped,{}
+2026-11-05T08:45:43.380+00:00,164530-window-ua,main_emulated,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 500, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""touch"": 5, ""coarse"": true, ""mobile"": true}"
+2026-11-05T08:45:43.652+00:00,164530-window-ua,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:45:52.314+00:00,164530-window-ua,tab_first_load,"{""server"": {""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"", ""ch_mobile"": ""?0"", ""ch_platform"": ""\""Linux\""""}, ""page"": {""url"": ""https://httpbin.org/headers?tab"", ""innerWidth"": 500, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""touch"": 5, ""coarse"": true, ""mobile"": true}}"
+2026-11-05T08:45:52.887+00:00,164530-window-ua,tab_reload,"{""server"": {""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""ch_mobile"": ""?1"", ""ch_platform"": ""\""Android\""""}}"
+2026-11-05T08:45:55.355+00:00,164530-window-ua,pop_first_load,"{""server"": {""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"", ""ch_mobile"": ""?0"", ""ch_platform"": ""\""Linux\""""}, ""page"": {""url"": ""https://httpbin.org/headers?popup"", ""innerWidth"": 500, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""touch"": 5, ""coarse"": true, ""mobile"": true}}"
+2026-11-05T08:45:55.956+00:00,164530-window-ua,pop_reload,"{""server"": {""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""ch_mobile"": ""?1"", ""ch_platform"": ""\""Android\""""}}"
+2026-11-05T08:45:55.958+00:00,164530-window-ua,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:46:03.258+00:00,164530-window-ua,restored,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"", ""touch"": 0, ""coarse"": false, ""mobile"": false}"
+2026-11-05T08:46:03.622+00:00,164530-window-ua,session_stopped,{}
+2026-11-05T08:46:40.302+00:00,164628-window-ua,main_emulated,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 500, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""touch"": 5, ""coarse"": true, ""mobile"": true}"
+2026-11-05T08:46:40.543+00:00,164628-window-ua,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:46:49.303+00:00,164628-window-ua,tab_first_load,"{""server"": {""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""ch_mobile"": ""?0"", ""ch_platform"": ""\""Linux\""""}, ""page"": {""url"": ""https://httpbin.org/headers?tab"", ""innerWidth"": 500, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""touch"": 5, ""coarse"": true, ""mobile"": true}}"
+2026-11-05T08:46:49.965+00:00,164628-window-ua,tab_reload,"{""server"": {""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""ch_mobile"": ""?1"", ""ch_platform"": ""\""Android\""""}}"
+2026-11-05T08:46:52.156+00:00,164628-window-ua,pop_first_load,"{""server"": {""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""ch_mobile"": ""?0"", ""ch_platform"": ""\""Linux\""""}, ""page"": {""url"": ""https://httpbin.org/headers?popup"", ""innerWidth"": 500, ""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""touch"": 5, ""coarse"": true, ""mobile"": true}}"
+2026-11-05T08:46:52.889+00:00,164628-window-ua,pop_reload,"{""server"": {""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebK"", ""ch_mobile"": ""?1"", ""ch_platform"": ""\""Android\""""}}"
+2026-11-05T08:46:52.893+00:00,164628-window-ua,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T08:47:01.222+00:00,164628-window-ua,restored,"{""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""ua"": ""Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36"", ""touch"": 0, ""coarse"": false, ""mobile"": false}"
+2026-11-05T08:47:01.544+00:00,164628-window-ua,session_stopped,{}
+2026-11-05T09:41:47.936+00:00,174136-window-takecontrol,resized,"{""bounds"": {""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 500, ""innerHeight"": 916}}"
+2026-11-05T09:41:48.276+00:00,174136-window-takecontrol,take_control,"{""stream"": ""DISABLED""}"
+2026-11-05T09:41:48.546+00:00,174136-window-takecontrol,viewer_requested,"{""ua"": ""Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/156.0.8078.4 Mobile Safari/537.36""}"
+2026-11-05T09:41:55.763+00:00,174136-window-takecontrol,during_shot,"{""first_frame"": true}"
+2026-11-05T09:41:56.861+00:00,174136-window-takecontrol,after_release,"{""bounds"": {""left"": 0, ""top"": 0, ""width"": 500, ""height"": 1003, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 500, ""innerHeight"": 916}}"
+2026-11-05T09:41:57.389+00:00,174136-window-takecontrol,restored,"{""bounds"": {""left"": 0, ""top"": 0, ""width"": 1599, ""height"": 999, ""windowState"": ""normal""}, ""page"": {""url"": ""https://zh.wikipedia.org/wiki/%E5%8F%B0%E5%8C%97101"", ""innerWidth"": 1599, ""innerHeight"": 912}}"
+2026-11-05T09:41:58.039+00:00,174136-window-takecontrol,session_stopped,{}

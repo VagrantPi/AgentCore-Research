@@ -30,10 +30,13 @@ const report = (name, extra = {}) =>
 const status = (text) => { document.getElementById('status').textContent = text; };
 
 const display = document.getElementById('dcv-display');
+// ?crop=412x915：遠端頁面用 CDP 模擬手機時只畫在左上角那一塊，只放大那一塊到滿寬（mobile_handoff.py）
+const crop = new URLSearchParams(location.search).get('crop')?.split('x').map(Number);
 const fit = (w, h) => {
-  const scale = window.innerWidth / w;
+  const [cw, ch] = crop ?? [w, h];
+  const scale = window.innerWidth / cw;
   Object.assign(display.style, { width: `${w}px`, height: `${h}px`, transform: `scale(${scale})` });
-  document.getElementById('wrap').style.height = `${h * scale}px`;
+  document.getElementById('wrap').style.height = `${ch * scale}px`;
 };
 fit(config.width, config.height);
 

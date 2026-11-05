@@ -79,6 +79,70 @@ curl -X POST localhost:8765/stop
 - 費用：19 個 session（含第 1 輪、除錯與卡住的）共 6,403 秒，`USAGE_LOGS` 實測 **$0.136**。
 - 清理：Browser `wp6_viewport`、delivery source／delivery 已刪。
 
+## 接手時才切手機版（`mobile_handoff.py`，2026-11-05）
+
+hephagent 的 Nova Act 要 1600×1000，整個 session 改手機尺寸會影響自動化。改成：session 維持 1600×1000，接手前用 CDP 模擬 Pixel 7（412×915、Android UA、touch），viewer 加 `?crop=412x1003` 只放大左上角那一塊。本機 Chromium（Pixel 7 尺寸）開 viewer 代替手機，系統 browser，東京。
+
+| 項目 | 結果 | 證據 |
+|---|---|---|
+| 模擬後頁面 | `innerWidth` 412、Android UA、`maxTouchPoints` 5，網站排成手機版 | `results.csv` 的 `emulated` |
+| 裁切放大後的 Live View | 手機版、字看得清楚。**串流含 Chrome 分頁列＋網址列 88 px**，裁切高度要 915＋88 | [`handoff-A-keep-automation.png`](handoff-A-keep-automation.png) |
+| 點擊座標（不 take_control） | 目標 (300, 600) → 頁面收到 (300, 601)，`pointerType: touch` | `A_tap` |
+| 點擊座標（take_control 後） | 同上，(300, 601) | `B_tap` |
+| 交還後清模擬（同一條 CDP 連線） | `clearDeviceMetricsOverride` 後回到 1599 寬、桌面 UA | `A_cleared` |
+| 交還後清模擬（take_control 切斷舊連線後重連） | **UA／touch 自動消失，但 412 寬殘留**；新連線直接 `clear` 清不掉，要先 `setDeviceMetricsOverride` 再 `clear` 才回到 1599 | `B_clear_only`、`B_override_then_clear` |
+
+| take_control 期間網站收到的 UA | **桌面版**：接手中在 viewer 點進 `httpbin.org/headers`，伺服器收到 `X11; Linux x86_64`、`Sec-CH-UA-Mobile: ?0`。UA／touch 在 CDP 斷線那一刻就掉了，只剩 412 寬 | `C_server_saw_during_takeover`、[`handoff-C-during.png`](handoff-C-during.png) |
+
+結論：方案可行，但兩條路效果不同。
+- **take_control（現行流程）**：接手期間只剩 412 寬，看 CSS 寬度的 RWD 網站是手機版；看 UA／client hints 的網站給桌面版。交還後要「先 `setDeviceMetricsOverride` 再 `clear`」清殘留寬度。
+- **不切 automation stream**（hephagent `BROWSER_HANDOFF_KEEP_AUTOMATION`）：UA、touch、寬度整段都在，交還時同一條連線 `clear` 就乾淨。
+
+費用：3 個 session 各約 1 分鐘，系統 browser 以秒數估 < $0.01。
+
+## 改成縮 Chrome 視窗（`window_bounds.py`，2026-11-05）
+
+裁網頁區域的做法，新分頁的分頁列、彈出視窗、Chrome 右上角的提示都會落在裁切範圍外。改用 CDP `Browser.setWindowBounds` 把 Chrome 視窗本身縮到左上角，viewer 裁同一塊。
+
+| 項目 | 結果 | 證據 |
+|---|---|---|
+| AgentCore 允許改視窗大小 | 可以，`windowState` 本來就是 `normal`，設完 `innerWidth` 跟著變 | `results.csv` 的 `window_resized` |
+| 最小寬度 | **Chrome 視窗最小 500**：要 412 會被拉到 500，所以裁 500×1003 | 同上 |
+| 新分頁（`target=_blank`） | 開在同一個視窗、本來就 500 寬；4 個分頁都看得到、都有 ×；網址列、⋮ 選單完整 | [`window-2-tabs-crop.png`](window-2-tabs-crop.png) |
+| 彈出視窗（`window.open` 帶尺寸） | 另開一個 1456×853 的視窗蓋住整個桌面；對它的 window 一樣 `setWindowBounds` 縮到 500×1003 後完整看得到 | [`window-3-popup-crop.png`](window-3-popup-crop.png) |
+| 彈出視窗關掉 | 回到主視窗，4 個分頁都在 | [`window-4-popup-closed-crop.png`](window-4-popup-closed-crop.png) |
+| 交還 | `setWindowBounds` 回 1600×1000，`innerWidth` 回 1599 | `window_restored` |
+
+注意：
+- 只縮視窗不改 UA：網站拿到桌面 UA，看寬度的 RWD 會排窄版（維基仍是桌面版的窄排、底部有橫向捲軸）。要手機版還是得對每個分頁加 `setUserAgentOverride`／touch（新分頁在 `context.on("page")` 補）——本輪沒測。
+- 彈出視窗沒有分頁列，**使用者無法自己關掉**；通常由網站（OAuth、3DS）自己關。
+- 縮視窗與縮彈出視窗都要 CDP 連線還在，只適用不切 automation stream 的接手。
+
+## 縮視窗＋UA／touch（`window_ua.py`，2026-11-05）
+
+縮視窗 500×1003 之外，每個分頁 `Emulation.setUserAgentOverride`（含 `userAgentMetadata` mobile）＋`setTouchEmulationEnabled`；新分頁、彈出視窗在 `context.on("page")` 補。新頁開 `httpbin.org/headers` 看伺服器**第一個請求**收到什麼。
+
+| 項目 | 結果 | 證據 |
+|---|---|---|
+| 主分頁 | Android UA、`maxTouchPoints` 5、`pointer: coarse`、`userAgentData.mobile`，維基變手機版、沒有橫向捲軸、Chrome 工具列完整 | [`window-ua-1-main.png`](window-ua-1-main.png) |
+| 新分頁／彈出視窗第一個請求（只靠 `on("page")`） | **桌面 UA**（`X11`、`?0`、`"Linux"`）：`on("page")` 觸發時第一個請求已送出；重新整理後才是手機 | `results.csv` 的 `tab_first_load`、`pop_first_load` |
+| 加 `context.route` 改寫 `user-agent` header | 第一個請求就是 Android UA；但 **`Sec-CH-UA-Mobile`／`-Platform` 改不掉**（仍 `?0`／`"Linux"`，Chrome 在攔截之後才加），要到第二個請求才一致 | 同上（第二輪） |
+| 交還 | 清模擬、關新頁、視窗回 1600×1000：1599 寬、桌面 UA、touch 0 | `restored` |
+
+注意：
+- 第一個請求 UA 說 Android、client hints 說 Linux，指紋不一致；看 UA 排版的網站沒影響，嚴格的反機器人可能起疑。登入／3DS 彈窗不能靠重新整理補（一次性網址、POST）。
+- hephagent 接手期間的 passthrough（`workspace-browser-agent-network.js:163`）原則是「不讀 header」；改寫 UA 要讀 `request.headers()` 再整包送回，跟 PCI 那條原則衝突，要先講好。
+
+## 縮視窗撐不撐得過 take_control（`window_takecontrol.py`，2026-11-05）
+
+| 項目 | 結果 | 證據 |
+|---|---|---|
+| 縮到 500×1003 後 take_control（stream `DISABLED`、CDP 斷） | 接手期間視窗維持 500 寬，Live View 是窄版排版 | [`window-tc-during.png`](window-tc-during.png) |
+| release_control 後重連 | bounds 仍 500×1003、`innerWidth` 500：視窗大小是瀏覽器狀態，不綁 CDP 連線 | `results.csv` 的 `after_release` |
+| 從新連線縮回 | 1599×999、`innerWidth` 1599 | `restored` |
+
+結論：兩條接手路（take_control、keepAutomation）都能用「接手前縮視窗、交還後縮回」；不碰任何請求。take_control 那條只是沒有手機 UA／touch。
+
 ## 實作時要做的事
 
 1. **viewer 上要有自己的輸入框**，把 `keydown`／`keyup` 轉給 `connection.sendKeyboardEvent`；輸入法選字中（`isComposing`）的按鍵不轉，`compositionend` 拿到的字串逐字送，事件之間留間隔。
